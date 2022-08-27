@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SMUBE
+namespace SMUBE.SMUBESimulator
 {
-    internal class Simulator
+    public class Simulator
     {
     }
 }

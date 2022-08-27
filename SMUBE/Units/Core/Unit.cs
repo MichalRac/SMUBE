@@ -1,13 +1,13 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Units.Core
+namespace SMUBE.Units.Core
 {
-    internal class Unit
+    [Serializable]
+    public class Unit
     {
         public string name;
         public int health;

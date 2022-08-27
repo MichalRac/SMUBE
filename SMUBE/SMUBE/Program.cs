@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SMUBE.Core
+namespace SMUBE
 {
     internal class Program
     {

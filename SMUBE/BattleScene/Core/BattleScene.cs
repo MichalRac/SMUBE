@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BattleScene.Core
+namespace SMUBE.BattleScene.Core
 {
-    internal class BattleScene
+    public class BattleScene
     {
     }
 }

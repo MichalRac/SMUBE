@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Units.Core
+namespace SMUBE.Units.Skills
 {
-    internal class Skill
+    public class Skill
     {
         public int id;
         public string name;

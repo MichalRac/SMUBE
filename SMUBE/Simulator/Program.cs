@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SMUBE.BattleScene.Data
+namespace SMUBE_Utils.Simulator
 {
-    public class BattleSceneData
+    internal class Program
     {
+        static void Main(string[] args)
+        {
+        }
     }
 }

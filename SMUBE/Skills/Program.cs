@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SMUBE.Units.Skills
+namespace SMUBE.Skills
 {
-    public class Skill
+    internal class Program
     {
-        public int id;
-        public string name;
+        static void Main(string[] args)
+        {
+        }
     }
 }

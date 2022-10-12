@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace SMUBE.BattleScene
 {
-    internal class Program
+    public class BattleScene
     {
-        static void Main(string[] args)
-        {
-        }
+        public string id = "0";
+        public string name = "debug_scene";
+        public const int MAX_UNITS = 6;
     }
 }

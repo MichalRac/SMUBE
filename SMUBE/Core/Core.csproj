@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7F1AFEE9-E609-4721-A476-C5511A3DF931}</ProjectGuid>
+    <ProjectGuid>{871BA149-C9D1-4154-9DDB-905A8C587EE4}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SMUBE.BattleScene</RootNamespace>
-    <AssemblyName>SMUBE.BattleScene</AssemblyName>
+    <RootNamespace>SMUBE.Core</RootNamespace>
+    <AssemblyName>SMUBE.Core</AssemblyName>
     <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -46,7 +46,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BattleScene.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -49,5 +49,31 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AI\AI.csproj">
+      <Project>{b4dc9703-eec3-44c5-9fa4-2f7ea8fb405b}</Project>
+      <Name>AI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BattleScene\BattleScene.csproj">
+      <Project>{7f1afee9-e609-4721-a476-c5511a3df931}</Project>
+      <Name>BattleScene</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Commands\Commands.csproj">
+      <Project>{7ccd401e-0eb6-46f7-ba56-a062dcd5c50e}</Project>
+      <Name>Commands</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{871ba149-c9d1-4154-9ddb-905a8c587ee4}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataStructures\DataStructures.csproj">
+      <Project>{31088efc-60a4-4dfe-8789-32e232387425}</Project>
+      <Name>DataStructures</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Units\Units.csproj">
+      <Project>{81204ae4-e72b-440f-8dd7-fc33f092e076}</Project>
+      <Name>Units</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

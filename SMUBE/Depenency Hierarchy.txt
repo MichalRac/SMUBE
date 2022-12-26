@@ -1,0 +1,12 @@
+   Simulator <- Tests
+    V V V V V V V V
+
+           Core
+       V         V
+     Units  <-  Battle Scene
+     V       _\|
+   Commands <-  AI
+
+
+     V V V V V V V V
+     Data Structures

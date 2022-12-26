@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SMUBE.DataStructures;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,10 @@ namespace SMUBE.Units
 {
     public class Unit
     {
-        public int HP { get; private set; } = UnitConsts.DEFAULT_HP;
-
+        public UnitIdentifier UnitIdentifier { get; private set; }
+        public Unit(int id, int teamId)
+        {
+            UnitIdentifier = new UnitIdentifier(id, teamId);
+        }
     }
 }

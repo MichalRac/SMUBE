@@ -1,0 +1,13 @@
+Villager
+	Squire
+		Sellsword
+		Guard?
+		Knight
+	Scholar
+		GeneralBuffer
+		Mage
+		Cleric
+	Hunter
+		Ranger
+		Rogue
+		Thief

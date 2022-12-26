@@ -58,6 +58,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\Unit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStructures", "DataStructures\DataStructures.csproj", "{31088EFC-60A4-4DFE-8789-32E232387425}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0B6737D9-EE6C-40D6-B0D2-C938457A2EBF}"
+	ProjectSection(SolutionItems) = preProject
+		CharacterTypeHierarchy.txt = CharacterTypeHierarchy.txt
+		Depenency Hierarchy.txt = Depenency Hierarchy.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -47,7 +47,7 @@ namespace SMUBE.Core
             return teamUnits;
         }
 
-        public bool GetUnit(UnitIdentifier unitIdentifier, out Unit result)
+        public bool TryGetUnit(UnitIdentifier unitIdentifier, out Unit result)
         {
             result = null;
 

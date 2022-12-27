@@ -176,8 +176,8 @@ namespace SMUBE_Utils.UnitTests
             battleCore.TryAddUnit(unit3);
             battleCore.TryAddUnit(unit4);
             var incorrectIdentifier = new UnitIdentifier(100, 100);
-            var fail1 = battleCore.GetUnit(incorrectIdentifier, out var fetchedFalseUnit);
-            var success1 = battleCore.GetUnit(unit3.UnitIdentifier, out var fetchedUnit3);
+            var fail1 = battleCore.TryGetUnit(incorrectIdentifier, out var fetchedFalseUnit);
+            var success1 = battleCore.TryGetUnit(unit3.UnitIdentifier, out var fetchedUnit3);
 
 
             Assert.IsFalse(fail1);

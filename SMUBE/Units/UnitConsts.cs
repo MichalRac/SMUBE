@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SMUBE.DataStructures;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,8 @@ namespace SMUBE.Units
 {
     internal class UnitConsts
     {
-        public const int DEFAULT_HP = 100;
+        public static UnitInfo SquireInfo = new UnitInfo("Squire", 100, 100, 0, 20, 10);
+        public static UnitInfo ScholarInfo = new UnitInfo("Scholar", 50, 25, 100, 5, 15);
+        public static UnitInfo HunterInfo = new UnitInfo("Hunter", 75, 75, 25, 10, 20);
     }
 }

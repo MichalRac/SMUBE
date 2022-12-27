@@ -10,57 +10,16 @@ namespace SMUBE.Core
 {
     public class BattleCore
     {
-        public List<Unit> Units { get; private set; } = new List<Unit>();
+        public BattleStateModel currentStateModel { get; private set; }
 
-        public bool TryAddUnit(Unit argUnit)
+        public BattleCore(List<Unit> initialUnits) 
         {
-            if(!Units.Contains(argUnit))
+            if(initialUnits == null || initialUnits.Count == 0)
             {
-                Units.Add(argUnit);
-                return true;
+                throw new ArgumentException(nameof(initialUnits), $"Cannot construct object of type {nameof(BattleCore)} with empty or null list of initial units");
             }
 
-            return false;
-        }
-
-        public bool TryRemoveUnit(Unit argUnit)
-        {
-            if (Units.Contains(argUnit))
-            {
-                Units.Remove(argUnit);
-                return true;
-            }
-
-            return false;
-        }
-
-        public List<Unit> GetTeamUnits(int teamId)
-        {
-            var teamUnits = new List<Unit>();
-            foreach (var unit in Units)
-            {
-                if(unit.UnitIdentifier.TeamId == teamId)
-                {
-                    teamUnits.Add(unit);
-                }
-            }
-            return teamUnits;
-        }
-
-        public bool TryGetUnit(UnitIdentifier unitIdentifier, out Unit result)
-        {
-            result = null;
-
-            foreach (var unit in Units)
-            {
-                if(unit.UnitIdentifier == unitIdentifier)
-                {
-                    result = unit;
-                    return true;
-                }
-            }
-
-            return false;
+            currentStateModel = new BattleStateModel(initialUnits);
         }
     }
 }

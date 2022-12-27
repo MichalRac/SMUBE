@@ -46,11 +46,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CharacterTypes\ICharacterType.cs" />
+    <Compile Include="CharacterTypes\BaseCharacter.cs" />
+    <Compile Include="CharacterTypes\Hunter.cs" />
+    <Compile Include="CharacterTypes\Scholar.cs" />
+    <Compile Include="CharacterTypes\Squire.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Unit.cs" />
     <Compile Include="UnitConsts.cs" />
+    <Compile Include="UnitHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

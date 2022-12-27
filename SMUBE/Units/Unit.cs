@@ -1,4 +1,5 @@
 ﻿using SMUBE.DataStructures;
+using SMUBE.Units.CharacterTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +11,12 @@ namespace SMUBE.Units
     public class Unit
     {
         public UnitIdentifier UnitIdentifier { get; private set; }
-        public Unit(int id, int teamId)
+        public UnitInfo UnitInfo { get; private set; }
+
+        public Unit(int id, int teamId, BaseCharacter baseCharacter)
         {
             UnitIdentifier = new UnitIdentifier(id, teamId);
+            UnitInfo = baseCharacter.UnitInfo;
         }
     }
 }

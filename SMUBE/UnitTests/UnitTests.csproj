@@ -52,6 +52,7 @@
     <Compile Include="BattleSceneTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CommandTests.cs" />
+    <Compile Include="BattleStateModelUnitTests.cs" />
     <Compile Include="CoreUnitTests.cs" />
     <Compile Include="UnitUnitTests.cs" />
   </ItemGroup>

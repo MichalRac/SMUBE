@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SMUBE.DataStructures.Utils
 {
-    sealed public partial class SMUBEVector2<T> : IEquatable<SMUBEVector2<T>> 
+    public partial class SMUBEVector2<T> : IEquatable<SMUBEVector2<T>> 
         where T : IEquatable<T>
     {
         public T x;

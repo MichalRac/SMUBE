@@ -9,6 +9,6 @@ namespace SMUBE.Units.CharacterTypes
 {
     public class Scholar : BaseCharacter
     {
-        public override UnitInfo UnitInfo => UnitConsts.ScholarInfo;
+        public override UnitStats UnitStats => UnitConsts.ScholarInfo;
     }
 }

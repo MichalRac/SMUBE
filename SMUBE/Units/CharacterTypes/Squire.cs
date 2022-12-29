@@ -9,6 +9,6 @@ namespace SMUBE.Units.CharacterTypes
 {
     public class Squire : BaseCharacter
     {
-        public override UnitInfo UnitInfo => UnitConsts.SquireInfo;
+        public override UnitStats UnitStats => UnitConsts.SquireInfo;
     }
 }

@@ -16,15 +16,14 @@ namespace SMUBE_Utils.UnitTests
         public void SetupCore()
         {
             // arrange
+            var teamId0 = 0;
+            var teamId1 = 1;
             var initalUnits = new List<Unit>()
             {
-                new Unit(0, 0, UnitHelper.CreateCharacter<Hunter>()),
-                new Unit(1, 0, UnitHelper.CreateCharacter<Hunter>()),
-                new Unit(2, 0, UnitHelper.CreateCharacter<Hunter>()),
-
-                new Unit(0, 1, UnitHelper.CreateCharacter<Hunter>()),
-                new Unit(1, 1, UnitHelper.CreateCharacter<Hunter>()),
-                new Unit(2, 1, UnitHelper.CreateCharacter<Hunter>()),
+                UnitHelper.CreateUnit<Hunter>(teamId0),
+                UnitHelper.CreateUnit<Scholar>(teamId1),
+                UnitHelper.CreateUnit<Squire>(teamId0),
+                UnitHelper.CreateUnit<Hunter>(teamId1),
             };
 
             // act

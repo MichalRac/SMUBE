@@ -14,20 +14,20 @@ namespace SMUBE_Utils.UnitTests
             var id = 0;
             var teamId = 0;
 
-            var unit = new Unit(id, teamId, UnitHelper.CreateCharacter<Hunter>());
+            var unit = UnitHelper.CreateUnit<Hunter>(teamId);
 
             Assert.IsNotNull(unit);
-            Assert.Equals(unit.UnitIdentifier.Id, id);
-            Assert.Equals(unit.UnitIdentifier.TeamId, teamId);
+            Assert.Equals(unit.UnitData.UnitIdentifier.PersonalId, id);
+            Assert.Equals(unit.UnitData.UnitIdentifier.TeamId, teamId);
 
-            return new Unit(id, teamId, UnitHelper.CreateCharacter<Hunter>());
+            return UnitHelper.CreateUnit<Hunter>(teamId);
         }
 
         [TestMethod]
         public void GetUnitViableCommands()
         {
-            var unit1 = new Unit(0, 0, UnitHelper.CreateCharacter<Hunter>());
-            var unit2 = new Unit(0, 1, UnitHelper.CreateCharacter<Squire>());
+            var unit1 = UnitHelper.CreateUnit<Hunter>(0);
+            var unit2 = UnitHelper.CreateUnit<Squire>(1);
 
             var viableCommands1 = unit1.GetViableCommands();
             var viableCommands2 = unit2.GetViableCommands();

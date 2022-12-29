@@ -23,8 +23,10 @@ namespace SMUBE_Utils.UnitTests
         [TestMethod]
         public void AddUnitToBattleState()
         {
+            var teamId = 0;
             // arrange
-            var newUnit = new Unit(0, 0, UnitHelper.CreateCharacter<Hunter>());
+            var newUnit = UnitHelper.CreateUnit<Hunter>(teamId);
+            //var newUnit = new Unit(0, 0, UnitHelper.CreateCharacter<Hunter>());
 
 
             // act
@@ -39,7 +41,8 @@ namespace SMUBE_Utils.UnitTests
         [TestMethod]
         public void CannotAddSameUnitTwice()
         {
-            var newUnit = new Unit(0, 0, UnitHelper.CreateCharacter<Hunter>());
+            var teamId = 0;
+            var newUnit = UnitHelper.CreateUnit<Hunter>(teamId);
 
 
             battleStateModel.TryAddUnit(newUnit);
@@ -52,8 +55,10 @@ namespace SMUBE_Utils.UnitTests
         [TestMethod]
         public void CanAddMultipleUnits()
         {
-            var unit1 = new Unit(0, 0, UnitHelper.CreateCharacter<Hunter>());
-            var unit2 = new Unit(0, 1, UnitHelper.CreateCharacter<Hunter>());
+            var teamId = 0;
+
+            var unit1 = UnitHelper.CreateUnit<Hunter>(teamId);
+            var unit2 = UnitHelper.CreateUnit<Hunter>(teamId);
 
 
             var successResult1 = battleStateModel.TryAddUnit(unit1);
@@ -68,8 +73,11 @@ namespace SMUBE_Utils.UnitTests
         [TestMethod]
         public void CanRemoveAddedUnit() 
         {
-            var addedUnit = new Unit(0, 0, UnitHelper.CreateCharacter<Hunter>());
-            var notAddedUnit = new Unit(0, 1, UnitHelper.CreateCharacter<Hunter>());
+            var teamId0 = 0;
+            var teamId1 = 1;
+
+            var addedUnit = UnitHelper.CreateUnit<Hunter>(teamId0);
+            var notAddedUnit = UnitHelper.CreateUnit<Hunter>(teamId1);
 
             battleStateModel.TryAddUnit(addedUnit);
             var successResult = battleStateModel.TryRemoveUnit(notAddedUnit);
@@ -84,7 +92,8 @@ namespace SMUBE_Utils.UnitTests
         [TestMethod]
         public void CannotRemoveNotAddedUnit()
         {
-            var newUnit = new Unit(0, 0, UnitHelper.CreateCharacter<Hunter>());
+            var teamId0 = 0;
+            var newUnit = UnitHelper.CreateUnit<Hunter>(teamId0);
 
 
             battleStateModel.TryAddUnit(newUnit);
@@ -99,8 +108,10 @@ namespace SMUBE_Utils.UnitTests
         [TestMethod]
         public void CanRemoveSpecificUnit()
         {
-            var unit1 = new Unit(0, 0, UnitHelper.CreateCharacter<Hunter>());
-            var unit2 = new Unit(0, 1, UnitHelper.CreateCharacter<Hunter>());
+            var teamId0 = 0;
+            var teamId1 = 1;
+            var unit1 = UnitHelper.CreateUnit<Hunter>(teamId0);
+            var unit2 = UnitHelper.CreateUnit<Hunter>(teamId1);
 
 
             battleStateModel.TryAddUnit(unit1);
@@ -115,9 +126,11 @@ namespace SMUBE_Utils.UnitTests
         [TestMethod]
         public void GetUnits()
         {
-            var unit1 = new Unit(0, 0, UnitHelper.CreateCharacter<Hunter>());
-            var unit2 = new Unit(0, 1, UnitHelper.CreateCharacter<Hunter>());
-            var unit3 = new Unit(1, 0, UnitHelper.CreateCharacter<Hunter>());
+            var teamId0 = 0;
+            var teamId1 = 1;
+            var unit1 = UnitHelper.CreateUnit<Hunter>(teamId0);
+            var unit2 = UnitHelper.CreateUnit<Hunter>(teamId0);
+            var unit3 = UnitHelper.CreateUnit<Hunter>(teamId1);
 
 
             battleStateModel.TryAddUnit(unit1);
@@ -138,10 +151,12 @@ namespace SMUBE_Utils.UnitTests
         [TestMethod]
         public void GetUnitsForTeam()
         {
-            var unit1 = new Unit(0, 0, UnitHelper.CreateCharacter<Hunter>());
-            var unit2 = new Unit(1, 0, UnitHelper.CreateCharacter<Hunter>());
-            var unit3 = new Unit(0, 1, UnitHelper.CreateCharacter<Hunter>());
-            var unit4 = new Unit(1, 1, UnitHelper.CreateCharacter<Hunter>());
+            var teamId0 = 0;
+            var teamId1 = 1;
+            var unit1 = UnitHelper.CreateUnit<Hunter>(teamId0);
+            var unit2 = UnitHelper.CreateUnit<Hunter>(teamId0);
+            var unit3 = UnitHelper.CreateUnit<Hunter>(teamId1);
+            var unit4 = UnitHelper.CreateUnit<Hunter>(teamId1);
 
 
             battleStateModel.TryAddUnit(unit1);
@@ -168,10 +183,12 @@ namespace SMUBE_Utils.UnitTests
         [TestMethod]
         public void GetSpecificUnit()
         {
-            var unit1 = new Unit(0, 0, UnitHelper.CreateCharacter<Hunter>());
-            var unit2 = new Unit(1, 0, UnitHelper.CreateCharacter<Hunter>());
-            var unit3 = new Unit(0, 1, UnitHelper.CreateCharacter<Hunter>());
-            var unit4 = new Unit(1, 1, UnitHelper.CreateCharacter<Hunter>());
+            var teamId0 = 0;
+            var teamId1 = 1;
+            var unit1 = UnitHelper.CreateUnit<Hunter>(teamId0);
+            var unit2 = UnitHelper.CreateUnit<Hunter>(teamId1);
+            var unit3 = UnitHelper.CreateUnit<Hunter>(teamId0);
+            var unit4 = UnitHelper.CreateUnit<Hunter>(teamId1);
 
 
             battleStateModel.TryAddUnit(unit1);
@@ -180,7 +197,7 @@ namespace SMUBE_Utils.UnitTests
             battleStateModel.TryAddUnit(unit4);
             var incorrectIdentifier = new UnitIdentifier(100, 100);
             var fail1 = battleStateModel.TryGetUnit(incorrectIdentifier, out var fetchedFalseUnit);
-            var successResult = battleStateModel.TryGetUnit(unit3.UnitIdentifier, out var fetchedUnit3);
+            var successResult = battleStateModel.TryGetUnit(unit3.UnitData.UnitIdentifier, out var fetchedUnit3);
 
 
             Assert.IsFalse(fail1);
@@ -203,10 +220,12 @@ namespace SMUBE_Utils.UnitTests
         [TestMethod]
         public void GetNextActiveUnit()
         {
-            var unit1 = new Unit(0, 0, UnitHelper.CreateCharacter<Hunter>());
-            var unit2 = new Unit(1, 0, UnitHelper.CreateCharacter<Hunter>());
-            var unit3 = new Unit(0, 1, UnitHelper.CreateCharacter<Hunter>());
-            var unit4 = new Unit(1, 1, UnitHelper.CreateCharacter<Hunter>());
+            var teamId0 = 0;
+            var teamId1 = 1;
+            var unit1 = UnitHelper.CreateUnit<Hunter>(teamId0);
+            var unit2 = UnitHelper.CreateUnit<Hunter>(teamId1);
+            var unit3 = UnitHelper.CreateUnit<Hunter>(teamId0);
+            var unit4 = UnitHelper.CreateUnit<Hunter>(teamId1);
 
 
             battleStateModel.TryAddUnit(unit1);
@@ -224,11 +243,13 @@ namespace SMUBE_Utils.UnitTests
         [TestMethod]
         public void GetFullUnitQueue_InitialUnitsOnly()
         {
-            //var unit1 = new Unit(0, 0, UnitHelper.CreateCharacter<Hunter>());
-            var unit2 = new Unit(1, 0, UnitHelper.CreateCharacter<Scholar>());
-            var unit3 = new Unit(0, 1, UnitHelper.CreateCharacter<Squire>());
-            var unit4 = new Unit(1, 1, UnitHelper.CreateCharacter<Hunter>());
-            
+            var teamId0 = 0;
+            var teamId1 = 1;
+            //var unit1 = UnitHelper.CreateUnit<Hunter>(teamId0);
+            var unit2 = UnitHelper.CreateUnit<Scholar>(teamId1);
+            var unit3 = UnitHelper.CreateUnit<Squire>(teamId0);
+            var unit4 = UnitHelper.CreateUnit<Hunter>(teamId1);
+
             List<Unit> units = new List<Unit>
             {
                 unit2,
@@ -250,10 +271,12 @@ namespace SMUBE_Utils.UnitTests
         [TestMethod]
         public void GetFullUnitQueue_AdditionalUnits()
         {
-            var unit1 = new Unit(0, 0, UnitHelper.CreateCharacter<Hunter>());
-            var unit2 = new Unit(1, 0, UnitHelper.CreateCharacter<Scholar>());
-            var unit3 = new Unit(0, 1, UnitHelper.CreateCharacter<Squire>());
-            var unit4 = new Unit(1, 1, UnitHelper.CreateCharacter<Hunter>());
+            var teamId0 = 0;
+            var teamId1 = 1;
+            var unit1 = UnitHelper.CreateUnit<Hunter>(teamId0);
+            var unit2 = UnitHelper.CreateUnit<Scholar>(teamId1);
+            var unit3 = UnitHelper.CreateUnit<Squire>(teamId0);
+            var unit4 = UnitHelper.CreateUnit<Hunter>(teamId1);
             List<Unit> units = new List<Unit>
             {
                 unit3,

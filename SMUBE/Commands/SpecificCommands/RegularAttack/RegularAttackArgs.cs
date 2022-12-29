@@ -1,4 +1,5 @@
-﻿using SMUBE.DataStructures.Units;
+﻿using SMUBE.DataStructures.BattleScene;
+using SMUBE.DataStructures.Units;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace Commands.SpecificCommands.RegularAttack
 {
     public class RegularAttackArgs : CommandArgs
     {
-        public UnitIdentifier UnitTarget { get; private set; }
+        public UnitIdentifier UnitTarget { get; }
+        public BattleSceneState battleSceneState { get; }
     }
 }

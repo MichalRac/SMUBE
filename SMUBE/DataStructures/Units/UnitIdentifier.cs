@@ -6,20 +6,21 @@ using System.Threading.Tasks;
 
 namespace SMUBE.DataStructures.Units
 {
+    [Serializable]
     public class UnitIdentifier : IEquatable<UnitIdentifier>
     {
-        public int Id { get; private set; }
+        public int PersonalId { get; private set; }
         public int TeamId { get; private set; }
 
         public UnitIdentifier(int id, int teamId)
         {
-            Id = id;
+            PersonalId = id;
             TeamId = teamId;
         }
      
         public bool Equals(UnitIdentifier other)
         {
-            return Id == other.Id && TeamId == other.TeamId;
+            return PersonalId == other.PersonalId && TeamId == other.TeamId;
         }
     }
 }

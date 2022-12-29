@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 
 namespace SMUBE.DataStructures.BattleScene
 {
-    public class BattleSceneState
+    public class BattleScenePosition : SMUBEVector2<int>
     {
-        public Dictionary<BattleScenePosition, BattleScenePositionContent> positions = new Dictionary<BattleScenePosition, BattleScenePositionContent>();
+        public BattleScenePosition(int x, int y) : base(x, y)
+        {
+        }
     }
 }

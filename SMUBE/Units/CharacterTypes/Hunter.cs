@@ -10,6 +10,6 @@ namespace SMUBE.Units.CharacterTypes
 {
     public class Hunter : BaseCharacter
     {
-        public override UnitInfo UnitInfo => UnitConsts.HunterInfo;
+        public override UnitStats UnitStats => UnitConsts.HunterInfo;
     }
 }

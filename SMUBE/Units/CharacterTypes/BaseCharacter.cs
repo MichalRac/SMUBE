@@ -9,6 +9,6 @@ namespace SMUBE.Units.CharacterTypes
 {
     public abstract class BaseCharacter
     {
-        public abstract UnitInfo UnitInfo { get; }
+        public abstract UnitStats UnitStats { get; }
     }
 }

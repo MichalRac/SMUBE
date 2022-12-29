@@ -50,7 +50,7 @@ namespace SMUBE.Core
             var teamUnits = new List<Unit>();
             foreach (var unit in Units)
             {
-                if (unit.UnitIdentifier.TeamId == teamId)
+                if (unit.UnitData.UnitIdentifier.TeamId == teamId)
                 {
                     teamUnits.Add(unit);
                 }
@@ -64,7 +64,7 @@ namespace SMUBE.Core
 
             foreach (var unit in Units)
             {
-                if (unit.UnitIdentifier == unitIdentifier)
+                if (unit.UnitData.UnitIdentifier == unitIdentifier)
                 {
                     result = unit;
                     return true;
@@ -79,7 +79,7 @@ namespace SMUBE.Core
         {
             ActionQueue.Clear();
 
-            var unitsBySpeed = Units.OrderByDescending(u => u.UnitInfo.Speed);
+            var unitsBySpeed = Units.OrderByDescending(u => u.UnitData.UnitStats.Speed);
 
             foreach (var unitBySpeed in unitsBySpeed)
             {

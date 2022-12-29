@@ -11,14 +11,15 @@ namespace SMUBE.Units
 {
     public class Unit
     {
-        public UnitIdentifier UnitIdentifier { get; private set; }
-        public UnitInfo UnitInfo { get; private set; }
+        public UnitData UnitData { get; private set; }
 
-        public Unit(int id, int teamId, BaseCharacter baseCharacter)
+        public Unit(UnitData argUnitData)
         {
-            UnitIdentifier = new UnitIdentifier(id, teamId);
-            UnitInfo = baseCharacter.UnitInfo;
+            UnitData = argUnitData;
         }
+
+        public Unit(string argName, UnitIdentifier argUnitIdentifier, UnitStats argUnitStats) 
+            : this(new UnitData(argName, argUnitIdentifier, argUnitStats)) { }
 
         public object GetViableCommands()
         {

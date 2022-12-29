@@ -43,12 +43,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BattleScene\BattleScenePosition.cs" />
+    <Compile Include="BattleScene\BattleScenePositionContent.cs" />
     <Compile Include="BattleScene\BattleSceneState.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Units\UnitData.cs" />
     <Compile Include="Utils\SMUBEVector2.cs" />
     <Compile Include="Units\UnitIdentifier.cs" />
-    <Compile Include="Units\UnitInfo.cs" />
+    <Compile Include="Units\UnitStats.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

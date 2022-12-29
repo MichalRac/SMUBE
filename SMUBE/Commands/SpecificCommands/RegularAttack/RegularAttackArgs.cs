@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SMUBE.Units.CharacterTypes
+namespace Commands.SpecificCommands.RegularAttack
 {
-    public class Scholar : BaseCharacter
+    public class RegularAttackArgs : CommandArgs
     {
-        public override UnitInfo UnitInfo => UnitConsts.ScholarInfo;
+        public UnitIdentifier UnitTarget { get; private set; }
     }
 }

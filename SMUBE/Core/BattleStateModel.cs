@@ -1,4 +1,4 @@
-﻿using SMUBE.DataStructures;
+﻿using SMUBE.DataStructures.Units;
 using SMUBE.Units;
 using System;
 using System.Collections;

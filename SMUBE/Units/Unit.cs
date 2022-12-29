@@ -1,4 +1,5 @@
 ﻿using SMUBE.DataStructures;
+using SMUBE.DataStructures.Units;
 using SMUBE.Units.CharacterTypes;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,11 @@ namespace SMUBE.Units
         {
             UnitIdentifier = new UnitIdentifier(id, teamId);
             UnitInfo = baseCharacter.UnitInfo;
+        }
+
+        public object GetViableCommands()
+        {
+            throw new NotImplementedException();
         }
     }
 }

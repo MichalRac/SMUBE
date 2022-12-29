@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SMUBE.DataStructures
+namespace SMUBE.DataStructures.Units
 {
     public class UnitIdentifier : IEquatable<UnitIdentifier>
     {

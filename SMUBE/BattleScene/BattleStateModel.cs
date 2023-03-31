@@ -1,13 +1,13 @@
-﻿using SMUBE.DataStructures.Units;
+﻿using Commands;
+using SMUBE.DataStructures.Units;
 using SMUBE.Units;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace SMUBE.Core
+namespace SMUBE.BattleState
 {
     public class BattleStateModel
     {
@@ -19,6 +19,11 @@ namespace SMUBE.Core
         {
             Units = units;
             SetupQueue();
+        }
+
+        public bool ExecuteCommand(Unit argUnit, ICommand command)
+        {
+            return true;
         }
 
         public bool TryAddUnit(Unit argUnit)

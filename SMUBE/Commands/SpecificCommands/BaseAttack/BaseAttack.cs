@@ -7,9 +7,15 @@ using System.Threading.Tasks;
 
 namespace Commands.SpecificCommands.BaseAttack
 {
-    public class BaseAttack : Command
+    public class BaseAttack : ICommand
     {
         public CommandId CommandId => CommandId.BaseAttack;
+
+        public bool Execute(CommandArgs commandArgs)
+        {
+            throw new NotImplementedException();
+        }
+
         public CommandResults GetCommandResults(CommandArgs commandArgs)
         {
             if(!commandArgs.CommandArgsValidator.Validate(commandArgs))

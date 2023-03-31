@@ -9,13 +9,13 @@ namespace SMUBE_Utils.UnitTests
         [TestMethod]
         public void CreateBattleScene()
         {
-            var battleScene = new SMUBE.BattleScene.BattleScene();
+            var battleScene = new SMUBE.BattleState.BattleScene();
         }
 
         [TestMethod]
         public void SetupBattleScene()
         {
-            var battleScene = new SMUBE.BattleScene.BattleScene();
+            var battleScene = new SMUBE.BattleState.BattleScene();
         }
     }
 }

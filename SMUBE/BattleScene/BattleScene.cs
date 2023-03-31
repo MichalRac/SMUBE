@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SMUBE.BattleScene
+namespace SMUBE.BattleState
 {
     public class BattleScene
     {

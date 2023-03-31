@@ -43,7 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Command.cs" />
+    <Compile Include="ICommand.cs" />
     <Compile Include="CommandArgs.cs" />
     <Compile Include="CommandArgsValidator.cs" />
     <Compile Include="CommandId.cs" />

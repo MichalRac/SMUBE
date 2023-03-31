@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace Commands
 {
-    public interface Command
+    public interface ICommand
     {
         CommandId CommandId { get; }
+        bool Execute(CommandArgs commandArgs);
         CommandResults GetCommandResults(CommandArgs commandArgs);
     }
 }

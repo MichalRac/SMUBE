@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{7F1AFEE9-E609-4721-A476-C5511A3DF931}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SMUBE.BattleScene</RootNamespace>
-    <AssemblyName>SMUBE.BattleScene</AssemblyName>
+    <RootNamespace>SMUBE.BattleState</RootNamespace>
+    <AssemblyName>SMUBE.BattleState</AssemblyName>
     <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BattleScene.cs" />
+    <Compile Include="BattleStateModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -54,6 +55,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Commands\Commands.csproj">
+      <Project>{7CCD401E-0EB6-46F7-BA56-A062DCD5C50E}</Project>
+      <Name>Commands</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DataStructures\DataStructures.csproj">
       <Project>{31088efc-60a4-4dfe-8789-32e232387425}</Project>
       <Name>DataStructures</Name>

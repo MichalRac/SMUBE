@@ -4,36 +4,21 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B4DC9703-EEC3-44C5-9FA4-2F7EA8FB405B}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>SMUBE.AI</RootNamespace>
-    <AssemblyName>SMUBE.AI</AssemblyName>
+    <ProjectGuid>{6055D86F-31C6-4FD9-9916-A5DAEA12B45B}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>AI</RootNamespace>
+    <AssemblyName>AI</AssemblyName>
     <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\Output\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -47,9 +32,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -61,6 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AIModel.cs" />
+    <Compile Include="RandomAIModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -68,20 +52,21 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\BattleScene\BattleState.csproj">
+      <Project>{7F1AFEE9-E609-4721-A476-C5511A3DF931}</Project>
+      <Name>BattleState</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Commands\Commands.csproj">
-      <Project>{7ccd401e-0eb6-46f7-ba56-a062dcd5c50e}</Project>
+      <Project>{7CCD401E-0EB6-46F7-BA56-A062DCD5C50E}</Project>
       <Name>Commands</Name>
     </ProjectReference>
     <ProjectReference Include="..\DataStructures\DataStructures.csproj">
-      <Project>{31088efc-60a4-4dfe-8789-32e232387425}</Project>
+      <Project>{31088EFC-60A4-4DFE-8789-32E232387425}</Project>
       <Name>DataStructures</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Units\Units.csproj">
+      <Project>{81204AE4-E72B-440F-8DD7-FC33F092E076}</Project>
+      <Name>Units</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

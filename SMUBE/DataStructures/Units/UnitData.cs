@@ -20,5 +20,26 @@ namespace SMUBE.DataStructures.Units
             UnitStats = argUnitStats;
         }
 
+        public override string ToString()
+        {
+            var fullDescribedStatus = new StringBuilder();
+
+            fullDescribedStatus.AppendLine($"Unit name: {Name}");
+            fullDescribedStatus.AppendLine($"Unit team: {UnitIdentifier.TeamId}");
+            fullDescribedStatus.AppendLine(UnitStats.ToString());
+
+            return fullDescribedStatus.ToString();
+        }
+
+        public string ToShortString()
+        {
+            var fullDescribedStatus = new StringBuilder();
+
+            fullDescribedStatus.AppendLine($"Unit name: {Name}");
+            fullDescribedStatus.AppendLine($"Unit team: {UnitIdentifier.TeamId}");
+            fullDescribedStatus.AppendLine(UnitStats.ToShortString());
+
+            return fullDescribedStatus.ToString();
+        }
     }
 }

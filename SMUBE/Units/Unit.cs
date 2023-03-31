@@ -14,9 +14,9 @@ namespace SMUBE.Units
     public class Unit
     {
         public UnitData UnitData { get; private set; }
-        public List<Command> ViableCommands { get; private set; } = new List<Command>();
+        public List<ICommand> ViableCommands { get; private set; } = new List<ICommand>();
 
-        public Unit(UnitData argUnitData, List<Command> argViableCommands = null)
+        public Unit(UnitData argUnitData, List<ICommand> argViableCommands = null)
         {
             UnitData = argUnitData;
             if (argViableCommands != null)
@@ -25,7 +25,7 @@ namespace SMUBE.Units
             }
         }
 
-        public Unit(string argName, UnitIdentifier argUnitIdentifier, UnitStats argUnitStats, List<Command> argViableCommands = null)
+        public Unit(string argName, UnitIdentifier argUnitIdentifier, UnitStats argUnitStats, List<ICommand> argViableCommands = null)
             : this(new UnitData(argName, argUnitIdentifier, argUnitStats)) 
         {
             if (argViableCommands != null)

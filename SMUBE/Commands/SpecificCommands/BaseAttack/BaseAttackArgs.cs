@@ -6,11 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Commands.SpecificCommands.RegularAttack
+namespace Commands.SpecificCommands.BaseAttack
 {
-    public class RegularAttackArgs : CommandArgs
+    public class BaseAttackArgs : CommandArgs
     {
-        public UnitIdentifier UnitTarget { get; }
-        public BattleSceneState battleSceneState { get; }
+        public override CommandArgsValidator CommandArgsValidator => new BaseAttackArgsValidator();
     }
 }

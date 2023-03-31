@@ -9,7 +9,6 @@ namespace SMUBE.DataStructures.BattleScene
 {
     public class BattleScenePositionContent
     {
-        public bool IsOccupied { get; set; }
         public UnitIdentifier UnitIdentifier { get; }
     }
 }

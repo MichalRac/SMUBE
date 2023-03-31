@@ -8,6 +8,7 @@ namespace SMUBE.DataStructures.Units
 {
     public class UnitData
     {
+        public const int DEFAULT_UNIT_GRID_SIZE = 1;
         public string Name { get; private set; }
         public UnitIdentifier UnitIdentifier { get; }
         public UnitStats UnitStats { get; }

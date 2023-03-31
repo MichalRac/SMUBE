@@ -7,12 +7,9 @@ using System.Threading.Tasks;
 
 namespace Commands
 {
-    public abstract class Command<TArgs, TResults> 
-        where TArgs : CommandArgs 
-        where TResults : CommandResults
+    public interface Command
     {
-        protected TArgs commandArgs;
-        protected TResults commandResults;
-        public abstract TResults GetCommandResults();
+        CommandId CommandId { get; }
+        CommandResults GetCommandResults(CommandArgs commandArgs);
     }
 }

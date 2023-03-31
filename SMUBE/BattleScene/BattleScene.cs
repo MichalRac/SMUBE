@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,9 +13,9 @@ namespace SMUBE.BattleScene
         public string name = "debug_scene";
         public const int MAX_UNITS = 6;
 
-        public BattleScene Setup()
+        public void Setup()
         {
-            return this;
+            Console.WriteLine("SMUBE connection defined");
         }
     }
 }

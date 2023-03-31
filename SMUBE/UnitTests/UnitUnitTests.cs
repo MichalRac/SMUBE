@@ -29,10 +29,8 @@ namespace SMUBE_Utils.UnitTests
             var unit1 = UnitHelper.CreateUnit<Hunter>(0);
             var unit2 = UnitHelper.CreateUnit<Squire>(1);
 
-            var viableCommands1 = unit1.GetViableCommands();
-            var viableCommands2 = unit2.GetViableCommands();
-
-
+            var viableCommands1 = unit1.ViableCommands;
+            var viableCommands2 = unit2.ViableCommands;
         }
     }
 }

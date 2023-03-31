@@ -46,6 +46,8 @@
     <Compile Include="BattleScene\BattleScenePosition.cs" />
     <Compile Include="BattleScene\BattleScenePositionContent.cs" />
     <Compile Include="BattleScene\BattleSceneState.cs" />
+    <Compile Include="BattleScene\BattleSceneType.cs" />
+    <Compile Include="BattleScene\GridSceneType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Units\UnitData.cs" />

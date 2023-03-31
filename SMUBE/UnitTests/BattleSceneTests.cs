@@ -15,7 +15,7 @@ namespace SMUBE_Utils.UnitTests
         [TestMethod]
         public void SetupBattleScene()
         {
-            var battleScene = new SMUBE.BattleScene.BattleScene().Setup();
+            var battleScene = new SMUBE.BattleScene.BattleScene();
         }
     }
 }

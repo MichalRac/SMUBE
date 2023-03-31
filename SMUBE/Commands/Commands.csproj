@@ -45,16 +45,17 @@
   <ItemGroup>
     <Compile Include="Command.cs" />
     <Compile Include="CommandArgs.cs" />
+    <Compile Include="CommandArgsValidator.cs" />
+    <Compile Include="CommandId.cs" />
     <Compile Include="CommandResults.cs" />
     <Compile Include="Effects\Effect.cs" />
-    <Compile Include="IInitMoveToTarget.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Effects\DamageEffect.cs" />
     <Compile Include="Skills\Skill.cs" />
-    <Compile Include="SpecificCommands\RegularAttack\RegularAttack.cs" />
-    <Compile Include="SpecificCommands\RegularAttack\RegularAttackArgs.cs" />
-    <Compile Include="SpecificCommands\RegularAttack\RegularAttackResults.cs" />
+    <Compile Include="SpecificCommands\BaseAttack\BaseAttack.cs" />
+    <Compile Include="SpecificCommands\BaseAttack\BaseAttackArgs.cs" />
+    <Compile Include="SpecificCommands\BaseAttack\BaseAttackArgsValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

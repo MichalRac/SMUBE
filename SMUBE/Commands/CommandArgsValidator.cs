@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Commands
 {
-    public interface IInitMoveToTarget
+    public interface CommandArgsValidator
     {
-
+        bool Validate(CommandArgs args);
     }
 }

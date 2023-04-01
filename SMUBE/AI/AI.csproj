@@ -44,31 +44,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AIModel.cs" />
-    <Compile Include="RandomAIModel.cs" />
+    <Compile Include="AI\AIModel.cs" />
+    <Compile Include="AI\RandomAIModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\BattleScene\BattleState.csproj">
-      <Project>{7F1AFEE9-E609-4721-A476-C5511A3DF931}</Project>
-      <Name>BattleState</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Commands\Commands.csproj">
-      <Project>{7CCD401E-0EB6-46F7-BA56-A062DCD5C50E}</Project>
-      <Name>Commands</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DataStructures\DataStructures.csproj">
-      <Project>{31088EFC-60A4-4DFE-8789-32E232387425}</Project>
-      <Name>DataStructures</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Units\Units.csproj">
-      <Project>{81204AE4-E72B-440F-8DD7-FC33F092E076}</Project>
-      <Name>Units</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

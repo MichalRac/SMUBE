@@ -21,8 +21,9 @@ namespace SMUBE.BattleState
             SetupQueue();
         }
 
-        public bool ExecuteCommand(Unit argUnit, ICommand command)
+        public bool ExecuteCommand(ICommand command, CommandArgs commandArgs)
         {
+            command.Execute(commandArgs);
             return true;
         }
 

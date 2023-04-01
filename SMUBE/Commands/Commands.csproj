@@ -44,28 +44,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ICommand.cs" />
-    <Compile Include="CommandArgs.cs" />
-    <Compile Include="CommandArgsValidator.cs" />
-    <Compile Include="CommandId.cs" />
-    <Compile Include="CommandResults.cs" />
-    <Compile Include="Effects\Effect.cs" />
+    <Compile Include="Commands\ICommand.cs" />
+    <Compile Include="Commands\CommandArgs.cs" />
+    <Compile Include="Commands\CommandArgsValidator.cs" />
+    <Compile Include="Commands\CommandId.cs" />
+    <Compile Include="Commands\CommandResults.cs" />
+    <Compile Include="Commands\Effects\Effect.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Effects\DamageEffect.cs" />
-    <Compile Include="Skills\Skill.cs" />
-    <Compile Include="SpecificCommands\BaseAttack\BaseAttack.cs" />
-    <Compile Include="SpecificCommands\BaseAttack\BaseAttackArgs.cs" />
-    <Compile Include="SpecificCommands\BaseAttack\BaseAttackArgsValidator.cs" />
+    <Compile Include="Commands\Effects\DamageEffect.cs" />
+    <Compile Include="Commands\Skills\Skill.cs" />
+    <Compile Include="Commands\SpecificCommands\BaseAttack\BaseAttack.cs" />
+    <Compile Include="Commands\SpecificCommands\BaseAttack\BaseAttackArgs.cs" />
+    <Compile Include="Commands\SpecificCommands\BaseAttack\BaseAttackArgsValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DataStructures\DataStructures.csproj">
-      <Project>{31088efc-60a4-4dfe-8789-32e232387425}</Project>
-      <Name>DataStructures</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

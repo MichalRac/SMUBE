@@ -47,27 +47,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BattleScene.cs" />
-    <Compile Include="BattleStateModel.cs" />
+    <Compile Include="BattleState\BattleScene.cs" />
+    <Compile Include="BattleState\BattleStateModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Commands\Commands.csproj">
-      <Project>{7CCD401E-0EB6-46F7-BA56-A062DCD5C50E}</Project>
-      <Name>Commands</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DataStructures\DataStructures.csproj">
-      <Project>{31088efc-60a4-4dfe-8789-32e232387425}</Project>
-      <Name>DataStructures</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Units\Units.csproj">
-      <Project>{81204ae4-e72b-440f-8dd7-fc33f092e076}</Project>
-      <Name>Units</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,4 +1,5 @@
-﻿using SMUBE.DataStructures;
+﻿using SMUBE.BattleState;
+using SMUBE.DataStructures;
 using SMUBE.Units;
 using System;
 using System.Collections.Generic;

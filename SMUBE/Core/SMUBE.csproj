@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{871BA149-C9D1-4154-9DDB-905A8C587EE4}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SMUBE.Core</RootNamespace>
-    <AssemblyName>SMUBE.Core</AssemblyName>
+    <RootNamespace>SMUBE</RootNamespace>
+    <AssemblyName>SMUBE</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -47,30 +47,47 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BattleCore.cs" />
+    <Compile Include="AI\AIModel.cs" />
+    <Compile Include="AI\DumbAIModel.cs" />
+    <Compile Include="AI\RandomAIModel.cs" />
+    <Compile Include="BattleState\BattleScene.cs" />
+    <Compile Include="BattleState\BattleStateModel.cs" />
+    <Compile Include="Commands\CommandArgs.cs" />
+    <Compile Include="Commands\CommandArgsValidator.cs" />
+    <Compile Include="Commands\CommandId.cs" />
+    <Compile Include="Commands\CommandResults.cs" />
+    <Compile Include="Commands\Effects\BlockEffect.cs" />
+    <Compile Include="Commands\Effects\DamageEffect.cs" />
+    <Compile Include="Commands\Effects\Effect.cs" />
+    <Compile Include="Commands\ICommand.cs" />
+    <Compile Include="Commands\Skills\Skill.cs" />
+    <Compile Include="Commands\SpecificCommands\BaseAttack\BaseAttack.cs" />
+    <Compile Include="Commands\SpecificCommands\_Common\CommonArgs.cs" />
+    <Compile Include="Commands\SpecificCommands\_Common\OneToOneArgsValidator.cs" />
+    <Compile Include="Commands\SpecificCommands\BaseBlock\BaseBlock.cs" />
+    <Compile Include="Commands\SpecificCommands\_Common\OneToZeroArgsValidator.cs" />
+    <Compile Include="Core\BattleCore.cs" />
+    <Compile Include="DataStructures\BattleScene\BattleScenePosition.cs" />
+    <Compile Include="DataStructures\BattleScene\BattleScenePositionContent.cs" />
+    <Compile Include="DataStructures\BattleScene\BattleSceneState.cs" />
+    <Compile Include="DataStructures\BattleScene\BattleSceneType.cs" />
+    <Compile Include="DataStructures\BattleScene\GridSceneType.cs" />
+    <Compile Include="DataStructures\Units\UnitData.cs" />
+    <Compile Include="DataStructures\Units\UnitIdentifier.cs" />
+    <Compile Include="DataStructures\Units\UnitStats.cs" />
+    <Compile Include="DataStructures\Utils\SMUBEVector2.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Units\CharacterTypes\BaseCharacter.cs" />
+    <Compile Include="Units\CharacterTypes\Hunter.cs" />
+    <Compile Include="Units\CharacterTypes\Scholar.cs" />
+    <Compile Include="Units\CharacterTypes\Squire.cs" />
+    <Compile Include="Units\Unit.cs" />
+    <Compile Include="Units\UnitConsts.cs" />
+    <Compile Include="Units\UnitHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\BattleScene\BattleState.csproj">
-      <Project>{7f1afee9-e609-4721-a476-c5511a3df931}</Project>
-      <Name>BattleState</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Commands\Commands.csproj">
-      <Project>{7ccd401e-0eb6-46f7-ba56-a062dcd5c50e}</Project>
-      <Name>Commands</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DataStructures\DataStructures.csproj">
-      <Project>{31088efc-60a4-4dfe-8789-32e232387425}</Project>
-      <Name>DataStructures</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Units\Units.csproj">
-      <Project>{81204ae4-e72b-440f-8dd7-fc33f092e076}</Project>
-      <Name>Units</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

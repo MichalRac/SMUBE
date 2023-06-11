@@ -3,34 +3,44 @@ using SMUBE.AI.GoalOrientedBehavior;
 using SMUBE.BattleState;
 using SMUBE.Commands;
 using SMUBE.DataStructures.Units;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SMUBE.AI.StateMachine
 {
     public class StateMachineAIModel : AIModel
     {
-        // Todo Replace with FSM implementation
-        public override ICommand ResolveNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
+        public StateMachineState initialState;
+        public StateMachineState currentState;
+
+        public StateMachineAIModel(StateMachineState initialState)
         {
-            if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
+            this.initialState = initialState;
+            currentState = initialState;
+        }
+
+        public void ResolveTransitions()
+        {
+            StateMachineTransition triggeredTransition = null;
+
+            foreach (var transition in currentState.Transitions)
             {
-                var viableCommands = unit.ViableCommands;
-
-                if (viableCommands == null || viableCommands.Count == 0)
+                if (transition.IsTriggered())
                 {
-                    Console.WriteLine($"Unit {unit.UnitData.Name} has no viable actions!");
-                    return null;
+                    triggeredTransition = transition;
+                    break;
                 }
-
-                return viableCommands[0];
             }
 
-            Console.WriteLine($"Trying to fetch actions for unit {unit.UnitData.Name} that is not part of the battle!");
-            return null;
+            if (triggeredTransition != null)
+            {
+                currentState = triggeredTransition.TargetState;
+            }
+        }
+
+        public override ICommand ResolveNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
+        {
+            ResolveTransitions();
+
+            return currentState.Command;
         }
 
         public override CommandArgs GetCommandArgs(ICommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)

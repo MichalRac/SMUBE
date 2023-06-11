@@ -1,4 +1,5 @@
 ﻿using SMUBE.AI;
+using SMUBE.AI.StateMachine;
 using SMUBE.DataStructures.Units;
 using SMUBE.Units.CharacterTypes;
 using System;
@@ -25,6 +26,11 @@ namespace SMUBE.Units
             var newUnitName = nameof(T) + $"_team{newUnitIdentifier.TeamId}_id{newUnitIdentifier.PersonalId}";
 
             teamCounts[teamId] = teamCounts[teamId] + 1;
+
+            if(aiModel is StateMachineAIModel)
+            {
+                aiModel = StateMachineConfig.GetStateMachineForArchetype(newUnitStats.BaseCharacter);
+            }
 
             return new Unit(newUnitName, newUnitIdentifier, newUnitStats, aiModel);
         }

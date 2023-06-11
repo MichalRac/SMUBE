@@ -71,6 +71,10 @@
     <Compile Include="AI\GoalOrientedBehavior\WinGoal.cs" />
     <Compile Include="AI\RandomAIModel.cs" />
     <Compile Include="AI\StateMachine\StateMachineAIModel.cs" />
+    <Compile Include="AI\StateMachine\StateMachineConfig.cs" />
+    <Compile Include="AI\StateMachine\StateMachineRandomTransition.cs" />
+    <Compile Include="AI\StateMachine\StateMachineState.cs" />
+    <Compile Include="AI\StateMachine\StateMachineTransition.cs" />
     <Compile Include="BattleState\BattleScene.cs" />
     <Compile Include="BattleState\BattleStateModel.cs" />
     <Compile Include="Commands\CommandArgs.cs" />

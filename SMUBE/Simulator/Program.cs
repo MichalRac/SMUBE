@@ -56,7 +56,7 @@ namespace SMUBE_Utils.Simulator
                     team1AIModel = new GoalOrientedBehaviorAIModel();
                     break;
                 case ConsoleKey.D5:
-                    team1AIModel = new StateMachineAIModel();
+                    team1AIModel = new StateMachineAIModel(null);
                     break;
                 case ConsoleKey.D6:
                     team1AIModel = new BehaviorTreeAIModel();
@@ -93,7 +93,7 @@ namespace SMUBE_Utils.Simulator
                     team2AIModel = new GoalOrientedBehaviorAIModel();
                     break;
                 case ConsoleKey.D5:
-                    team2AIModel = new StateMachineAIModel();
+                    team2AIModel = new StateMachineAIModel(null);
                     break;
                 case ConsoleKey.D6:
                     team2AIModel = new BehaviorTreeAIModel();
@@ -105,16 +105,15 @@ namespace SMUBE_Utils.Simulator
                     break;
             }
 
-            var initUnits = new List<Unit>()
+            List<Unit> initUnits =new List<Unit>
             {
-                UnitHelper.CreateUnit<Squire>(0,team1AIModel),
-                UnitHelper.CreateUnit<Squire>(1,team2AIModel),
+                UnitHelper.CreateUnit<Squire>(0, team1AIModel),
+                UnitHelper.CreateUnit<Hunter>(0, team1AIModel),
+                UnitHelper.CreateUnit<Scholar>(0, team1AIModel),
 
-                UnitHelper.CreateUnit<Hunter>(0,team1AIModel),
-                UnitHelper.CreateUnit<Hunter>(1,team2AIModel),
-
-                UnitHelper.CreateUnit<Scholar>(0,team1AIModel),
-                UnitHelper.CreateUnit<Scholar>(1,team2AIModel),
+                UnitHelper.CreateUnit<Squire>(1, team2AIModel),
+                UnitHelper.CreateUnit<Hunter>(1, team2AIModel),
+                UnitHelper.CreateUnit<Scholar>(1, team2AIModel),
             };
 
             _core = new BattleCore(initUnits);

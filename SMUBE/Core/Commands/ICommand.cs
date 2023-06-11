@@ -12,6 +12,7 @@ namespace Commands
     {
         int StaminaCost { get; }
         int ManaCost { get; }
+        CommandArgs ArgsCache { get; set; }
 
         CommandId CommandId { get; }
         CommandArgsValidator CommandArgsValidator { get; }

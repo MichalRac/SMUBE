@@ -20,6 +20,18 @@ namespace SMUBE.DataStructures.Units
             UnitStats = argUnitStats;
         }
 
+        private UnitData(UnitData sourceUnitData)
+        {
+            UnitIdentifier = sourceUnitData.UnitIdentifier;
+            Name = sourceUnitData.Name;
+            UnitStats = sourceUnitData.UnitStats.Copy();
+        }
+
+        public UnitData DeepCopy()
+        {
+            return new UnitData(this);
+        }
+
         public override string ToString()
         {
             var fullDescribedStatus = new StringBuilder();

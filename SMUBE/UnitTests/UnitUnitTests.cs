@@ -1,7 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SMUBE.Units;
-using SMUBE.Units.CharacterTypes;
-using System;
 
 namespace SMUBE_Utils.UnitTests
 {

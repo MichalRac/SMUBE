@@ -48,11 +48,27 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AI\AIModel.cs" />
+    <Compile Include="AI\BehaviorTree\BehaviorTreeAIModel.cs" />
+    <Compile Include="AI\DecisionTree\DecisionTreeAction.cs" />
+    <Compile Include="AI\DecisionTree\DecisionTreeActionBlock.cs" />
+    <Compile Include="AI\DecisionTree\DecisionTreeAIModel.cs" />
+    <Compile Include="AI\DecisionTree\DecisionTreeActionAttack.cs" />
+    <Compile Include="AI\DecisionTree\DecisionTreeConfigs.cs" />
+    <Compile Include="AI\DecisionTree\DecisionTreeNode.cs" />
+    <Compile Include="AI\DecisionTree\DecisionTreeTest.cs" />
+    <Compile Include="AI\DecisionTree\DecisionTreeTestRandom.cs" />
     <Compile Include="AI\DumbAIModel.cs" />
+    <Compile Include="AI\GoalOrientedBehavior\Goal.cs" />
+    <Compile Include="AI\GoalOrientedBehavior\GoalOrientedBehaviorAIModel.cs" />
+    <Compile Include="AI\GoalOrientedBehavior\GOPConfig.cs" />
+    <Compile Include="AI\GoalOrientedBehavior\SurviveGoal.cs" />
+    <Compile Include="AI\GoalOrientedBehavior\WinGoal.cs" />
     <Compile Include="AI\RandomAIModel.cs" />
+    <Compile Include="AI\StateMachine\StateMachineAIModel.cs" />
     <Compile Include="BattleState\BattleScene.cs" />
     <Compile Include="BattleState\BattleStateModel.cs" />
     <Compile Include="Commands\CommandArgs.cs" />
+    <Compile Include="Commands\CommandArgsHelper.cs" />
     <Compile Include="Commands\CommandArgsValidator.cs" />
     <Compile Include="Commands\CommandId.cs" />
     <Compile Include="Commands\CommandResults.cs" />

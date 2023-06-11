@@ -14,11 +14,36 @@ namespace SMUBE.BattleState
         public List<Unit> Units { get; private set; } = new List<Unit>();
         private Queue<Unit> ActionQueue { get; set; } = new Queue<Unit>();
 
-        public BattleStateModel() {}
+        public BattleStateModel(BattleStateModel sourceBattleStateModel) 
+        {
+            foreach (var unit in sourceBattleStateModel.Units)
+            {
+                Units.Add(unit.DeepCopy());
+            }
+            
+            foreach (var unit in sourceBattleStateModel.ActionQueue)
+            {
+                var matchingUnit = Units.Find(u => u.UnitData.UnitIdentifier == unit.UnitData.UnitIdentifier);
+
+                if(matchingUnit != null)
+                {
+                    ActionQueue.Enqueue(matchingUnit);
+                }
+                else
+                {
+                    Console.WriteLine($"Unable to find matching unit for id {unit.UnitData} when deep copying world state");
+                }
+            }
+        }
         public BattleStateModel(List<Unit> units)
         {
             Units = units;
             SetupQueue();
+        }
+
+        public BattleStateModel DeepCopy()
+        {
+            return new BattleStateModel(this);
         }
 
         public bool IsFinished(out int winnerTeam)

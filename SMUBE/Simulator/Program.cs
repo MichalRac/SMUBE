@@ -1,4 +1,8 @@
 ﻿using SMUBE.AI;
+using SMUBE.AI.BehaviorTree;
+using SMUBE.AI.DecisionTree;
+using SMUBE.AI.GoalOrientedBehavior;
+using SMUBE.AI.StateMachine;
 using SMUBE.Core;
 using SMUBE.Units;
 using SMUBE.Units.CharacterTypes;
@@ -27,6 +31,10 @@ namespace SMUBE_Utils.Simulator
             Console.WriteLine("Team 1 AI:");
             Console.WriteLine("1. Random AI");
             Console.WriteLine("2. Dumb AI");
+            Console.WriteLine("3. Decision Tree AI");
+            Console.WriteLine("4. Goal Oriented Behavior AI");
+            Console.WriteLine("5. Finite State Machine AI");
+            Console.WriteLine("6. Behavior Tree AI");
 
             Console.WriteLine("\nChoice:");
             var key = Console.ReadKey(true);
@@ -39,6 +47,18 @@ namespace SMUBE_Utils.Simulator
                 case ConsoleKey.D2:
                     team1AIModel = new DumbAIModel();
                     break;
+                case ConsoleKey.D3:
+                    team1AIModel = new DecisionTreeAIModel();
+                    break;
+                case ConsoleKey.D4:
+                    team1AIModel = new GoalOrientedBehaviorAIModel();
+                    break;
+                case ConsoleKey.D5:
+                    team1AIModel = new StateMachineAIModel();
+                    break;
+                case ConsoleKey.D6:
+                    team1AIModel = new BehaviorTreeAIModel();
+                    break;
                 case ConsoleKey.D0:
                     return;
                 default:
@@ -49,6 +69,10 @@ namespace SMUBE_Utils.Simulator
             Console.WriteLine("Team 2 AI:");
             Console.WriteLine("1. Random AI");
             Console.WriteLine("2. Dumb AI");
+            Console.WriteLine("3. Decision Tree AI");
+            Console.WriteLine("4. Goal Oriented Behavior AI");
+            Console.WriteLine("5. Finite State Machine AI");
+            Console.WriteLine("6. Behavior Tree AI");
             Console.WriteLine("\nChoice:");
             var key2 = Console.ReadKey(true);
 
@@ -59,6 +83,18 @@ namespace SMUBE_Utils.Simulator
                     break;
                 case ConsoleKey.D2:
                     team2AIModel = new DumbAIModel();
+                    break;
+                case ConsoleKey.D3:
+                    team2AIModel = new DecisionTreeAIModel();
+                    break;
+                case ConsoleKey.D4:
+                    team2AIModel = new GoalOrientedBehaviorAIModel();
+                    break;
+                case ConsoleKey.D5:
+                    team2AIModel = new StateMachineAIModel();
+                    break;
+                case ConsoleKey.D6:
+                    team2AIModel = new BehaviorTreeAIModel();
                     break;
                 case ConsoleKey.D0:
                     return;

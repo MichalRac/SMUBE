@@ -1,10 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SMUBE.BattleState;
-using SMUBE.Core;
-using SMUBE.DataStructures;
-using SMUBE.DataStructures.Units;
-using SMUBE.Units;
-using SMUBE.Units.CharacterTypes;
 using System;
 using System.Collections.Generic;
 

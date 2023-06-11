@@ -19,6 +19,9 @@ namespace SMUBE.Commands.SpecificCommands.BaseBlock
 
         public CommandArgsValidator CommandArgsValidator => new OneToZeroArgsValidator();
 
+        private CommandArgs _argsCache;
+        public CommandArgs ArgsCache { get => _argsCache; set => _argsCache = value; }
+
         public bool Execute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
             return CommandArgsValidator.Validate(commandArgs);

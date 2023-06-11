@@ -1,31 +1,33 @@
 ﻿using Commands;
-using Commands.SpecificCommands._Common;
 using SMUBE.BattleState;
 using SMUBE.Commands;
-using SMUBE.Commands.SpecificCommands._Common;
 using SMUBE.DataStructures.Units;
+using SMUBE.Units.CharacterTypes;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace SMUBE.AI
+namespace SMUBE.AI.DecisionTree
 {
-    // always pick random option
-    public class RandomAIModel : AIModel
+    public class DecisionTreeAIModel : AIModel
     {
+
         public override ICommand GetNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
-            if(battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
+            if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
             {
-                var viableCommands = unit.ViableCommands;
-                
-                if(viableCommands == null || viableCommands.Count == 0) 
-                {
-                    Console.WriteLine($"Unit {unit.UnitData.Name} has no viable actions!");
-                    return null;
-                }
+                var baseCharacter = unit.UnitData.UnitStats.BaseCharacter;
+                var decisionTree = DecisionTreeConfigs.GetDecisionTreeForArchetype(baseCharacter);
+                var decision = decisionTree.MakeDecision();
 
-                return viableCommands[new Random().Next(viableCommands.Count)];
+                if(decision is DecisionTreeAction action)
+                {
+                    return action.GetCommand();
+                }
+                Console.WriteLine($"Trying to make an action with non Action end node in decision tree!");
+                return null;
             }
 
             Console.WriteLine($"Trying to fetch actions for unit {unit.UnitData.Name} that is not part of the battle!");
@@ -36,5 +38,6 @@ namespace SMUBE.AI
         {
             return CommandArgsHelper.GetRandomCommandArgs(command, battleStateModel, activeUnitIdentifier);
         }
+
     }
 }

@@ -54,6 +54,29 @@ namespace SMUBE.DataStructures.Units
             Speed = speed;
         }
 
+        private UnitStats(UnitStats sourceUnitStats)
+        {
+            BaseCharacter = sourceUnitStats.BaseCharacter;
+
+            CurrentHealth = sourceUnitStats.MaxHealth;
+            MaxHealth = sourceUnitStats.MaxHealth;
+
+            CurrentStamina = sourceUnitStats.MaxStamina;
+            MaxStamina = sourceUnitStats.MaxStamina;
+
+            CurrentMana = sourceUnitStats.MaxMana;
+            MaxMana = sourceUnitStats.MaxMana;
+
+            Power = sourceUnitStats.Power;
+            Defense = sourceUnitStats.Defense;
+            Speed = sourceUnitStats.Speed;
+        }
+
+        public UnitStats Copy()
+        {
+            return new UnitStats(this);
+        }
+
         public void UseAbility(ICommand command)
         {
             CurrentStamina -= command.StaminaCost;

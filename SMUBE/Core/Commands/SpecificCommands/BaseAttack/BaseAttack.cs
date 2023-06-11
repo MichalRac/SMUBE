@@ -20,6 +20,9 @@ namespace Commands.SpecificCommands.BaseAttack
 
         public CommandArgsValidator CommandArgsValidator => new OneToOneArgsValidator();
 
+        private CommandArgs _argsCache;
+        public CommandArgs ArgsCache { get => _argsCache; set => _argsCache = value; }
+
         public bool Execute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
             if (!CommandArgsValidator.Validate(commandArgs))

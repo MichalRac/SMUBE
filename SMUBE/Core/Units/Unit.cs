@@ -41,5 +41,17 @@ namespace SMUBE.Units
             ViableCommands.Add(new BaseAttack());
             ViableCommands.Add(new BaseBlock());
         }
+
+        private Unit(Unit sourceUnit)
+        {
+            UnitData = sourceUnit.UnitData.DeepCopy();
+            ViableCommands = sourceUnit.ViableCommands;
+            AiModel = sourceUnit.AiModel;
+        }
+
+        public Unit DeepCopy()
+        {
+            return new Unit(this);
+        }
     }
 }

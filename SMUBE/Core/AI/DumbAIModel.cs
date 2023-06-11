@@ -6,6 +6,7 @@ using SMUBE.Commands.SpecificCommands._Common;
 using SMUBE.DataStructures.Units;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace SMUBE.AI
     // always pick first option
     public class DumbAIModel : AIModel
     {
-        public override ICommand GetNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
+        public override ICommand ResolveNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
             if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
             {

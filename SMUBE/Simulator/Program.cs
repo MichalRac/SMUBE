@@ -1,8 +1,10 @@
-﻿using SMUBE.AI;
+﻿using Commands;
+using SMUBE.AI;
 using SMUBE.AI.BehaviorTree;
 using SMUBE.AI.DecisionTree;
 using SMUBE.AI.GoalOrientedBehavior;
 using SMUBE.AI.StateMachine;
+using SMUBE.BattleState;
 using SMUBE.Core;
 using SMUBE.Units;
 using SMUBE.Units.CharacterTypes;
@@ -237,6 +239,8 @@ namespace SMUBE_Utils.Simulator
         private static long teamOneActions = 0;
         private static long teamTwoActions = 0;
 
+        private static bool prewarm = false;
+
         private static bool ResolveTurn()
         {
             if (!_core.currentStateModel.GetNextActiveUnit(out var unit))
@@ -247,30 +251,57 @@ namespace SMUBE_Utils.Simulator
 
             var commandStopwatch = new Stopwatch();
             var argsStopwatch = new Stopwatch();
-            commandStopwatch.Start();
-            var nextCommand = unit.AiModel.GetNextCommand(_core.currentStateModel, unit.UnitData.UnitIdentifier);
-            commandStopwatch.Stop();
-            argsStopwatch.Start();
-            var nextArgs = unit.AiModel.GetCommandArgs(nextCommand, _core.currentStateModel, unit.UnitData.UnitIdentifier);
-            argsStopwatch.Stop();
+            ICommand nextCommand = null;
+            CommandArgs nextArgs = null;
 
-            Console.WriteLine($"Unit {unit.UnitData.ToShortString()}");
-            Console.WriteLine($"Used {nextCommand.GetType().Name}");
-
-            if (unit.UnitData.UnitIdentifier.TeamId == 0)
+            if(unit.AiModel is BehaviorTreeAIModel)
             {
-                teamOneAICommandTime += commandStopwatch.ElapsedTicks;
-                teamOneAIArgsTime += argsStopwatch.ElapsedTicks;
-                teamOneActions++;
+                commandStopwatch.Start();
+                unit.AiModel.ResolveNextCommand(_core.currentStateModel, unit.UnitData.UnitIdentifier);
+                commandStopwatch.Stop();
+
+                Console.WriteLine($"Unit {unit.UnitData.ToShortString()}");
             }
             else
             {
-                teamTwoAICommandTime += commandStopwatch.ElapsedTicks;
-                teamTwoAIArgsTime += argsStopwatch.ElapsedTicks;
-                teamTwoActions++;
+                commandStopwatch.Start();
+                nextCommand = unit.AiModel.ResolveNextCommand(_core.currentStateModel, unit.UnitData.UnitIdentifier);
+                commandStopwatch.Stop();
+                argsStopwatch.Start();
+                nextArgs = unit.AiModel.GetCommandArgs(nextCommand, _core.currentStateModel, unit.UnitData.UnitIdentifier);
+                argsStopwatch.Stop();
+
+                Console.WriteLine($"Unit {unit.UnitData.ToShortString()}");
+                Console.WriteLine($"Used {nextCommand.GetType().Name}");
             }
 
-            _core.currentStateModel.ExecuteCommand(nextCommand, nextArgs);
+
+            // todo investigate why first lookup on state model from ai model causes additional processing time
+            if(!prewarm)
+            {
+                prewarm = true;
+            }
+            else
+            {
+                if (unit.UnitData.UnitIdentifier.TeamId == 0)
+                {
+                    teamOneAICommandTime += commandStopwatch.ElapsedTicks;
+                    teamOneAIArgsTime += argsStopwatch.ElapsedTicks;
+                    teamOneActions++;
+                }
+                else
+                {
+                    teamTwoAICommandTime += commandStopwatch.ElapsedTicks;
+                    teamTwoAIArgsTime += argsStopwatch.ElapsedTicks;
+                    teamTwoActions++;
+                }
+            }
+
+            if (!(unit.AiModel is BehaviorTreeAIModel))
+            {
+                _core.currentStateModel.ExecuteCommand(nextCommand, nextArgs);
+            }
+
             turnCounter++;
             return _core.currentStateModel.IsFinished(out var _);
         }

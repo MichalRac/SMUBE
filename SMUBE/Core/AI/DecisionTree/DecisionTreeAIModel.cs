@@ -14,7 +14,7 @@ namespace SMUBE.AI.DecisionTree
     public class DecisionTreeAIModel : AIModel
     {
 
-        public override ICommand GetNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
+        public override ICommand ResolveNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
             if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
             {

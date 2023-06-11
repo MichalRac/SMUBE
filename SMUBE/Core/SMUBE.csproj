@@ -49,6 +49,12 @@
   <ItemGroup>
     <Compile Include="AI\AIModel.cs" />
     <Compile Include="AI\BehaviorTree\BehaviorTreeAIModel.cs" />
+    <Compile Include="AI\BehaviorTree\BehaviorTreeBasicAttack.cs" />
+    <Compile Include="AI\BehaviorTree\BehaviorTreeBasicBlock.cs" />
+    <Compile Include="AI\BehaviorTree\BehaviorTreeConfig.cs" />
+    <Compile Include="AI\BehaviorTree\BehaviorTreeSelector.cs" />
+    <Compile Include="AI\BehaviorTree\BehaviorTreeSequence.cs" />
+    <Compile Include="AI\BehaviorTree\BehaviorTreeTask.cs" />
     <Compile Include="AI\DecisionTree\DecisionTreeAction.cs" />
     <Compile Include="AI\DecisionTree\DecisionTreeActionBlock.cs" />
     <Compile Include="AI\DecisionTree\DecisionTreeAIModel.cs" />

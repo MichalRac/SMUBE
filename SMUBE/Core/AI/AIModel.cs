@@ -11,7 +11,12 @@ namespace SMUBE.AI
 {
     public abstract class AIModel
     {
-        public abstract ICommand GetNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier);
+        public abstract ICommand ResolveNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier);
         public abstract CommandArgs GetCommandArgs(ICommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier);
+
+        public void SimulationPrewarm(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
+        {
+            battleStateModel.TryGetUnit(activeUnitIdentifier, out var _);
+        }
     }
 }

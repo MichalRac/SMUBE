@@ -14,7 +14,7 @@ namespace SMUBE.AI.StateMachine
     public class StateMachineAIModel : AIModel
     {
         // Todo Replace with FSM implementation
-        public override ICommand GetNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
+        public override ICommand ResolveNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
             if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
             {

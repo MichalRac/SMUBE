@@ -27,7 +27,8 @@ namespace SMUBE.DataStructures.Units
         public int Defense { get; private set; }
         public int Speed { get; private set; }
 
-        private List<Effect> PersistentEffects = new List<Effect>();
+        private List<Effect> _persistentEffects = new List<Effect>();
+        public List<Effect> PersistentEffects => _persistentEffects;
 
         public UnitStats(
                          BaseCharacter baseCharacter,
@@ -86,6 +87,23 @@ namespace SMUBE.DataStructures.Units
         public void DeltaHealth(int delta)
         {
             CurrentHealth += delta;
+        }
+
+        public void AddEffects(CommandResults commandResults)
+        {
+            foreach(var newEffect in commandResults.effects)
+            {
+                for (int i = 0; i < PersistentEffects.Count; i++)
+                {
+                    if (PersistentEffects[i].GetType() == newEffect.GetType())
+                    {
+                        PersistentEffects.RemoveAt(i);
+                        break;
+                    }
+                }
+
+                PersistentEffects.Add(newEffect);
+            }
         }
 
         public void AffectByAbility(CommandResults commandResults)

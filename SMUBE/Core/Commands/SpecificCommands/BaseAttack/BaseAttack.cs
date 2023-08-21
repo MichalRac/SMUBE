@@ -49,7 +49,7 @@ namespace Commands.SpecificCommands.BaseAttack
         public CommandResults GetCommandResults(CommandArgs commandArgs)
         {
             var results = new CommandResults();
-            results.effects.Add(new DamageEffect(commandArgs.ActiveUnit.UnitStats.Power));
+            results.effects.Add(new DamageEffect(commandArgs.ActiveUnit.UnitStats.Power, commandArgs.TargetUnits[0].UnitIdentifier));
             return results;
         }
     }

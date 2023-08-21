@@ -80,8 +80,18 @@ namespace SMUBE.BattleState
                     TryRemoveUnit(unit);
                 }
             }
+            OnNewTurn();
             return true;
         }
+
+        public void OnNewTurn()
+        {
+            if(GetNextActiveUnit(out var nextUnit))
+            {
+                nextUnit.UnitData.UnitStats.OnTurnStartEvaluate();
+            }
+        }
+
 
         public bool TryAddUnit(Unit argUnit)
         {

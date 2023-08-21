@@ -1,5 +1,6 @@
 ﻿using Commands;
 using SMUBE.BattleState;
+using SMUBE.Commands.Effects;
 using SMUBE.Commands.SpecificCommands._Common;
 using System;
 using System.Collections.Generic;
@@ -24,14 +25,32 @@ namespace SMUBE.Commands.SpecificCommands.BaseBlock
 
         public bool Execute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
-            return CommandArgsValidator.Validate(commandArgs);
+            if (!CommandArgsValidator.Validate(commandArgs))
+            {
+                return false;
+            }
+
+
+            battleStateModel.TryGetUnit(commandArgs.ActiveUnit.UnitIdentifier, out var activeUnit);
+
+            if(activeUnit == null)
+            {
+                return false;
+            }
+
+            activeUnit.UnitData.UnitStats.UseAbility(this);
+            activeUnit.UnitData.UnitStats.AddEffects(GetCommandResults(commandArgs));
+
+            return true;
         }
 
         public CommandResults GetCommandResults(CommandArgs commandArgs)
         {
             var results = new CommandResults();
 
-            return new CommandResults();
+            results.effects.Add(new BlockEffect());
+
+            return results;
         }
     }
 }

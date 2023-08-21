@@ -11,10 +11,12 @@ namespace SMUBE.Commands.Effects
     public class DamageEffect : Effect
     {
         public int Value { get; set; }
+        public UnitIdentifier TargetUnit { get; }
 
-        public DamageEffect(int value)
+        public DamageEffect(int value, UnitIdentifier targetUnit)
         {
             Value = value;
+            TargetUnit = targetUnit;
         }
 
         public override void Apply(UnitStats unitStats)

@@ -18,7 +18,7 @@ namespace SMUBE_Utils.UnitTests
             var damageValue = 10;
 
             //Act
-            var damageEffect = new DamageEffect(damageValue);
+            var damageEffect = new DamageEffect(damageValue, null);
 
             //Assert
             Assert.AreEqual(damageValue, damageEffect.Value);

@@ -18,7 +18,7 @@ namespace SMUBE.Commands.SpecificCommands.BaseBlock
 
         public CommandId CommandId => CommandId.BaseBlock;
 
-        public CommandArgsValidator CommandArgsValidator => new OneToZeroArgsValidator();
+        public CommandArgsValidator CommandArgsValidator => new OneToSelfArgsValidator();
 
         private CommandArgs _argsCache;
         public CommandArgs ArgsCache { get => _argsCache; set => _argsCache = value; }

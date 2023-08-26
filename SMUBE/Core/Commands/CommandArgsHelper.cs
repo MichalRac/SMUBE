@@ -16,7 +16,7 @@ namespace SMUBE.Commands
 
         public static CommandArgs GetDumbCommandArgs(ICommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
-            if (command.CommandArgsValidator is OneToZeroArgsValidator)
+            if (command.CommandArgsValidator is OneToSelfArgsValidator)
             {
                 if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
                 {
@@ -46,7 +46,7 @@ namespace SMUBE.Commands
 
         public static CommandArgs GetRandomCommandArgs(ICommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
-            if (command.CommandArgsValidator is OneToZeroArgsValidator)
+            if (command.CommandArgsValidator is OneToSelfArgsValidator)
             {
                 if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
                 {

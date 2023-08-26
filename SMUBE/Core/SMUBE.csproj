@@ -89,9 +89,10 @@
     <Compile Include="Commands\Skills\Skill.cs" />
     <Compile Include="Commands\SpecificCommands\BaseAttack\BaseAttack.cs" />
     <Compile Include="Commands\SpecificCommands\_Common\CommonArgs.cs" />
+    <Compile Include="Commands\SpecificCommands\_Common\OneToEveryArgsValidator.cs" />
     <Compile Include="Commands\SpecificCommands\_Common\OneToOneArgsValidator.cs" />
     <Compile Include="Commands\SpecificCommands\BaseBlock\BaseBlock.cs" />
-    <Compile Include="Commands\SpecificCommands\_Common\OneToZeroArgsValidator.cs" />
+    <Compile Include="Commands\SpecificCommands\_Common\OneToSelfArgsValidator.cs" />
     <Compile Include="Core\BattleCore.cs" />
     <Compile Include="DataStructures\BattleScene\BattleScenePosition.cs" />
     <Compile Include="DataStructures\BattleScene\BattleScenePositionContent.cs" />

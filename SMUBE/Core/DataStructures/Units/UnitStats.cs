@@ -78,18 +78,23 @@ namespace SMUBE.DataStructures.Units
             return new UnitStats(this);
         }
 
-        public void UseAbility(ICommand command)
+        public bool IsAlive()
+        {
+            return CurrentHealth > 0;
+        }
+
+        internal void UseAbility(ICommand command)
         {
             CurrentStamina -= command.StaminaCost;
             CurrentMana -= command.ManaCost;
         }
 
-        public void DeltaHealth(int delta)
+        internal void DeltaHealth(int delta)
         {
             CurrentHealth += delta;
         }
 
-        public void AddEffects(CommandResults commandResults)
+        internal void AddEffects(CommandResults commandResults)
         {
             foreach(var newEffect in commandResults.effects)
             {
@@ -106,7 +111,7 @@ namespace SMUBE.DataStructures.Units
             }
         }
 
-        public void AffectByAbility(CommandResults commandResults)
+        internal void AffectByAbility(CommandResults commandResults)
         {
             ModifyByPersistantEffects(commandResults);
             foreach (var effect in commandResults.effects)
@@ -120,7 +125,7 @@ namespace SMUBE.DataStructures.Units
             }
         }
 
-        public void ModifyByPersistantEffects(CommandResults commandResults)
+        internal void ModifyByPersistantEffects(CommandResults commandResults)
         {
             foreach (var effect in PersistentEffects)
             {
@@ -128,7 +133,7 @@ namespace SMUBE.DataStructures.Units
             }
         }
 
-        public void OnTurnStartEvaluate()
+        internal void OnTurnStartEvaluate()
         {
             for (int i = PersistentEffects.Count - 1; i >= 0; i--)
             {

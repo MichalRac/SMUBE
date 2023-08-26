@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 
 namespace SMUBE.Commands.SpecificCommands._Common
 {
-    public class OneToZeroArgsValidator : CommandArgsValidator
+    public class OneToSelfArgsValidator : CommandArgsValidator
     {
+        public ArgsConstraint ArgsConstraint => ArgsConstraint.None;
+
         public bool Validate(CommandArgs args)
         {
             if (args == null)

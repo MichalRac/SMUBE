@@ -18,7 +18,7 @@ namespace Commands.SpecificCommands.BaseAttack
 
         public int ManaCost => 0;
 
-        public CommandArgsValidator CommandArgsValidator => new OneToOneArgsValidator();
+        public CommandArgsValidator CommandArgsValidator => new OneToOneArgsValidator(ArgsConstraint.Enemy);
 
         private CommandArgs _argsCache;
         public CommandArgs ArgsCache { get => _argsCache; set => _argsCache = value; }

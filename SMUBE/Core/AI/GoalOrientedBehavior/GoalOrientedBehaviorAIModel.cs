@@ -1,4 +1,5 @@
 ﻿using Commands;
+using Commands.SpecificCommands._Common;
 using SMUBE.BattleState;
 using SMUBE.Commands;
 using SMUBE.DataStructures.Units;
@@ -19,22 +20,28 @@ namespace SMUBE.AI.GoalOrientedBehavior
 
         public override ICommand ResolveNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
-            if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
+            if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var activeUnit))
             {
-                var baseCharacter = unit.UnitData.UnitStats.BaseCharacter;
+                var baseCharacter = activeUnit.UnitData.UnitStats.BaseCharacter;
                 var goals = GOPConfig.GetGoalsForArchetype(baseCharacter);
 
-                var viableActions = unit.ViableCommands;
+                var viableActions = activeUnit.ViableCommands;
 
-                var battleStateModelDeepCopy = battleStateModel.DeepCopy();
                 ICommand bestAction = null;
                 CommandArgs bestArgs = null;
                 float minDiscontentment = float.MaxValue;
 
                 foreach (var action in viableActions)
                 {
+                    var battleStateModelDeepCopy = battleStateModel.DeepCopy();
                     var commandArgs = CommandArgsHelper.GetRandomCommandArgs(action, battleStateModelDeepCopy, activeUnitIdentifier);
-                    action.Execute(battleStateModelDeepCopy, commandArgs);
+                    
+                    bool success = action.Execute(battleStateModelDeepCopy, commandArgs);
+
+                    if(!success)
+                    {
+                        continue;
+                    }
 
                     var discontentment = GetDiscontentment(goals, battleStateModelDeepCopy, activeUnitIdentifier);
                     if(discontentment < minDiscontentment)
@@ -45,11 +52,22 @@ namespace SMUBE.AI.GoalOrientedBehavior
                     }
                 }
 
-                bestAction.ArgsCache = bestArgs;
+                var targetUnits = new List<UnitData>();
+                foreach (var deepCopyTargetUnit in bestArgs.TargetUnits)
+                {
+                    if(battleStateModel.TryGetUnit(deepCopyTargetUnit.UnitIdentifier, out var targetUnit))
+                    {
+                        targetUnits.Add(targetUnit.UnitData);
+                        continue;
+                    }
+                    return null;
+                }
+
+                bestAction.ArgsCache = new CommonArgs(activeUnit.UnitData, targetUnits, battleStateModel);
                 return bestAction;
             }
 
-            Console.WriteLine($"Trying to fetch actions for unit {unit.UnitData.Name} that is not part of the battle!");
+            Console.WriteLine($"Trying to fetch actions for unit {activeUnit.UnitData.Name} that is not part of the battle!");
             return null;
         }
 

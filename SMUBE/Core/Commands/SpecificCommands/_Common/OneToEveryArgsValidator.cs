@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace SMUBE.Commands.SpecificCommands._Common
 {
-    public class OneToEveryArgsValidator
+    public class OneToEveryArgsValidator : CommandArgsValidator
     {
         private ArgsConstraint _argsConstraint;
         public ArgsConstraint ArgsConstraint => _argsConstraint;

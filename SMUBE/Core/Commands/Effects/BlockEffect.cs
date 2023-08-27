@@ -13,6 +13,11 @@ namespace SMUBE.Commands.Effects
         private const int DEFAULT_PERSISTANCE = 1;
         private int currentPersistance = DEFAULT_PERSISTANCE;
 
+        public BlockEffect(int currentPersistance = DEFAULT_PERSISTANCE)
+        {
+            this.currentPersistance = currentPersistance;
+        }
+
         public override int GetPersistence() => currentPersistance;
         public override void OnTurnStartEvaluate(UnitStats unitStats)
         {

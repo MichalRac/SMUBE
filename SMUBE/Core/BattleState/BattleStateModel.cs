@@ -17,6 +17,8 @@ namespace SMUBE.BattleState
 
         public BattleStateModel(BattleStateModel sourceBattleStateModel) 
         {
+            Units = new List<Unit>();
+            ActionQueue = new Queue<Unit>();
             foreach (var unit in sourceBattleStateModel.Units)
             {
                 Units.Add(unit.DeepCopy());

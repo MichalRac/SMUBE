@@ -21,8 +21,9 @@ namespace SMUBE.Units
                 teamCounts.Add(teamId, 0);
             }
 
-            var newUnitIdentifier = new UnitIdentifier(teamCounts[teamId], teamId); 
-            var newUnitStats = CreateCharacter<T>().DefaultStats;
+            var newUnitIdentifier = new UnitIdentifier(teamCounts[teamId], teamId);
+            var baseUnit = CreateCharacter<T>();
+            var newUnitStats = baseUnit.DefaultStats;
             var newUnitName = nameof(T) + $"_team{newUnitIdentifier.TeamId}_id{newUnitIdentifier.PersonalId}";
 
             teamCounts[teamId] = teamCounts[teamId] + 1;
@@ -32,7 +33,7 @@ namespace SMUBE.Units
                 aiModel = StateMachineConfig.GetStateMachineForArchetype(newUnitStats.BaseCharacter);
             }
 
-            return new Unit(newUnitName, newUnitIdentifier, newUnitStats, aiModel);
+            return new Unit(newUnitName, newUnitIdentifier, newUnitStats, aiModel, baseUnit.AvailableCommands);
         }
 
         public static BaseCharacter CreateCharacter<T>() where T : BaseCharacter, new()

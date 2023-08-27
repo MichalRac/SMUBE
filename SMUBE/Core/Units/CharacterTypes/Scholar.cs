@@ -1,4 +1,7 @@
-﻿using SMUBE.DataStructures.Units;
+﻿using Commands;
+using SMUBE.Commands.SpecificCommands.HealAll;
+using SMUBE.Commands.SpecificCommands.HeavyAttack;
+using SMUBE.DataStructures.Units;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +19,11 @@ namespace SMUBE.Units.CharacterTypes
                                                                 UnitConsts.ScholarInfo.Power,
                                                                 UnitConsts.ScholarInfo.Defense,
                                                                 UnitConsts.ScholarInfo.Speed);
+
+        public override List<ICommand> AvailableCommands => new List<ICommand>()
+        {
+            new HealAll(),
+        };
+
     }
 }

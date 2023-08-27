@@ -1,4 +1,5 @@
-﻿using SMUBE.BattleState;
+﻿using Commands;
+using SMUBE.BattleState;
 using SMUBE.DataStructures.Units;
 using System;
 using System.Collections.Generic;
@@ -18,11 +19,12 @@ namespace SMUBE.AI.BehaviorTree
             this.childTasks = childTasks;
         }
 
-        public override bool Run(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
+        public override bool Run(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier, out ICommand finalCommand)
         {
+            finalCommand = null;
             foreach (BehaviorTreeTask task in childTasks)
             {
-                if (!task.Run(battleStateModel, activeUnitIdentifier))
+                if (!task.Run(battleStateModel, activeUnitIdentifier, out finalCommand))
                 {
                     return false;
                 }

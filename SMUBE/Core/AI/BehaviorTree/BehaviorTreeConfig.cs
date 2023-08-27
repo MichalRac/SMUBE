@@ -29,18 +29,21 @@ namespace SMUBE.AI.BehaviorTree
         public static BehaviorTreeTask GetHunterBehaviorTree()
         {
             return new BehaviorTreeSelector(new List<BehaviorTreeTask>() { 
+                new BehaviorTreeHeavyAttack(),
                 new BehaviorTreeBasicAttack(), 
                 new BehaviorTreeBasicBlock()});
         }
         public static BehaviorTreeTask GetScholarBehaviorTree()
         {
             return new BehaviorTreeSelector(new List<BehaviorTreeTask>() {
+                new BehaviorTreeHealAll(),
                 new BehaviorTreeBasicAttack(),
                 new BehaviorTreeBasicBlock()});
         }
         public static BehaviorTreeTask GetSquireBehaviorTree()
         {
             return new BehaviorTreeSelector(new List<BehaviorTreeTask>() {
+                new BehaviorTreeDefendAll(),
                 new BehaviorTreeBasicAttack(),
                 new BehaviorTreeBasicBlock()});
         }

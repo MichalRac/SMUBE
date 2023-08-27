@@ -15,6 +15,7 @@ namespace SMUBE.Units
 {
     public class Unit
     {
+        private bool isDeepCopy = false;
         public UnitData UnitData { get; private set; }
         public List<ICommand> ViableCommands { get; private set; } = new List<ICommand>();
         public AIModel AiModel { get; }
@@ -40,6 +41,7 @@ namespace SMUBE.Units
 
             ViableCommands.Add(new BaseAttack());
             ViableCommands.Add(new BaseBlock());
+            ViableCommands.AddRange(argViableCommands);
         }
 
         private Unit(Unit sourceUnit)
@@ -47,6 +49,7 @@ namespace SMUBE.Units
             UnitData = sourceUnit.UnitData.DeepCopy();
             ViableCommands = sourceUnit.ViableCommands;
             AiModel = sourceUnit.AiModel;
+            isDeepCopy = true;
         }
 
         public Unit DeepCopy()

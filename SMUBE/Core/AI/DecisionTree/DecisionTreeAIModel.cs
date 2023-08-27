@@ -20,7 +20,7 @@ namespace SMUBE.AI.DecisionTree
             {
                 var baseCharacter = unit.UnitData.UnitStats.BaseCharacter;
                 var decisionTree = DecisionTreeConfigs.GetDecisionTreeForArchetype(baseCharacter);
-                var decision = decisionTree.MakeDecision();
+                var decision = decisionTree.MakeDecision(battleStateModel);
 
                 if(decision is DecisionTreeAction action)
                 {

@@ -2,7 +2,8 @@
 using Commands.SpecificCommands.BaseAttack;
 using SMUBE.BattleState;
 using SMUBE.Commands;
-using SMUBE.Commands.SpecificCommands.BaseBlock;
+using SMUBE.Commands.SpecificCommands.DefendAll;
+using SMUBE.Commands.SpecificCommands.HeavyAttack;
 using SMUBE.DataStructures.Units;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace SMUBE.AI.BehaviorTree
 {
-    public class BehaviorTreeBasicBlock : BehaviorTreeTask
+    internal class BehaviorTreeDefendAll : BehaviorTreeTask
     {
         public override bool Run(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier, out ICommand finalCommand)
         {
@@ -23,10 +24,16 @@ namespace SMUBE.AI.BehaviorTree
 
                 foreach (var command in viableCommands)
                 {
-                    if (command is BaseBlock baseBlock)
+                    if (command is DefendAll defendAll)
                     {
-                        var commandArgs = CommandArgsHelper.GetDumbCommandArgs(baseBlock, battleStateModel, activeUnitIdentifier);
-                        var success = battleStateModel.ExecuteCommand(baseBlock, commandArgs);
+                        var commandArgs = CommandArgsHelper.GetRandomCommandArgs(defendAll, battleStateModel, activeUnitIdentifier);
+                        var success = unit.UnitData.UnitStats.CanUseAbility(defendAll);
+                        if (!success)
+                        {
+                            return false;
+                        }
+
+                        success = battleStateModel.ExecuteCommand(defendAll, commandArgs);
 
                         if (success)
                         {
@@ -34,7 +41,6 @@ namespace SMUBE.AI.BehaviorTree
                         }
 
                         return success;
-                        return true;
                     }
                 }
                 return false;
@@ -43,6 +49,5 @@ namespace SMUBE.AI.BehaviorTree
             Console.WriteLine($"Trying to fetch actions for unit {unit.UnitData.Name} that is not part of the battle!");
             return false;
         }
-
     }
 }

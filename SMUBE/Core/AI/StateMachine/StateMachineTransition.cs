@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SMUBE.BattleState;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,6 @@ namespace SMUBE.AI.StateMachine
             TargetState = targetState;
         }
 
-        public abstract bool IsTriggered();
+        public abstract bool IsTriggered(BattleStateModel battleStateModel);
     }
 }

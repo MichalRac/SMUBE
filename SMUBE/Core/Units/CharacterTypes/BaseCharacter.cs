@@ -1,4 +1,5 @@
-﻿using SMUBE.DataStructures.Units;
+﻿using Commands;
+using SMUBE.DataStructures.Units;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,7 @@ namespace SMUBE.Units.CharacterTypes
     public abstract class BaseCharacter
     {
         public abstract UnitStats DefaultStats { get; }
+
+        public abstract List<ICommand> AvailableCommands { get; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Commands.SpecificCommands.BaseAttack;
+﻿using Commands;
+using Commands.SpecificCommands.BaseAttack;
 using SMUBE.BattleState;
 using SMUBE.Commands;
 using SMUBE.DataStructures.Units;
@@ -14,8 +15,9 @@ namespace SMUBE.AI.BehaviorTree
 {
     public class BehaviorTreeBasicAttack : BehaviorTreeTask
     {
-        public override bool Run(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
+        public override bool Run(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier, out ICommand finalCommand)
         {
+            finalCommand = null;
             if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
             {
                 var viableCommands = unit.ViableCommands;
@@ -25,7 +27,14 @@ namespace SMUBE.AI.BehaviorTree
                     if(command is BaseAttack baseAttack)
                     {
                         var commandArgs = CommandArgsHelper.GetRandomCommandArgs(baseAttack, battleStateModel, activeUnitIdentifier);
-                        battleStateModel.ExecuteCommand(baseAttack, commandArgs);
+                        var success = battleStateModel.ExecuteCommand(baseAttack, commandArgs);
+
+                        if (success)
+                        {
+                            finalCommand = command;
+                        }
+
+                        return success;
                         return true;
                     }
                 }

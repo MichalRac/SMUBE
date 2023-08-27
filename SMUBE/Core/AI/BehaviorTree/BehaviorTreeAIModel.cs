@@ -24,8 +24,8 @@ namespace SMUBE.AI.BehaviorTree
             {
                 var baseCharacter = unit.UnitData.UnitStats.BaseCharacter;
                 var behaviorTree = BehaviorTreeConfig.GetBehaviorTreeForArchetype(baseCharacter);
-                behaviorTree.Run(battleStateModel, activeUnitIdentifier);
-                return null;            
+                behaviorTree.Run(battleStateModel, activeUnitIdentifier, out var finalCommand);
+                return finalCommand;            
             }
 
             Console.WriteLine($"Trying to fetch actions for unit {unit.UnitData.Name} that is not part of the battle!");

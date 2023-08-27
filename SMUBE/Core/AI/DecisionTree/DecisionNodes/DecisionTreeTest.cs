@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Commands;
+using SMUBE.BattleState;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,11 +19,13 @@ namespace SMUBE.AI.DecisionTree
             _nodeIfFalse = nodeIfFalse;
         }
 
-        protected abstract bool Test();
+        protected abstract bool Test(BattleStateModel battleStateModel = null, CommandArgs commandArgs = null);
 
-        public DecisionTreeNode MakeDecision()
+        public DecisionTreeNode MakeDecision(BattleStateModel battleStateModel = null, CommandArgs commandArgs = null)
         {
-            return Test() ? _nodeIfTrue : _nodeIfFalse;
+            return Test(battleStateModel, commandArgs)
+                ? _nodeIfTrue.MakeDecision(battleStateModel, commandArgs) 
+                : _nodeIfFalse.MakeDecision(battleStateModel, commandArgs);
         }
     }
 }

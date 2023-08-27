@@ -16,6 +16,9 @@ namespace Commands
         BaseBlock = 296890,
 
         // todo class specific
+        DefendAll = 981175,
+        HealAll = 115850,
+        HeavyAttack = 997422,
 
     }
 }

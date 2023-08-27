@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -126,10 +127,14 @@ namespace SMUBE_Utils.Simulator
         private static int turnCounter = 0;
         private static void TurnChoice()
         {
-            Console.WriteLine($"-- -- -- -- -- --");
-            Console.WriteLine($"-- TURN {turnCounter} --");
-            Console.WriteLine($"-- -- -- -- -- --");
+            void turn_log()
+            {
+                Console.WriteLine($"\n-- -- -- -- -- --");
+                Console.WriteLine($"-- TURN {turnCounter} --");
+                Console.WriteLine($"-- -- -- -- -- --");
+            }
 
+            turn_log();
             Console.WriteLine("Options:");
             Console.WriteLine("1. Continue");
             Console.WriteLine("2. Auto-continue");
@@ -156,7 +161,15 @@ namespace SMUBE_Utils.Simulator
                     }
                     break;
                 case ConsoleKey.D2:
-                    while (!ResolveTurn()) { }
+                    var gameAutoResolved = false;
+                    while (!gameAutoResolved)
+                    {
+                        gameAutoResolved = ResolveTurn();
+                        if (!gameAutoResolved)
+                        {
+                            turn_log();
+                        }
+                    }
                     Finish();
                     break;
                 case ConsoleKey.D3:
@@ -256,10 +269,11 @@ namespace SMUBE_Utils.Simulator
             if(unit.AiModel is BehaviorTreeAIModel)
             {
                 commandStopwatch.Start();
-                unit.AiModel.ResolveNextCommand(_core.currentStateModel, unit.UnitData.UnitIdentifier);
+                nextCommand = unit.AiModel.ResolveNextCommand(_core.currentStateModel, unit.UnitData.UnitIdentifier);
                 commandStopwatch.Stop();
 
                 Console.WriteLine($"Unit {unit.UnitData.ToShortString()}");
+                Console.WriteLine($"Used {nextCommand.GetType().Name}");
             }
             else
             {
@@ -270,13 +284,19 @@ namespace SMUBE_Utils.Simulator
                 nextArgs = unit.AiModel.GetCommandArgs(nextCommand, _core.currentStateModel, unit.UnitData.UnitIdentifier);
                 argsStopwatch.Stop();
 
-                Console.WriteLine($"Unit {unit.UnitData.ToShortString()}");
-                Console.WriteLine($"Used {nextCommand.GetType().Name}");
+                if(nextArgs.TargetUnits != null && nextArgs.TargetUnits.Count > 0)
+                {
+                    Console.WriteLine($"\nUnit {unit.UnitData.Name} Used {nextCommand.GetType().Name} on {nextArgs.TargetUnits[0].Name}\n");
+                }
+                else
+                {
+                    Console.WriteLine($"\nUnit {unit.UnitData.Name} Used {nextCommand.GetType().Name}");
+                }
             }
 
 
             // todo investigate why first lookup on state model from ai model causes additional processing time
-            if(!prewarm)
+            if (!prewarm)
             {
                 prewarm = true;
             }
@@ -299,6 +319,18 @@ namespace SMUBE_Utils.Simulator
             if (!(unit.AiModel is BehaviorTreeAIModel))
             {
                 _core.currentStateModel.ExecuteCommand(nextCommand, nextArgs);
+            }
+
+            Console.WriteLine("Unit Summary:");
+            for (int i = 0; i < _core.currentStateModel.Units.Count; i++)
+            {
+                Console.WriteLine(write_unit_summary(_core.currentStateModel.Units[i]));
+                string write_unit_summary(Unit loggedUnit)
+                {
+                    var unitCache = loggedUnit;
+                    var unitStats = unitCache.UnitData.UnitStats;
+                    return $"{unitCache.UnitData.Name} {unitCache.UnitData.UnitStats.BaseCharacter.GetType().Name}\thp{unitStats.CurrentHealth}/{unitStats.MaxHealth}\tsp{unitStats.CurrentStamina}/{unitStats.MaxStamina}   \tmp{unitStats.CurrentMana}/{unitStats.MaxMana}";
+                }
             }
 
             turnCounter++;

@@ -55,17 +55,17 @@ namespace SMUBE.DataStructures.Units
             Speed = speed;
         }
 
-        private UnitStats(UnitStats sourceUnitStats)
+        public UnitStats(UnitStats sourceUnitStats)
         {
             BaseCharacter = sourceUnitStats.BaseCharacter;
 
-            CurrentHealth = sourceUnitStats.MaxHealth;
+            CurrentHealth = sourceUnitStats.CurrentHealth;
             MaxHealth = sourceUnitStats.MaxHealth;
 
-            CurrentStamina = sourceUnitStats.MaxStamina;
+            CurrentStamina = sourceUnitStats.CurrentStamina;
             MaxStamina = sourceUnitStats.MaxStamina;
 
-            CurrentMana = sourceUnitStats.MaxMana;
+            CurrentMana = sourceUnitStats.CurrentMana;
             MaxMana = sourceUnitStats.MaxMana;
 
             Power = sourceUnitStats.Power;
@@ -73,20 +73,25 @@ namespace SMUBE.DataStructures.Units
             Speed = sourceUnitStats.Speed;
         }
 
-        public UnitStats Copy()
-        {
-            return new UnitStats(this);
-        }
-
         public bool IsAlive()
         {
             return CurrentHealth > 0;
         }
 
-        internal void UseAbility(ICommand command)
+        internal bool CanUseAbility(ICommand command)
         {
+            return CurrentStamina >= command.StaminaCost && CurrentMana >= command.ManaCost;
+        }
+
+        internal bool TryUseAbility(ICommand command)
+        {
+            if(!CanUseAbility(command))
+            {
+                return false;
+            }
             CurrentStamina -= command.StaminaCost;
             CurrentMana -= command.ManaCost;
+            return true;
         }
 
         internal void DeltaHealth(int delta)

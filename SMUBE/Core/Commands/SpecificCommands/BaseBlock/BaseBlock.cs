@@ -30,7 +30,6 @@ namespace SMUBE.Commands.SpecificCommands.BaseBlock
                 return false;
             }
 
-
             battleStateModel.TryGetUnit(commandArgs.ActiveUnit.UnitIdentifier, out var activeUnit);
 
             if(activeUnit == null)
@@ -38,7 +37,7 @@ namespace SMUBE.Commands.SpecificCommands.BaseBlock
                 return false;
             }
 
-            activeUnit.UnitData.UnitStats.UseAbility(this);
+            activeUnit.UnitData.UnitStats.TryUseAbility(this);
             activeUnit.UnitData.UnitStats.AddEffects(GetCommandResults(commandArgs));
 
             return true;
@@ -48,6 +47,7 @@ namespace SMUBE.Commands.SpecificCommands.BaseBlock
         {
             var results = new CommandResults();
 
+            results.targets.Add(commandArgs.ActiveUnit);
             results.effects.Add(new BlockEffect());
 
             return results;

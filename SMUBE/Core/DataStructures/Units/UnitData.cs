@@ -24,7 +24,7 @@ namespace SMUBE.DataStructures.Units
         {
             UnitIdentifier = sourceUnitData.UnitIdentifier;
             Name = sourceUnitData.Name;
-            UnitStats = sourceUnitData.UnitStats.Copy();
+            UnitStats = new UnitStats(sourceUnitData.UnitStats);
         }
 
         public UnitData DeepCopy()

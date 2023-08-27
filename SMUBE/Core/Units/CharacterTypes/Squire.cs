@@ -1,4 +1,7 @@
-﻿using SMUBE.DataStructures.Units;
+﻿using Commands;
+using SMUBE.Commands.SpecificCommands.DefendAll;
+using SMUBE.Commands.SpecificCommands.HealAll;
+using SMUBE.DataStructures.Units;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +19,10 @@ namespace SMUBE.Units.CharacterTypes
                                                                 UnitConsts.SquireInfo.Power,
                                                                 UnitConsts.SquireInfo.Defense,
                                                                 UnitConsts.SquireInfo.Speed);
+
+        public override List<ICommand> AvailableCommands => new List<ICommand>()
+        {
+            new DefendAll(),
+        };
     }
 }

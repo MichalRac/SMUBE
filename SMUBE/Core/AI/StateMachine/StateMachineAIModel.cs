@@ -17,13 +17,13 @@ namespace SMUBE.AI.StateMachine
             currentState = initialState;
         }
 
-        public void ResolveTransitions()
+        public void ResolveTransitions(BattleStateModel battleStateModel)
         {
             StateMachineTransition triggeredTransition = null;
 
             foreach (var transition in currentState.Transitions)
             {
-                if (transition.IsTriggered())
+                if (transition.IsTriggered(battleStateModel))
                 {
                     triggeredTransition = transition;
                     break;
@@ -38,7 +38,7 @@ namespace SMUBE.AI.StateMachine
 
         public override ICommand ResolveNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
-            ResolveTransitions();
+            ResolveTransitions(battleStateModel);
 
             return currentState.Command;
         }

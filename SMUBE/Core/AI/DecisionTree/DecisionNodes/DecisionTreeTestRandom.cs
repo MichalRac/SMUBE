@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Commands;
+using SMUBE.BattleState;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,7 +17,7 @@ namespace SMUBE.AI.DecisionTree
             _chance = chance;
         }
 
-        protected override bool Test()
+        protected override bool Test(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
             return new Random().NextDouble() <= _chance;
         }

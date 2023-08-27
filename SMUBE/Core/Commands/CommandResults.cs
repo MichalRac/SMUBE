@@ -10,6 +10,7 @@ namespace Commands
 {
     public class CommandResults
     {
+        public List<UnitData> targets = new List<UnitData>();
         public List<Effect> effects = new List<Effect>();
     }
 }

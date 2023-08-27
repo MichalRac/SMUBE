@@ -47,6 +47,7 @@ namespace SMUBE.Commands.SpecificCommands.BaseBlock
         {
             var results = new CommandResults();
 
+            results.performer = commandArgs.ActiveUnit;
             results.targets.Add(commandArgs.ActiveUnit);
             results.effects.Add(new BlockEffect());
 

@@ -90,6 +90,47 @@ namespace SMUBE.Commands
             }
         }
 
+        public static List<CommandArgs> GetAllViableRandomCommandArgs(ICommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
+        {
+            var listViable = new List<CommandArgs>();
+
+            if (command.CommandArgsValidator is OneToSelfArgsValidator)
+            {
+                listViable.Add(GetDumbCommandArgs(command, battleStateModel, activeUnitIdentifier));
+                return listViable;
+            }
+            else if (command.CommandArgsValidator is OneToOneArgsValidator)
+            {
+                if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
+                {
+                    // todo hardcoded 2 teams limit
+                    var enemyTeamId = unit.UnitData.UnitIdentifier.TeamId == 0 ? 1 : 0;
+                    var enemyTeamUnits = battleStateModel.GetTeamUnits(enemyTeamId).Where(u => u.UnitData.UnitStats.IsAlive());
+                    if (enemyTeamUnits != null && enemyTeamUnits.Count() > 0)
+                    {
+                        foreach (var enemyTeamUnit in enemyTeamUnits)
+                        {
+                            listViable.Add(new CommonArgs(unit.UnitData, new List<UnitData>() { enemyTeamUnit.UnitData }, battleStateModel));
+                        }
+
+                        return listViable;
+                    }
+
+                    return null;
+                }
+                return null;
+            }
+            else if(command.CommandArgsValidator is OneToEveryArgsValidator)
+            {
+                listViable.Add(GetDumbCommandArgs(command, battleStateModel, activeUnitIdentifier));
+                return listViable;  
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public static CommandArgs GetRandomCommandArgs(ICommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
             if (command.CommandArgsValidator is OneToSelfArgsValidator)

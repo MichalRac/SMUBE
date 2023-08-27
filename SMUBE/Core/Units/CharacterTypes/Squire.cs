@@ -24,5 +24,6 @@ namespace SMUBE.Units.CharacterTypes
         {
             new DefendAll(),
         };
+        public override BaseCharacterType BaseCharacterType => BaseCharacterType.Squire;
     }
 }

@@ -60,6 +60,7 @@ namespace SMUBE.Commands.SpecificCommands.DefendAll
         public CommandResults GetCommandResults(CommandArgs commandArgs)
         {
             var results = new CommandResults();
+            results.performer = commandArgs.ActiveUnit;
             results.targets.AddRange(commandArgs.TargetUnits);
             results.effects.Add(new BlockEffect(DEFEND_ALL_PERSISTANCE));
             return results;

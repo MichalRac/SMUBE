@@ -24,6 +24,7 @@ namespace SMUBE.Units.CharacterTypes
         {
             new HealAll(),
         };
+        public override BaseCharacterType BaseCharacterType => BaseCharacterType.Scholar;
 
     }
 }

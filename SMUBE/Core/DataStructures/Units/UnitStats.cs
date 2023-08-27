@@ -121,7 +121,7 @@ namespace SMUBE.DataStructures.Units
             ModifyByPersistantEffects(commandResults);
             foreach (var effect in commandResults.effects)
             {
-                effect.Apply(this);
+                effect.Apply(this, commandResults);
 
                 if(effect.GetPersistence() > 0)
                 {

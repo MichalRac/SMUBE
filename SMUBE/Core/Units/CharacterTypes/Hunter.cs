@@ -24,5 +24,7 @@ namespace SMUBE.Units.CharacterTypes
         {
             new HeavyAttack(),
         };
+
+        public override BaseCharacterType BaseCharacterType => BaseCharacterType.Hunter;
     }
 }

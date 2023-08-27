@@ -34,33 +34,40 @@ namespace SMUBE.AI.GoalOrientedBehavior
                 foreach (var action in viableActions)
                 {
                     var battleStateModelDeepCopy = battleStateModel.DeepCopy();
-                    var commandArgs = CommandArgsHelper.GetRandomCommandArgs(action, battleStateModelDeepCopy, activeUnitIdentifier);
-                    
-                    bool success = action.Execute(battleStateModelDeepCopy, commandArgs);
+                    var validCommandArgs = CommandArgsHelper.GetAllViableRandomCommandArgs(action, battleStateModelDeepCopy, activeUnitIdentifier);
 
-                    if(!success)
+                    foreach (var commandArgs in validCommandArgs)
                     {
-                        continue;
-                    }
+                        var battleStateModelArgDeepCopy = battleStateModelDeepCopy.DeepCopy();
+                        bool success = action.Execute(battleStateModelDeepCopy, commandArgs);
 
-                    var discontentment = GetDiscontentment(goals, battleStateModelDeepCopy, activeUnitIdentifier);
-                    if(discontentment < minDiscontentment)
-                    {
-                        minDiscontentment = discontentment;
-                        bestAction = action;
-                        bestArgs = commandArgs;
+                        if (!success)
+                        {
+                            continue;
+                        }
+
+                        var discontentment = GetDiscontentment(goals, battleStateModelDeepCopy, activeUnitIdentifier);
+                        if (discontentment < minDiscontentment)
+                        {
+                            minDiscontentment = discontentment;
+                            bestAction = action;
+                            bestArgs = commandArgs;
+                        }
                     }
                 }
 
                 var targetUnits = new List<UnitData>();
-                foreach (var deepCopyTargetUnit in bestArgs.TargetUnits)
+                if(bestArgs.TargetUnits?.Count > 0)
                 {
-                    if(battleStateModel.TryGetUnit(deepCopyTargetUnit.UnitIdentifier, out var targetUnit))
+                    foreach (var deepCopyTargetUnit in bestArgs.TargetUnits)
                     {
-                        targetUnits.Add(targetUnit.UnitData);
-                        continue;
+                        if (battleStateModel.TryGetUnit(deepCopyTargetUnit.UnitIdentifier, out var targetUnit))
+                        {
+                            targetUnits.Add(targetUnit.UnitData);
+                            continue;
+                        }
+                        return null;
                     }
-                    return null;
                 }
 
                 bestAction.ArgsCache = new CommonArgs(activeUnit.UnitData, targetUnits, battleStateModel);

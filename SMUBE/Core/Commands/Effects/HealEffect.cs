@@ -1,4 +1,5 @@
-﻿using SMUBE.DataStructures.Units;
+﻿using Commands;
+using SMUBE.DataStructures.Units;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,9 +17,9 @@ namespace SMUBE.Commands.Effects
             Value = value;
         }
 
-        public override void Apply(UnitStats unitStats)
+        public override void Apply(UnitStats unitStats, CommandResults commandResults)
         {
-            unitStats.DeltaHealth(Value / 2);
+            unitStats.DeltaHealth(Value);
         }
     }
 }

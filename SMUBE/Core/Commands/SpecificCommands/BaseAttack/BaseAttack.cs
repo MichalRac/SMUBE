@@ -49,6 +49,7 @@ namespace Commands.SpecificCommands.BaseAttack
         public CommandResults GetCommandResults(CommandArgs commandArgs)
         {
             var results = new CommandResults();
+            results.performer = commandArgs.ActiveUnit;
             results.targets.Add(commandArgs.TargetUnits.First());
             results.effects.Add(new DamageEffect(commandArgs.ActiveUnit.UnitStats.Power));
             return results;

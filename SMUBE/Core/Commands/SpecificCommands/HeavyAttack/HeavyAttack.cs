@@ -56,6 +56,7 @@ namespace SMUBE.Commands.SpecificCommands.HeavyAttack
         public CommandResults GetCommandResults(CommandArgs commandArgs)
         {
             var results = new CommandResults();
+            results.performer = commandArgs.ActiveUnit;
             results.targets.Add(commandArgs.TargetUnits.First());
             results.effects.Add(new DamageEffect(commandArgs.ActiveUnit.UnitStats.Power * HEAVY_ATTACK_POWER_MULTIPLIER));
             return results;

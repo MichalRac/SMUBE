@@ -75,6 +75,7 @@
     <Compile Include="AI\GoalOrientedBehavior\Goal.cs" />
     <Compile Include="AI\GoalOrientedBehavior\GoalOrientedBehaviorAIModel.cs" />
     <Compile Include="AI\GoalOrientedBehavior\GOPConfig.cs" />
+    <Compile Include="AI\GoalOrientedBehavior\LowerEnemyHealthGoal.cs" />
     <Compile Include="AI\GoalOrientedBehavior\SurviveGoal.cs" />
     <Compile Include="AI\GoalOrientedBehavior\WinGoal.cs" />
     <Compile Include="AI\RandomAIModel.cs" />

@@ -1,8 +1,10 @@
 ﻿using Commands;
 using Commands.SpecificCommands._Common;
+using SMUBE.AI.DecisionTree;
 using SMUBE.BattleState;
 using SMUBE.Commands;
 using SMUBE.DataStructures.Units;
+using SMUBE.Units.CharacterTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +15,21 @@ namespace SMUBE.AI.GoalOrientedBehavior
 {
     public class GoalOrientedBehaviorAIModel : AIModel
     {
+        public GoalOrientedBehaviorAIModel(bool useSimpleBehavior) : base(useSimpleBehavior)
+        {
+        }
+
+        private List<Goal> _goals = new List<Goal>();
+        private List<Goal> GetGoals(BaseCharacter baseCharacter)
+        {
+            if (_goals != null && _goals.Count > 0)
+                return _goals;
+
+            _goals = GOPConfig.GetGoalsForArchetype(baseCharacter, UseSimpleBehavior);
+            return _goals;
+        }
+
+
         public override CommandArgs GetCommandArgs(ICommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
             return command.ArgsCache;
@@ -23,7 +40,7 @@ namespace SMUBE.AI.GoalOrientedBehavior
             if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var activeUnit))
             {
                 var baseCharacter = activeUnit.UnitData.UnitStats.BaseCharacter;
-                var goals = GOPConfig.GetGoalsForArchetype(baseCharacter);
+                var goals = GetGoals(baseCharacter);
 
                 var viableActions = activeUnit.ViableCommands;
 

@@ -11,16 +11,16 @@ namespace SMUBE.AI.BehaviorTree
     public static class BehaviorTreeConfig
     {
 
-        public static BehaviorTreeTask GetBehaviorTreeForArchetype(BaseCharacter character)
+        public static BehaviorTreeTask GetBehaviorTreeForArchetype(BaseCharacter character, bool simpleSetup = false)
         {
             switch (character)
             {
                 case Hunter _:
-                    return GetHunterBehaviorTree();
+                    return simpleSetup ? GetSimpleHunterBehaviorTree() : GetHunterBehaviorTree();
                 case Scholar _:
-                    return GetScholarBehaviorTree();
+                    return simpleSetup ? GetSimpleScholarBehaviorTree() : GetScholarBehaviorTree();
                 case Squire _:
-                    return GetSquireBehaviorTree();
+                    return simpleSetup ? GetSimpleSquireBehaviorTree() : GetSquireBehaviorTree();
                 default:
                     return null;
             }
@@ -48,5 +48,23 @@ namespace SMUBE.AI.BehaviorTree
                 new BehaviorTreeBasicBlock()});
         }
 
+        public static BehaviorTreeTask GetSimpleHunterBehaviorTree()
+        {
+            return new BehaviorTreeSelector(new List<BehaviorTreeTask>() { 
+                new BehaviorTreeBasicAttack(), 
+                new BehaviorTreeBasicBlock()});
+        }
+        public static BehaviorTreeTask GetSimpleScholarBehaviorTree()
+        {
+            return new BehaviorTreeSelector(new List<BehaviorTreeTask>() {
+                new BehaviorTreeBasicAttack(),
+                new BehaviorTreeBasicBlock()});
+        }
+        public static BehaviorTreeTask GetSimpleSquireBehaviorTree()
+        {
+            return new BehaviorTreeSelector(new List<BehaviorTreeTask>() {
+                new BehaviorTreeBasicAttack(),
+                new BehaviorTreeBasicBlock()});
+        }
     }
 }

@@ -9,16 +9,16 @@ namespace SMUBE.AI.GoalOrientedBehavior
 {
     public static class GOPConfig
     {
-        public static List<Goal> GetGoalsForArchetype(BaseCharacter character)
+        public static List<Goal> GetGoalsForArchetype(BaseCharacter character, bool useSimpleBehavior)
         {
             switch (character)
             {
                 case Hunter _:
-                    return GetHunterGoals();
+                    return useSimpleBehavior ? GetSimpleHunterGoals() : GetHunterGoals();
                 case Scholar _:
-                    return GetScholarGoals();
+                    return useSimpleBehavior ? GetSimpleScholarGoals() : GetScholarGoals();
                 case Squire _:
-                    return GetSquireGoals();
+                    return useSimpleBehavior ? GetSimpleSquireGoals() : GetSquireGoals();
                 default:
                     return null;
             }
@@ -39,6 +39,7 @@ namespace SMUBE.AI.GoalOrientedBehavior
             {
                 new WinGoal(),
                 new LowerEnemyHealthGoal(),
+                new KeepTeamHealthUpGoal(),
                 new SurviveGoal(),
             };
         }
@@ -48,6 +49,32 @@ namespace SMUBE.AI.GoalOrientedBehavior
             {
                 new WinGoal(),
                 new LowerEnemyHealthGoal(),
+                new KeepTeamGuardedGoal(),
+                new SurviveGoal(),
+            };
+        }
+
+        public static List<Goal> GetSimpleHunterGoals()
+        {
+            return new List<Goal>()
+            {
+                new WinGoal(),
+                new SurviveGoal(),
+            };
+        }
+        public static List<Goal> GetSimpleScholarGoals()
+        {
+            return new List<Goal>()
+            {
+                new WinGoal(),
+                new SurviveGoal(),
+            };
+        }
+        public static List<Goal> GetSimpleSquireGoals()
+        {
+            return new List<Goal>()
+            {
+                new WinGoal(),
                 new SurviveGoal(),
             };
         }

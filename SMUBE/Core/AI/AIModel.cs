@@ -11,6 +11,13 @@ namespace SMUBE.AI
 {
     public abstract class AIModel
     {
+        public bool UseSimpleBehavior { get; }
+
+        protected AIModel(bool useSimpleBehavior)
+        {
+            this.UseSimpleBehavior = useSimpleBehavior;
+        }
+
         public abstract ICommand ResolveNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier);
         public abstract CommandArgs GetCommandArgs(ICommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier);
 

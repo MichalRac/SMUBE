@@ -3,6 +3,7 @@ using SMUBE.AI.GoalOrientedBehavior;
 using SMUBE.BattleState;
 using SMUBE.Commands;
 using SMUBE.DataStructures.Units;
+using SMUBE.Units.CharacterTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,19 @@ namespace SMUBE.AI.BehaviorTree
 {
     public class BehaviorTreeAIModel : AIModel
     {
+
+        public BehaviorTreeAIModel(bool useSimpleBehavior) : base(useSimpleBehavior) { }
+
+        private BehaviorTreeTask _behaviorTree;
+        private BehaviorTreeTask GetBehaviorTree(BaseCharacter baseCharacter)
+        {
+            if(_behaviorTree != null)
+                return _behaviorTree;
+
+            _behaviorTree = BehaviorTreeConfig.GetBehaviorTreeForArchetype(baseCharacter, UseSimpleBehavior);
+            return _behaviorTree;
+        }
+
         public override CommandArgs GetCommandArgs(ICommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
             return null;
@@ -23,7 +37,7 @@ namespace SMUBE.AI.BehaviorTree
             if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
             {
                 var baseCharacter = unit.UnitData.UnitStats.BaseCharacter;
-                var behaviorTree = BehaviorTreeConfig.GetBehaviorTreeForArchetype(baseCharacter);
+                var behaviorTree = GetBehaviorTree(baseCharacter);
                 behaviorTree.Run(battleStateModel, activeUnitIdentifier, out var finalCommand);
                 return finalCommand;            
             }

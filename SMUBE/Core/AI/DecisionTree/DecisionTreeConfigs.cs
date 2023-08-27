@@ -11,19 +11,36 @@ namespace SMUBE.AI.DecisionTree
 {
     public static class DecisionTreeConfigs
     {
-        public static DecisionTreeNode GetDecisionTreeForArchetype(BaseCharacter character)
+        public static DecisionTreeNode GetDecisionTreeForArchetype(BaseCharacter character, bool useSimpleBehavior)
         {
             switch (character)
             {
                 case Hunter _:
-                    return GetHunterDecisionTree();
+                    return useSimpleBehavior ? GetSimpleHunterDecisionTree() : FakeDecisionTreeExpander(GetHunterDecisionTree());
                 case Scholar _:
-                    return GetScholarDecisionTree();
+                    return useSimpleBehavior ? GetSimpleScholarDecisionTree() : FakeDecisionTreeExpander(GetScholarDecisionTree());
                 case Squire _:
-                    return GetSquireDecisionTree();
+                    return useSimpleBehavior ? GetSimpleSquireDecisionTree() : FakeDecisionTreeExpander(GetSquireDecisionTree());
                 default:
                     return null;
             }    
+        }
+
+        public static DecisionTreeNode FakeDecisionTreeExpander(DecisionTreeNode treeToExpand, int count = 0)
+        {
+            count++;
+
+            if(count > 2)
+            {
+                return treeToExpand;
+            }
+            else
+            {
+                var nextNode = FakeDecisionTreeExpander(treeToExpand, count);
+                return new DecisionTreeTestRandom(1D,
+                                nextNode,
+                                nextNode);
+            }
         }
 
         public static DecisionTreeNode GetHunterDecisionTree()
@@ -49,6 +66,25 @@ namespace SMUBE.AI.DecisionTree
                 new DecisionTreeTestCanPerform<DefendAll>(
                     new DecisionTreeActionSimple<DefendAll>(),
                     new DecisionTreeActionSimple<BaseBlock>()));
+        }       
+        
+        public static DecisionTreeNode GetSimpleHunterDecisionTree()
+        {
+            return new DecisionTreeTestRandom(0.5D,
+                new DecisionTreeActionSimple<BaseAttack>(),
+                new DecisionTreeActionSimple<BaseBlock>());
+        }
+        public static DecisionTreeNode GetSimpleScholarDecisionTree()
+        {
+            return new DecisionTreeTestRandom(0.5D,
+                new DecisionTreeActionSimple<BaseAttack>(),
+                new DecisionTreeActionSimple<BaseBlock>());
+        }
+        public static DecisionTreeNode GetSimpleSquireDecisionTree()
+        {
+            return new DecisionTreeTestRandom(0.5D,
+                new DecisionTreeActionSimple<BaseAttack>(),
+                new DecisionTreeActionSimple<BaseBlock>());
         }
 
     }

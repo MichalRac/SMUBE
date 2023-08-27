@@ -13,6 +13,10 @@ namespace SMUBE.AI
     // always pick random option
     public class RandomAIModel : AIModel
     {
+        public RandomAIModel(bool useSimpleBehavior) : base(useSimpleBehavior)
+        {
+        }
+
         public override ICommand ResolveNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
             if(battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))

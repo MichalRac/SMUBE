@@ -26,41 +26,59 @@ namespace SMUBE_Utils.Simulator
         }
 
         private static BattleCore _core;
-        static AIModel team1AIModel = null;
-        static AIModel team2AIModel = null;
+        static Func<AIModel> team1AIModelProvider = null;
+        static Func<AIModel> team2AIModelProvider = null;
 
-        private static void Init()
+        private static void Init(bool autoInit = false)
         {
+            const bool useSimpleBehavior = true;
+
+            List<Unit> initUnits;
+            if (autoInit)
+            {
+                 initUnits = new List<Unit>
+                {
+                    UnitHelper.CreateUnit<Squire>(0, team1AIModelProvider?.Invoke(), useSimpleBehavior),
+                    UnitHelper.CreateUnit<Hunter>(0, team1AIModelProvider?.Invoke(), useSimpleBehavior),
+                    UnitHelper.CreateUnit<Scholar>(0, team1AIModelProvider?.Invoke(), useSimpleBehavior),
+
+                    UnitHelper.CreateUnit<Squire>(1, team2AIModelProvider?.Invoke(), useSimpleBehavior),
+                    UnitHelper.CreateUnit<Hunter>(1, team2AIModelProvider?.Invoke(), useSimpleBehavior),
+                    UnitHelper.CreateUnit<Scholar>(1, team2AIModelProvider?.Invoke(), useSimpleBehavior),
+                };
+
+                _core = new BattleCore(initUnits);
+                return;
+
+            }
+
             Console.WriteLine("Team 1 AI:");
             Console.WriteLine("1. Random AI");
-            Console.WriteLine("2. Dumb AI");
-            Console.WriteLine("3. Decision Tree AI");
-            Console.WriteLine("4. Goal Oriented Behavior AI");
-            Console.WriteLine("5. Finite State Machine AI");
-            Console.WriteLine("6. Behavior Tree AI");
+            Console.WriteLine("2. Decision Tree AI");
+            Console.WriteLine("3. Goal Oriented Behavior AI");
+            Console.WriteLine("4. Finite State Machine AI");
+            Console.WriteLine("5. Behavior Tree AI");
 
             Console.WriteLine("\nChoice:");
             var key = Console.ReadKey(true);
 
+
             switch (key.Key)
             {
                 case ConsoleKey.D1:
-                    team1AIModel = new RandomAIModel();
+                    team1AIModelProvider = () => new RandomAIModel(useSimpleBehavior);
                     break;
                 case ConsoleKey.D2:
-                    team1AIModel = new DumbAIModel();
+                    team1AIModelProvider = () => new DecisionTreeAIModel(useSimpleBehavior);
                     break;
                 case ConsoleKey.D3:
-                    team1AIModel = new DecisionTreeAIModel();
+                    team1AIModelProvider = () => new GoalOrientedBehaviorAIModel(useSimpleBehavior);
                     break;
                 case ConsoleKey.D4:
-                    team1AIModel = new GoalOrientedBehaviorAIModel();
+                    team1AIModelProvider = () => new StateMachineAIModel(null, useSimpleBehavior);
                     break;
                 case ConsoleKey.D5:
-                    team1AIModel = new StateMachineAIModel(null);
-                    break;
-                case ConsoleKey.D6:
-                    team1AIModel = new BehaviorTreeAIModel();
+                    team1AIModelProvider = () => new BehaviorTreeAIModel(useSimpleBehavior);
                     break;
                 case ConsoleKey.D0:
                     return;
@@ -71,33 +89,29 @@ namespace SMUBE_Utils.Simulator
             /////////////////////////////////
             Console.WriteLine("Team 2 AI:");
             Console.WriteLine("1. Random AI");
-            Console.WriteLine("2. Dumb AI");
-            Console.WriteLine("3. Decision Tree AI");
-            Console.WriteLine("4. Goal Oriented Behavior AI");
-            Console.WriteLine("5. Finite State Machine AI");
-            Console.WriteLine("6. Behavior Tree AI");
+            Console.WriteLine("2. Decision Tree AI");
+            Console.WriteLine("3. Goal Oriented Behavior AI");
+            Console.WriteLine("4. Finite State Machine AI");
+            Console.WriteLine("5. Behavior Tree AI");
             Console.WriteLine("\nChoice:");
             var key2 = Console.ReadKey(true);
 
             switch (key2.Key)
             {
                 case ConsoleKey.D1:
-                    team2AIModel = new RandomAIModel();
+                    team2AIModelProvider = () => new RandomAIModel(useSimpleBehavior);
                     break;
                 case ConsoleKey.D2:
-                    team2AIModel = new DumbAIModel();
+                    team2AIModelProvider = () => new DecisionTreeAIModel(useSimpleBehavior);
                     break;
                 case ConsoleKey.D3:
-                    team2AIModel = new DecisionTreeAIModel();
+                    team2AIModelProvider = () => new GoalOrientedBehaviorAIModel(useSimpleBehavior);
                     break;
                 case ConsoleKey.D4:
-                    team2AIModel = new GoalOrientedBehaviorAIModel();
+                    team2AIModelProvider = () => new StateMachineAIModel(null, useSimpleBehavior);
                     break;
                 case ConsoleKey.D5:
-                    team2AIModel = new StateMachineAIModel(null);
-                    break;
-                case ConsoleKey.D6:
-                    team2AIModel = new BehaviorTreeAIModel();
+                    team2AIModelProvider = () => new BehaviorTreeAIModel(useSimpleBehavior);
                     break;
                 case ConsoleKey.D0:
                     return;
@@ -106,15 +120,15 @@ namespace SMUBE_Utils.Simulator
                     break;
             }
 
-            List<Unit> initUnits =new List<Unit>
+            initUnits =new List<Unit>
             {
-                UnitHelper.CreateUnit<Squire>(0, team1AIModel),
-                UnitHelper.CreateUnit<Hunter>(0, team1AIModel),
-                UnitHelper.CreateUnit<Scholar>(0, team1AIModel),
+                UnitHelper.CreateUnit<Squire>(0, team1AIModelProvider?.Invoke(), useSimpleBehavior),
+                UnitHelper.CreateUnit<Hunter>(0, team1AIModelProvider?.Invoke(), useSimpleBehavior),
+                UnitHelper.CreateUnit<Scholar>(0, team1AIModelProvider?.Invoke(), useSimpleBehavior),
 
-                UnitHelper.CreateUnit<Squire>(1, team2AIModel),
-                UnitHelper.CreateUnit<Hunter>(1, team2AIModel),
-                UnitHelper.CreateUnit<Scholar>(1, team2AIModel),
+                UnitHelper.CreateUnit<Squire>(1, team2AIModelProvider?.Invoke(), useSimpleBehavior),
+                UnitHelper.CreateUnit<Hunter>(1, team2AIModelProvider?.Invoke(), useSimpleBehavior),
+                UnitHelper.CreateUnit<Scholar>(1, team2AIModelProvider?.Invoke(), useSimpleBehavior),
             };
 
             _core = new BattleCore(initUnits);
@@ -125,6 +139,7 @@ namespace SMUBE_Utils.Simulator
         }
 
         private static int turnCounter = 0;
+        private static int simulationsRun = 0;
         private static void TurnChoice()
         {
             void turn_log()
@@ -141,6 +156,7 @@ namespace SMUBE_Utils.Simulator
             Console.WriteLine("3. Show full unit summary");
             Console.WriteLine("4. Show short unit summary");
             Console.WriteLine("5. Show queue");
+            Console.WriteLine("6. Run n simulations with this setup");
             Console.WriteLine("0. Close");
 
             Console.WriteLine("\nChoice:");
@@ -190,6 +206,38 @@ namespace SMUBE_Utils.Simulator
                     }
                     TurnChoice();
                     break;
+                case ConsoleKey.D6:
+                    int get_simulation_number()
+                    {
+                        Console.WriteLine("\nNumber of simulations to be run:");
+                        var read = Console.ReadLine();
+                        if(!int.TryParse(read, out var number))
+                        {
+                            Console.WriteLine("\nNon int value provided! Try again!");
+                            return get_simulation_number();
+                        }
+                        return number;
+                    }
+
+                    var simulationNumber = get_simulation_number();
+
+                    var simulationAutoResolved = false;
+                    while (simulationsRun++ < simulationNumber)
+                    {
+                        while (!simulationAutoResolved)
+                        {
+                            simulationAutoResolved = ResolveTurn(false);
+                        }
+                        if(simulationsRun % 250 == 0)
+                        {
+                            Console.WriteLine($"simulation {simulationsRun}/{simulationNumber}");
+                        }
+                        simulationAutoResolved = false;
+                        Init(true);
+                    }
+
+                    FinishSimulationSeries();
+                    return;
                 case ConsoleKey.D0:
                     return;
                 default:
@@ -207,14 +255,22 @@ namespace SMUBE_Utils.Simulator
                 Console.WriteLine($"-- -- -- -- -- --");
 
                 Console.WriteLine($"Winner team: {winnerTeam}");
-                Console.WriteLine($"team 1 ai ({team1AIModel.GetType().Name}) runtime: command {teamOneAICommandTime}ticks / args {teamOneAIArgsTime}ticks / total {teamOneAICommandTime + teamOneAIArgsTime}");
-                Console.WriteLine($"team 2 ai ({team2AIModel.GetType().Name}) runtime: command {teamTwoAICommandTime}ticks / args {teamTwoAIArgsTime}ticks / total {teamTwoAICommandTime + teamTwoAIArgsTime}");
+                Console.WriteLine($"team 1 ai ({team1AIModelProvider.Invoke().GetType().Name}) runtime: command {teamOneAICommandTime}ticks / args {teamOneAIArgsTime}ticks / total {teamOneAICommandTime + teamOneAIArgsTime}");
+                Console.WriteLine($"team 2 ai ({team2AIModelProvider.Invoke().GetType().Name}) runtime: command {teamTwoAICommandTime}ticks / args {teamTwoAIArgsTime}ticks / total {teamTwoAICommandTime + teamTwoAIArgsTime}");
                 Console.WriteLine($"team 1 actions: {teamOneActions}");
                 Console.WriteLine($"team 2 actions: {teamTwoActions}");
 
                 Console.WriteLine($"team 1 ticks per action: {(float)(teamOneAICommandTime + teamOneAIArgsTime) / teamOneActions}");
                 Console.WriteLine($"team 2 ticks per action: {(float)(teamTwoAICommandTime + teamTwoAIArgsTime) / teamTwoActions}");
 
+                if(team1AIModelProvider.Invoke().GetType().Name == team2AIModelProvider.Invoke().GetType().Name)
+                {
+                    var aiTotalRuntime = teamOneAICommandTime + teamTwoAICommandTime;
+                    var aiTotalArgsRuntime = teamOneAIArgsTime + teamTwoAIArgsTime;
+
+                    Console.WriteLine($"ai ({team1AIModelProvider.Invoke().GetType().Name}) runtime: command {teamOneAICommandTime}ticks / args {teamOneAIArgsTime}ticks / total {teamOneAICommandTime + teamOneAIArgsTime}");
+                    Console.WriteLine($"ai ticks per action: {(float)(aiTotalRuntime + aiTotalArgsRuntime) / (teamOneActions + teamTwoActions)}");
+                }
             }
             else
             {
@@ -242,6 +298,34 @@ namespace SMUBE_Utils.Simulator
             return;
         }
 
+        private static void FinishSimulationSeries()
+        {
+            Console.WriteLine($"-- -- -- -- -- -- -- --");
+            Console.WriteLine($"-- END OF SIMULATION --");
+            Console.WriteLine($"-- -- -- -- -- -- -- --");
+
+            Console.WriteLine($"team 1 ai ({team1AIModelProvider.Invoke().GetType().Name}) runtime: command {teamOneAICommandTime}ticks / args {teamOneAIArgsTime}ticks / total {teamOneAICommandTime + teamOneAIArgsTime}");
+            Console.WriteLine($"team 2 ai ({team2AIModelProvider.Invoke().GetType().Name}) runtime: command {teamTwoAICommandTime}ticks / args {teamTwoAIArgsTime}ticks / total {teamTwoAICommandTime + teamTwoAIArgsTime}");
+            Console.WriteLine($"team 1 actions: {teamOneActions}");
+            Console.WriteLine($"team 2 actions: {teamTwoActions}");
+
+            Console.WriteLine($"team 1 ticks per action: {(float)(teamOneAICommandTime + teamOneAIArgsTime) / teamOneActions}");
+            Console.WriteLine($"team 2 ticks per action: {(float)(teamTwoAICommandTime + teamTwoAIArgsTime) / teamTwoActions}");
+
+            if (team1AIModelProvider.Invoke().GetType().Name == team2AIModelProvider.Invoke().GetType().Name)
+            {
+                var aiTotalRuntime = teamOneAICommandTime + teamTwoAICommandTime;
+                var aiTotalArgsRuntime = teamOneAIArgsTime + teamTwoAIArgsTime;
+
+                Console.WriteLine($"ai ({team1AIModelProvider.Invoke().GetType().Name}) runtime: command {teamOneAICommandTime}ticks / args {teamOneAIArgsTime}ticks / total {teamOneAICommandTime + teamOneAIArgsTime}");
+                Console.WriteLine($"ai ticks per action: {(float)(aiTotalRuntime + aiTotalArgsRuntime) / (teamOneActions + teamTwoActions)}");
+            }
+
+
+            Console.WriteLine("\nPress anything to quit");
+            var key = Console.ReadKey();
+        }
+
         private static long teamOneAICommandTime = 0;
         private static long teamTwoAICommandTime = 0;
 
@@ -253,7 +337,7 @@ namespace SMUBE_Utils.Simulator
 
         private static bool prewarm = false;
 
-        private static bool ResolveTurn()
+        private static bool ResolveTurn(bool log = true)
         {
             if (!_core.currentStateModel.GetNextActiveUnit(out var unit))
             {
@@ -272,8 +356,11 @@ namespace SMUBE_Utils.Simulator
                 nextCommand = unit.AiModel.ResolveNextCommand(_core.currentStateModel, unit.UnitData.UnitIdentifier);
                 commandStopwatch.Stop();
 
-                Console.WriteLine($"Unit {unit.UnitData.ToShortString()}");
-                Console.WriteLine($"Used {nextCommand.GetType().Name}");
+                if(log)
+                {
+                    Console.WriteLine($"Unit {unit.UnitData.ToShortString()}");
+                    Console.WriteLine($"Used {nextCommand.GetType().Name}");
+                }
             }
             else
             {
@@ -284,13 +371,16 @@ namespace SMUBE_Utils.Simulator
                 nextArgs = unit.AiModel.GetCommandArgs(nextCommand, _core.currentStateModel, unit.UnitData.UnitIdentifier);
                 argsStopwatch.Stop();
 
-                if(nextArgs.TargetUnits != null && nextArgs.TargetUnits.Count > 0)
+                if (log)
                 {
-                    Console.WriteLine($"\nUnit {unit.UnitData.Name} Used {nextCommand.GetType().Name} on {nextArgs.TargetUnits[0].Name}\n");
-                }
-                else
-                {
-                    Console.WriteLine($"\nUnit {unit.UnitData.Name} Used {nextCommand.GetType().Name}");
+                    if (nextArgs.TargetUnits != null && nextArgs.TargetUnits.Count > 0)
+                    {
+                        Console.WriteLine($"\nUnit {unit.UnitData.Name} Used {nextCommand.GetType().Name} on {nextArgs.TargetUnits[0].Name}\n");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"\nUnit {unit.UnitData.Name} Used {nextCommand.GetType().Name}");
+                    }
                 }
             }
 
@@ -321,15 +411,18 @@ namespace SMUBE_Utils.Simulator
                 _core.currentStateModel.ExecuteCommand(nextCommand, nextArgs);
             }
 
-            Console.WriteLine("Unit Summary:");
-            for (int i = 0; i < _core.currentStateModel.Units.Count; i++)
+            if(log)
             {
-                Console.WriteLine(write_unit_summary(_core.currentStateModel.Units[i]));
-                string write_unit_summary(Unit loggedUnit)
+                Console.WriteLine("Unit Summary:");
+                for (int i = 0; i < _core.currentStateModel.Units.Count; i++)
                 {
-                    var unitCache = loggedUnit;
-                    var unitStats = unitCache.UnitData.UnitStats;
-                    return $"{unitCache.UnitData.Name} {unitCache.UnitData.UnitStats.BaseCharacter.GetType().Name}\thp{unitStats.CurrentHealth}/{unitStats.MaxHealth}\tsp{unitStats.CurrentStamina}/{unitStats.MaxStamina}   \tmp{unitStats.CurrentMana}/{unitStats.MaxMana}";
+                    Console.WriteLine(write_unit_summary(_core.currentStateModel.Units[i]));
+                    string write_unit_summary(Unit loggedUnit)
+                    {
+                        var unitCache = loggedUnit;
+                        var unitStats = unitCache.UnitData.UnitStats;
+                        return $"{unitCache.UnitData.Name} {unitCache.UnitData.UnitStats.BaseCharacter.GetType().Name}\thp{unitStats.CurrentHealth}/{unitStats.MaxHealth}\tsp{unitStats.CurrentStamina}/{unitStats.MaxStamina}   \tmp{unitStats.CurrentMana}/{unitStats.MaxMana}";
+                    }
                 }
             }
 

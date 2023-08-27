@@ -16,6 +16,10 @@ namespace SMUBE.AI
     // always pick first option
     public class DumbAIModel : AIModel
     {
+        public DumbAIModel(bool useSimpleBehavior) : base(useSimpleBehavior)
+        {
+        }
+
         public override ICommand ResolveNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
             if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))

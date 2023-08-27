@@ -15,8 +15,13 @@ namespace SMUBE.AI.StateMachine
 {
     public static class StateMachineConfig
     {
-        public static StateMachineAIModel GetStateMachineForArchetype(BaseCharacter character)
+        public static StateMachineAIModel GetStateMachineForArchetype(BaseCharacter character, bool useSimpleBehavior)
         {
+            if(useSimpleBehavior)
+            {
+                return GetBasicStateMachine();
+            }
+
             switch (character)
             {
                 case Hunter _:
@@ -42,7 +47,7 @@ namespace SMUBE.AI.StateMachine
             attackState.InjectTransitions(new List<StateMachineTransition>() { attackToBlockTransition });
             blockState.InjectTransitions(new List<StateMachineTransition>() { blockToAttackTransition });
 
-            return new StateMachineAIModel(attackState);
+            return new StateMachineAIModel(attackState, true);
         }
 
         public static StateMachineAIModel GetHunterStateMachine()
@@ -59,7 +64,7 @@ namespace SMUBE.AI.StateMachine
             blockState.InjectTransitions(new List<StateMachineTransition>() { transitionToAttack, transitionToHeavyAttack });
             heavyAttackState.InjectTransitions(new List<StateMachineTransition>() { transitionToAttack, transitionToBlock});
 
-            return new StateMachineAIModel(attackState);
+            return new StateMachineAIModel(attackState, false);
         }
 
         public static StateMachineAIModel GetScholarStateMachine()
@@ -76,7 +81,7 @@ namespace SMUBE.AI.StateMachine
             blockState.InjectTransitions(new List<StateMachineTransition>() { transitionToAttack, transitionToHealAll });
             healAllState.InjectTransitions(new List<StateMachineTransition>() { transitionToAttack, transitionToBlock });
 
-            return new StateMachineAIModel(attackState);
+            return new StateMachineAIModel(attackState, false);
         }
 
         public static StateMachineAIModel GetSquireStateMachine()
@@ -93,7 +98,7 @@ namespace SMUBE.AI.StateMachine
             blockState.InjectTransitions(new List<StateMachineTransition>() { transitionToAttack, transitionToDefendAll });
             defendAllState.InjectTransitions(new List<StateMachineTransition>() { transitionToAttack, transitionToBlock });
 
-            return new StateMachineAIModel(attackState);
+            return new StateMachineAIModel(attackState, false);
         }
 
     }

@@ -41,7 +41,11 @@ namespace SMUBE.Units
 
             ViableCommands.Add(new BaseAttack());
             ViableCommands.Add(new BaseBlock());
-            ViableCommands.AddRange(argViableCommands);
+
+            if(argViableCommands != null  && argViableCommands.Count > 0)
+            {
+                ViableCommands.AddRange(argViableCommands);
+            }
         }
 
         private Unit(Unit sourceUnit)

@@ -1,8 +1,10 @@
 ﻿using Commands;
+using SMUBE.AI.DecisionTree;
 using SMUBE.AI.GoalOrientedBehavior;
 using SMUBE.BattleState;
 using SMUBE.Commands;
 using SMUBE.DataStructures.Units;
+using SMUBE.Units.CharacterTypes;
 
 namespace SMUBE.AI.StateMachine
 {
@@ -11,7 +13,7 @@ namespace SMUBE.AI.StateMachine
         public StateMachineState initialState;
         public StateMachineState currentState;
 
-        public StateMachineAIModel(StateMachineState initialState)
+        public StateMachineAIModel(StateMachineState initialState, bool useSimpleBehavior) : base(useSimpleBehavior)
         {
             this.initialState = initialState;
             currentState = initialState;

@@ -5,6 +5,7 @@ using SMUBE.Units.CharacterTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,7 +15,7 @@ namespace SMUBE.Units
     {
         private static Dictionary<int, int> teamCounts = new Dictionary<int, int>();
 
-        public static Unit CreateUnit<T>(int teamId, AIModel aiModel) where T : BaseCharacter, new()
+        public static Unit CreateUnit<T>(int teamId, AIModel aiModel, bool useSimpleBehavior = false) where T : BaseCharacter, new()
         {
             if (!teamCounts.ContainsKey(teamId))
             {
@@ -30,10 +31,10 @@ namespace SMUBE.Units
 
             if(aiModel is StateMachineAIModel)
             {
-                aiModel = StateMachineConfig.GetStateMachineForArchetype(newUnitStats.BaseCharacter);
+                aiModel = StateMachineConfig.GetStateMachineForArchetype(newUnitStats.BaseCharacter, useSimpleBehavior);
             }
 
-            return new Unit(newUnitName, newUnitIdentifier, newUnitStats, aiModel, baseUnit.AvailableCommands);
+            return new Unit(newUnitName, newUnitIdentifier, newUnitStats, aiModel, useSimpleBehavior ? null : baseUnit.AvailableCommands);
         }
 
         public static BaseCharacter CreateCharacter<T>() where T : BaseCharacter, new()

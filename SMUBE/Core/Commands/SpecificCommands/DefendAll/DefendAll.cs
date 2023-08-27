@@ -41,7 +41,9 @@ namespace SMUBE.Commands.SpecificCommands.DefendAll
                 return false;
             }
 
-            foreach(var targetUnitData in commandArgs.TargetUnits)
+            activeUnit.UnitData.UnitStats.TryUseAbility(this);
+
+            foreach (var targetUnitData in commandArgs.TargetUnits)
             {
                 battleStateModel.TryGetUnit(targetUnitData.UnitIdentifier, out var targetUnit);
 
@@ -52,7 +54,6 @@ namespace SMUBE.Commands.SpecificCommands.DefendAll
 
                 targetUnit.UnitData.UnitStats.AddEffects(GetCommandResults(commandArgs));
             }
-            activeUnit.UnitData.UnitStats.TryUseAbility(this);
 
             return true;
         }

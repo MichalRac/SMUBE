@@ -56,14 +56,14 @@ namespace SMUBE.AI.GoalOrientedBehavior
                     foreach (var commandArgs in validCommandArgs)
                     {
                         var battleStateModelArgDeepCopy = battleStateModelDeepCopy.DeepCopy();
-                        bool success = action.Execute(battleStateModelDeepCopy, commandArgs);
+                        bool success = action.Execute(battleStateModelArgDeepCopy, commandArgs);
 
                         if (!success)
                         {
                             continue;
                         }
 
-                        var discontentment = GetDiscontentment(goals, battleStateModelDeepCopy, activeUnitIdentifier);
+                        var discontentment = GetDiscontentment(goals, battleStateModelArgDeepCopy, activeUnitIdentifier);
                         if (discontentment < minDiscontentment)
                         {
                             minDiscontentment = discontentment;

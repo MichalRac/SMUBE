@@ -11,17 +11,24 @@ namespace SMUBE.AI.GoalOrientedBehavior
 {
     internal class KeepTeamGuardedGoal : Goal
     {
-        protected override float Importance => 8;
+        protected override float Importance => 50;
 
         public override float GetDiscontentment(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
             var TeamId = activeUnitIdentifier.TeamId == 0 ? 0 : 1;
 
-            var teamUnit = battleStateModel.GetTeamUnits(TeamId);
-            var guardedTeamUnits = teamUnit.Count(u => u.UnitData.UnitStats.PersistentEffects.Where(e => e is BlockEffect).Count() > 0);
+            var teamUnits = battleStateModel.GetTeamUnits(TeamId);
+
+            // no need to guard if you're the last unit
+            if(teamUnits.Count <= 1)
+            {
+                return Importance;
+            }
+
+            var guardedTeamUnits = teamUnits.Count(u => u.UnitData.UnitStats.PersistentEffects.Where(e => e is BlockEffect).Count() > 0);
 
 
-            return (1 - (guardedTeamUnits / teamUnit.Count)) * Importance;
+            return (1 - (guardedTeamUnits / teamUnits.Count)) * Importance;
         }
     }
 }

@@ -55,6 +55,7 @@ namespace SMUBE.Commands.SpecificCommands.HealAll
                 }
 
                 targetUnit.UnitData.UnitStats.AddEffects(GetCommandResults(commandArgs));
+                targetUnit.UnitData.UnitStats.AffectByAbility(GetCommandResults(commandArgs));
             }
 
             activeUnit.UnitData.UnitStats.TryUseAbility(this);

@@ -97,6 +97,8 @@ namespace SMUBE.DataStructures.Units
         internal void DeltaHealth(int delta)
         {
             CurrentHealth += delta;
+            if (CurrentHealth > MaxHealth)
+                CurrentHealth = MaxHealth;
         }
 
         internal void AddEffects(CommandResults commandResults)

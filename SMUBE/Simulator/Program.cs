@@ -31,7 +31,7 @@ namespace SMUBE_Utils.Simulator
 
         private static void Init(bool autoInit = false)
         {
-            const bool useSimpleBehavior = true;
+            const bool useSimpleBehavior = false;
 
             List<Unit> initUnits;
             if (autoInit)
@@ -140,6 +140,10 @@ namespace SMUBE_Utils.Simulator
 
         private static int turnCounter = 0;
         private static int simulationsRun = 0;
+
+        private static int team1WinCount = 0;
+        private static int team2WinCount = 0;
+
         private static void TurnChoice()
         {
             void turn_log()
@@ -228,7 +232,15 @@ namespace SMUBE_Utils.Simulator
                         {
                             simulationAutoResolved = ResolveTurn(false);
                         }
-                        if(simulationsRun % 250 == 0)
+
+                        _core.currentStateModel.IsFinished(out var winnerTeam);
+                        if (winnerTeam == 0)
+                            team1WinCount++;
+                        else
+                            team2WinCount++;
+
+
+                        if (simulationsRun % 250 == 0)
                         {
                             Console.WriteLine($"simulation {simulationsRun}/{simulationNumber}");
                         }
@@ -236,7 +248,7 @@ namespace SMUBE_Utils.Simulator
                         Init(true);
                     }
 
-                    FinishSimulationSeries();
+                    FinishSimulationSeries(simulationNumber);
                     return;
                 case ConsoleKey.D0:
                     return;
@@ -298,7 +310,7 @@ namespace SMUBE_Utils.Simulator
             return;
         }
 
-        private static void FinishSimulationSeries()
+        private static void FinishSimulationSeries(int simulationAmount)
         {
             Console.WriteLine($"-- -- -- -- -- -- -- --");
             Console.WriteLine($"-- END OF SIMULATION --");
@@ -308,9 +320,11 @@ namespace SMUBE_Utils.Simulator
             Console.WriteLine($"team 2 ai ({team2AIModelProvider.Invoke().GetType().Name}) runtime: command {teamTwoAICommandTime}ticks / args {teamTwoAIArgsTime}ticks / total {teamTwoAICommandTime + teamTwoAIArgsTime}");
             Console.WriteLine($"team 1 actions: {teamOneActions}");
             Console.WriteLine($"team 2 actions: {teamTwoActions}");
+            Console.WriteLine($"team 1 win rate: {(float)team1WinCount/simulationAmount}%");
+            Console.WriteLine($"team 2 win rate: {(float)team2WinCount/simulationAmount}%");
 
-            Console.WriteLine($"team 1 ticks per action: {(float)(teamOneAICommandTime + teamOneAIArgsTime) / teamOneActions}");
-            Console.WriteLine($"team 2 ticks per action: {(float)(teamTwoAICommandTime + teamTwoAIArgsTime) / teamTwoActions}");
+            Console.WriteLine($"team 1 ticks per action: {((float)(teamOneAICommandTime + teamOneAIArgsTime) / teamOneActions) * 100}");
+            Console.WriteLine($"team 2 ticks per action: {((float)(teamTwoAICommandTime + teamTwoAIArgsTime) / teamTwoActions) * 100}");
 
             if (team1AIModelProvider.Invoke().GetType().Name == team2AIModelProvider.Invoke().GetType().Name)
             {

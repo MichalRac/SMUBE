@@ -1,5 +1,6 @@
 ﻿using Commands;
 using SMUBE.DataStructures.Units;
+using SMUBE.DataStructures.Utils;
 using SMUBE.Units;
 using System;
 using System.Collections;
@@ -153,9 +154,10 @@ namespace SMUBE.BattleState
         {
             ActionQueue.Clear();
 
-            var unitsBySpeed = Units.OrderByDescending(u => u.UnitData.UnitStats.Speed);
+            Units.Shuffle();
+            //var unitsBySpeed = Units.OrderByDescending(u => u.UnitData.UnitStats.Speed);
 
-            foreach (var unitBySpeed in unitsBySpeed)
+            foreach (var unitBySpeed in Units)
             {
                 ActionQueue.Enqueue(unitBySpeed);
             }

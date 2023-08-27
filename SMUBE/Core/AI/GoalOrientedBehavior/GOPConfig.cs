@@ -29,6 +29,8 @@ namespace SMUBE.AI.GoalOrientedBehavior
             return new List<Goal>()
             {
                 new WinGoal(),
+                new WinGoal(),
+                new WinGoal(),
                 new LowerEnemyHealthGoal(),
                 new SurviveGoal(),
             };
@@ -37,6 +39,8 @@ namespace SMUBE.AI.GoalOrientedBehavior
         {
             return new List<Goal>()
             {
+                new WinGoal(),
+                new WinGoal(),
                 new WinGoal(),
                 new LowerEnemyHealthGoal(),
                 new KeepTeamHealthUpGoal(),
@@ -47,6 +51,8 @@ namespace SMUBE.AI.GoalOrientedBehavior
         {
             return new List<Goal>()
             {
+                new WinGoal(),
+                new WinGoal(),
                 new WinGoal(),
                 new LowerEnemyHealthGoal(),
                 new KeepTeamGuardedGoal(),

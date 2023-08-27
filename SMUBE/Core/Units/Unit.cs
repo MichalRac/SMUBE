@@ -20,31 +20,22 @@ namespace SMUBE.Units
         public List<ICommand> ViableCommands { get; private set; } = new List<ICommand>();
         public AIModel AiModel { get; }
 
-        public Unit(UnitData argUnitData, AIModel aiModel, List<ICommand> argViableCommands = null)
-        {
-            UnitData = argUnitData;
-            AiModel = aiModel;
-            if (argViableCommands != null)
-            {
-                ViableCommands = argViableCommands;
-            }
-        }
 
         public Unit(string argName, UnitIdentifier argUnitIdentifier, UnitStats argUnitStats, AIModel aiModel, List<ICommand> argViableCommands = null)
-            : this(new UnitData(argName, argUnitIdentifier, argUnitStats), aiModel) 
         {
+            UnitData = new UnitData(argName, argUnitIdentifier, argUnitStats);
+            AiModel = aiModel;
 
-            if (argViableCommands != null)
-            {
-                ViableCommands = argViableCommands;
-            }
 
             ViableCommands.Add(new BaseAttack());
             ViableCommands.Add(new BaseBlock());
 
-            if(argViableCommands != null  && argViableCommands.Count > 0)
+            if (argViableCommands != null)
             {
-                ViableCommands.AddRange(argViableCommands);
+                foreach (var argViableCommand in argViableCommands)
+                {
+                    ViableCommands.Add(argViableCommand);
+                }
             }
         }
 

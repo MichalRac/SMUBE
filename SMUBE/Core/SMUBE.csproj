@@ -118,6 +118,7 @@
     <Compile Include="DataStructures\Units\UnitData.cs" />
     <Compile Include="DataStructures\Units\UnitIdentifier.cs" />
     <Compile Include="DataStructures\Units\UnitStats.cs" />
+    <Compile Include="DataStructures\Utils\ListShuffle.cs" />
     <Compile Include="DataStructures\Utils\SMUBEVector2.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

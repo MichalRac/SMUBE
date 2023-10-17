@@ -2,6 +2,7 @@
 using Commands.SpecificCommands.BaseAttack;
 using SMUBE.BattleState;
 using SMUBE.Commands;
+using SMUBE.Commands.SpecificCommands.DefendAll;
 using SMUBE.DataStructures.Units;
 using System;
 using System.Collections.Generic;
@@ -13,8 +14,16 @@ using static System.Collections.Specialized.BitVector32;
 
 namespace SMUBE.AI.BehaviorTree
 {
-    public class BehaviorTreeBasicAttack : BehaviorTreeTask
+    public class BehaviorTreeBasicAttack : BehaviorTreeTask, IBehaviorTreeCommand
     {
+        private CommandArgs _commandArgsCache;
+        public CommandArgs CommandArgsCache => _commandArgsCache;
+        public CommandArgs GetCommandArgs(ICommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
+        {
+            _commandArgsCache = CommandArgsHelper.GetRandomCommandArgs(command, battleStateModel, activeUnitIdentifier);
+            return _commandArgsCache;
+        }
+
         public override bool Run(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier, out ICommand finalCommand)
         {
             finalCommand = null;
@@ -26,16 +35,16 @@ namespace SMUBE.AI.BehaviorTree
                 {
                     if(command is BaseAttack baseAttack)
                     {
-                        var commandArgs = CommandArgsHelper.GetRandomCommandArgs(baseAttack, battleStateModel, activeUnitIdentifier);
+                        var commandArgs = GetCommandArgs(baseAttack, battleStateModel, activeUnitIdentifier);
                         var success = battleStateModel.ExecuteCommand(baseAttack, commandArgs);
 
                         if (success)
                         {
                             finalCommand = command;
+                            finalCommand.ArgsCache = CommandArgsCache;
                         }
 
                         return success;
-                        return true;
                     }
                 }
                 return false;

@@ -58,6 +58,7 @@
     <Compile Include="AI\BehaviorTree\BehaviorTreeSelector.cs" />
     <Compile Include="AI\BehaviorTree\BehaviorTreeSequence.cs" />
     <Compile Include="AI\BehaviorTree\BehaviorTreeTask.cs" />
+    <Compile Include="AI\BehaviorTree\IBehaviorTreeCommand.cs" />
     <Compile Include="AI\DecisionTree\DecisionNodes\DecisionTreeTestCanPerform.cs" />
     <Compile Include="AI\DecisionTree\EndNodes\DecisionTreeAction.cs" />
     <Compile Include="AI\DecisionTree\EndNodes\DecisionTreeActionBlock.cs" />

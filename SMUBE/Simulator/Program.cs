@@ -38,18 +38,17 @@ namespace SMUBE_Utils.Simulator
             {
                  initUnits = new List<Unit>
                 {
-                    UnitHelper.CreateUnit<Squire>(0, team1AIModelProvider?.Invoke(), useSimpleBehavior),
-                    UnitHelper.CreateUnit<Hunter>(0, team1AIModelProvider?.Invoke(), useSimpleBehavior),
-                    UnitHelper.CreateUnit<Scholar>(0, team1AIModelProvider?.Invoke(), useSimpleBehavior),
+                    UnitHelper.CreateRandomUnit(0, team1AIModelProvider?.Invoke(), useSimpleBehavior),
+                    UnitHelper.CreateRandomUnit(0, team1AIModelProvider?.Invoke(), useSimpleBehavior),
+                    UnitHelper.CreateRandomUnit(0, team1AIModelProvider?.Invoke(), useSimpleBehavior),
 
-                    UnitHelper.CreateUnit<Squire>(1, team2AIModelProvider?.Invoke(), useSimpleBehavior),
-                    UnitHelper.CreateUnit<Hunter>(1, team2AIModelProvider?.Invoke(), useSimpleBehavior),
-                    UnitHelper.CreateUnit<Scholar>(1, team2AIModelProvider?.Invoke(), useSimpleBehavior),
+                    UnitHelper.CreateRandomUnit(1, team2AIModelProvider?.Invoke(), useSimpleBehavior),
+                    UnitHelper.CreateRandomUnit(1, team2AIModelProvider?.Invoke(), useSimpleBehavior),
+                    UnitHelper.CreateRandomUnit(1, team2AIModelProvider?.Invoke(), useSimpleBehavior),
                 };
 
                 _core = new BattleCore(initUnits);
                 return;
-
             }
 
             Console.WriteLine("Team 1 AI:");
@@ -122,13 +121,13 @@ namespace SMUBE_Utils.Simulator
 
             initUnits =new List<Unit>
             {
-                UnitHelper.CreateUnit<Squire>(0, team1AIModelProvider?.Invoke(), useSimpleBehavior),
-                UnitHelper.CreateUnit<Hunter>(0, team1AIModelProvider?.Invoke(), useSimpleBehavior),
-                UnitHelper.CreateUnit<Scholar>(0, team1AIModelProvider?.Invoke(), useSimpleBehavior),
-
-                UnitHelper.CreateUnit<Squire>(1, team2AIModelProvider?.Invoke(), useSimpleBehavior),
-                UnitHelper.CreateUnit<Hunter>(1, team2AIModelProvider?.Invoke(), useSimpleBehavior),
-                UnitHelper.CreateUnit<Scholar>(1, team2AIModelProvider?.Invoke(), useSimpleBehavior),
+                UnitHelper.CreateRandomUnit(0, team1AIModelProvider?.Invoke(), useSimpleBehavior),
+                UnitHelper.CreateRandomUnit(0, team1AIModelProvider?.Invoke(), useSimpleBehavior),
+                UnitHelper.CreateRandomUnit(0, team1AIModelProvider?.Invoke(), useSimpleBehavior),
+                
+                UnitHelper.CreateRandomUnit(1, team2AIModelProvider?.Invoke(), useSimpleBehavior),
+                UnitHelper.CreateRandomUnit(1, team2AIModelProvider?.Invoke(), useSimpleBehavior),
+                UnitHelper.CreateRandomUnit(1, team2AIModelProvider?.Invoke(), useSimpleBehavior),
             };
 
             _core = new BattleCore(initUnits);
@@ -322,6 +321,11 @@ namespace SMUBE_Utils.Simulator
             Console.WriteLine($"team 2 actions: {teamTwoActions}");
             Console.WriteLine($"team 1 win rate: {(float)team1WinCount/simulationAmount * 100}%");
             Console.WriteLine($"team 2 win rate: {(float)team2WinCount/simulationAmount * 100}%");
+
+
+            Console.WriteLine($"total support character type count: {UnitHelper.ScholarCount}");
+            Console.WriteLine($"total offensive character type count: {UnitHelper.HunterCount}");
+            Console.WriteLine($"total defensive character type count: {UnitHelper.SquireCount}");
 
             Console.WriteLine($"team 1 ticks per action: {((float)(teamOneAICommandTime + teamOneAIArgsTime) / teamOneActions)}");
             Console.WriteLine($"team 2 ticks per action: {((float)(teamTwoAICommandTime + teamTwoAIArgsTime) / teamTwoActions)}");

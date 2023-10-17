@@ -13,7 +13,34 @@ namespace SMUBE.Units
 {
     public static class UnitHelper
     {
+        public static long HunterCount = 0;
+        public static long SquireCount = 0;
+        public static long ScholarCount = 0;
+        private static Random _randomCache;
+        private static Random Random => _randomCache ?? (_randomCache = new Random());
+
+
         private static Dictionary<int, int> teamCounts = new Dictionary<int, int>();
+
+        public static Unit CreateRandomUnit(int teamId, AIModel aiModel, bool useSimpleBehavior = false)
+        {
+            var rng = Random;
+
+            switch (rng.Next(3))
+            {
+                case 0:
+                    ScholarCount++;
+                    return CreateUnit<Scholar>(teamId, aiModel, useSimpleBehavior);
+                case 1:
+                    SquireCount++;
+                    return CreateUnit<Squire>(teamId, aiModel, useSimpleBehavior);
+                case 2:
+                    HunterCount++;
+                    return CreateUnit<Hunter>(teamId, aiModel, useSimpleBehavior);
+            }
+
+            return null;
+        }
 
         public static Unit CreateUnit<T>(int teamId, AIModel aiModel, bool useSimpleBehavior = false) where T : BaseCharacter, new()
         {

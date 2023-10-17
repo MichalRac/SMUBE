@@ -12,8 +12,18 @@ using System.Threading.Tasks;
 
 namespace SMUBE.AI.BehaviorTree
 {
-    internal class BehaviorTreeHeavyAttack : BehaviorTreeTask
+    internal class BehaviorTreeHeavyAttack : BehaviorTreeTask, IBehaviorTreeCommand
     {
+        private CommandArgs _commandArgsCache;
+
+        public CommandArgs CommandArgsCache => _commandArgsCache;
+
+        public CommandArgs GetCommandArgs(ICommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
+        {
+            _commandArgsCache = CommandArgsHelper.GetRandomCommandArgs(command, battleStateModel, activeUnitIdentifier);
+            return _commandArgsCache;
+        }
+
         public override bool Run(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier, out ICommand finalCommand)
         {
             finalCommand = null;
@@ -25,7 +35,7 @@ namespace SMUBE.AI.BehaviorTree
                 {
                     if (command is HeavyAttack heavyAttack)
                     {
-                        var commandArgs = CommandArgsHelper.GetRandomCommandArgs(heavyAttack, battleStateModel, activeUnitIdentifier);
+                        var commandArgs = GetCommandArgs(heavyAttack, battleStateModel, activeUnitIdentifier);
 
                         var success = unit.UnitData.UnitStats.CanUseAbility(heavyAttack);
                         if (!success)
@@ -38,6 +48,7 @@ namespace SMUBE.AI.BehaviorTree
                         if(success)
                         {
                             finalCommand = command;
+                            finalCommand.ArgsCache = CommandArgsCache;
                         }
 
                         return success;

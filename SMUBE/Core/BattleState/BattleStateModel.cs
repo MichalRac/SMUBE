@@ -1,4 +1,5 @@
 ﻿using Commands;
+using SMUBE.DataStructures.BattleScene;
 using SMUBE.DataStructures.Units;
 using SMUBE.DataStructures.Utils;
 using SMUBE.Units;
@@ -15,6 +16,7 @@ namespace SMUBE.BattleState
     {
         public List<Unit> Units { get; private set; } = new List<Unit>();
         private Queue<Unit> ActionQueue { get; set; } = new Queue<Unit>();
+        public GridBattleScene BattleSceneState { get; set; }
 
         public BattleStateModel(BattleStateModel sourceBattleStateModel) 
         {

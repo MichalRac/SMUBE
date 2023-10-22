@@ -57,6 +57,7 @@ namespace SMUBE_Utils.Simulator
             Console.WriteLine("3. Goal Oriented Behavior AI");
             Console.WriteLine("4. Finite State Machine AI");
             Console.WriteLine("5. Behavior Tree AI");
+            Console.WriteLine("6. Pathfinding Module");
 
             Console.WriteLine("\nChoice:");
             var key = Console.ReadKey(true);
@@ -79,6 +80,10 @@ namespace SMUBE_Utils.Simulator
                 case ConsoleKey.D5:
                     team1AIModelProvider = () => new BehaviorTreeAIModel(useSimpleBehavior);
                     break;
+                case ConsoleKey.D6:
+                    var pathfindingSimulator = new PathfindingSimulator();
+                    pathfindingSimulator.Run();
+                    return;
                 case ConsoleKey.D0:
                     return;
                 default:

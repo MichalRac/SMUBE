@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SMUBE.DataStructures.BattleScene;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ namespace SMUBE.DataStructures.Units
         public string Name { get; private set; }
         public UnitIdentifier UnitIdentifier { get; }
         public UnitStats UnitStats { get; }
+        public BattleScenePosition BattleScenePosition { get; set; }
 
         public UnitData(string argName, UnitIdentifier argUnitIdentifier, UnitStats argUnitStats)
         {

@@ -7,13 +7,11 @@ using System.Threading.Tasks;
 
 namespace SMUBE.DataStructures.BattleScene
 {
-    public class GridSceneType : BattleSceneType
+    public class Grid
     {
-        public GridSceneType(int argSceneSize) : base(argSceneSize)
-        {
-        }
 
-        public override List<BattleScenePosition> GetAdjacentPositions(BattleScenePosition targetPos)
+
+/*        public List<BattleScenePosition> GetAdjacentPositions(BattleScenePosition targetPos)
         {
             var validPositions = new List<BattleScenePosition>();
             for (int x = targetPos.x - UnitData.DEFAULT_UNIT_GRID_SIZE; x < targetPos.x + UnitData.DEFAULT_UNIT_GRID_SIZE; x++)
@@ -25,7 +23,7 @@ namespace SMUBE.DataStructures.BattleScene
                         continue;
                     }
 
-                    if (Math.Abs(x) > SceneSize || Math.Abs(y) > SceneSize)
+                    if (Math.Abs(x) > _width || Math.Abs(y) > _height)
                     {
                         continue;
                     }
@@ -36,12 +34,12 @@ namespace SMUBE.DataStructures.BattleScene
             return validPositions;
         }
 
-        public override bool IsOccupied(BattleScenePosition targetPos, BattleSceneState battleSceneState)
+        public bool IsOccupied(BattleScenePosition targetPos, BattleSceneState battleSceneState)
         {
             return battleSceneState.occupiedPositions.ContainsKey(targetPos);
         }
 
-        public override bool IsReachable(BattleScenePosition _, BattleScenePosition targetPos, BattleSceneState battleSceneState)
+        public bool IsReachable(BattleScenePosition _, BattleScenePosition targetPos, BattleSceneState battleSceneState)
         {
             var adjacentPositions = GetAdjacentPositions(targetPos);
 
@@ -63,20 +61,39 @@ namespace SMUBE.DataStructures.BattleScene
             return false;
         }
 
-
-        public override bool IsValidPosition(BattleScenePosition targetPos)
+*/
+/*        public bool IsValidPosition(BattleScenePosition targetPos)
         {
             if(targetPos == null)
             {
                 return false;
             }
 
-            if (Math.Abs(targetPos.x) > SceneSize || Math.Abs(targetPos.y) > SceneSize)
+            if(Math.Abs(targetPos) > _width || Math.Abs(targetPos.y) > _height)
             {
                 return false;
             }
 
+            if (_gridContent[targetPos.x, targetPos.y])
+
             return true;
+        }*/
+
+/*        public static bool IsNextTo(BattleScenePosition basePos, BattleScenePosition targetPos)
+        {
+            if (Math.Abs(basePos.x - targetPos.x) > UnitData.DEFAULT_UNIT_GRID_SIZE)
+                return true;
+
+            if (Math.Abs(basePos.y - targetPos.y) > UnitData.DEFAULT_UNIT_GRID_SIZE)
+                return true;
+
+            return false;
         }
+
+        public static double GetDistanceTo(BattleScenePosition basePos, BattleScenePosition targetPos)
+        {
+            return Math.Sqrt(((basePos.x - targetPos.x) * (basePos.x - targetPos.x)) + ((basePos.y - targetPos.y) * (basePos.y - targetPos.y)));
+        }
+*/
     }
 }

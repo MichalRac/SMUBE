@@ -8,29 +8,62 @@ using System.Threading.Tasks;
 
 namespace SMUBE.DataStructures.BattleScene
 {
-    public class BattleScenePosition : SMUBEVector2<int>
+    public enum BattleScenePositionContentType
     {
-        public BattleScenePosition(int x, int y) : base(x, y)
-        {
-        }
+        None,
+        Obstacle,
+        Defensive,
+        Unstable,
     }
 
-    public static class BattleScenePositionExtensions
+    public class BattleScenePosition
     {
-        public static bool IsApproximatelyCloseTo(this BattleScenePosition basePos, BattleScenePosition targetPos)
+        public SMUBEVector2<int> Coordinates { get; }
+
+        public BattleScenePosition(int x, int y)
         {
-            if (Math.Abs(basePos.x - targetPos.x) > UnitData.DEFAULT_UNIT_GRID_SIZE * 3)
-                return true;
-
-            if (Math.Abs(basePos.y - targetPos.y) > UnitData.DEFAULT_UNIT_GRID_SIZE * 3)
-                return true;
-
-            return false;
+            Coordinates = new SMUBEVector2<int>(x, y);
         }
 
-        public static double GetDistanceTo(this BattleScenePosition basePos, BattleScenePosition targetPos)
+        public UnitIdentifier UnitIdentifier { get; private set; }
+        public BattleScenePositionContentType ContentType { get; private set; }
+
+        public bool IsEmpty() 
         {
-            return Math.Sqrt(((basePos.x - targetPos.x) * (basePos.x - targetPos.x)) + ((basePos.y - targetPos.y) * (basePos.y - targetPos.y)));
+            return UnitIdentifier == null && (ContentType != BattleScenePositionContentType.Obstacle);
+        }
+
+        private void Clear()
+        {
+            UnitIdentifier = null;
+        }
+
+        public void ApplyUnit(UnitIdentifier unitIdentifier)
+        {
+            Clear();
+            UnitIdentifier = unitIdentifier;
+        }
+
+        public void ApplyObstacle()
+        {
+            Clear();
+            ContentType = BattleScenePositionContentType.Obstacle;
+        }
+
+        public void ApplyDefensive()
+        {
+            Clear();
+            ContentType = BattleScenePositionContentType.Defensive;
+        }
+        public void ApplyUnstable()
+        {
+            Clear();
+            ContentType = BattleScenePositionContentType.Unstable;
+        }
+
+        public override string ToString()
+        {
+            return $"({Coordinates.x},{Coordinates.y})";
         }
     }
 }

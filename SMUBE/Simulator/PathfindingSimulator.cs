@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -41,6 +42,7 @@ namespace SMUBE_Utils.Simulator
             Console.WriteLine("1. Run predefined path setup");
             Console.WriteLine("2. Run manual path setup");
             Console.WriteLine("3. Run all predefined configurations");
+            Console.WriteLine("4. Show all reachable positions");
 
             Console.WriteLine("P. Toggle pathfinding algorithm");
             Console.WriteLine("G. Toggle simplified grid");
@@ -112,6 +114,23 @@ namespace SMUBE_Utils.Simulator
                 case ConsoleKey.D3:
                     {
                         RunAllConfigurations();
+                        break;
+                    }
+                case ConsoleKey.D4:
+                    {
+                        Console.WriteLine("Input max number of steps: ");
+                        int amount;
+                        while(!int.TryParse(Console.ReadLine(), out amount))
+                        {
+                            Console.WriteLine("Non int value! Try again: ");
+                        }
+
+                        Console.Clear();
+                        var predefinedPath = PathfindingConfigurations.PredefinedPaths[chosenPathId];
+                        var start = GridBattleScene.Grid[predefinedPath.start.x, predefinedPath.start.y];
+                        var reachable = pathfindingModel.GetAllReachablePositions(GridBattleScene, start, amount);
+                        DisplayGridReachablePositions(start.Coordinates, reachable.Select(n => n.Coordinates).ToList());
+                        Console.ReadKey();
                         break;
                     }
                 case ConsoleKey.D0:
@@ -217,7 +236,7 @@ namespace SMUBE_Utils.Simulator
                 Console.Write("\n\t");
                 for (int pathId = 0; pathId < numberOfPaths; pathId++)
                 {
-                    var pathLenght = dijkstraVisitedNodesResults[gridId, pathId];
+                    var pathLenght = dijkstraPathLenghts[gridId, pathId];
                     var pathResult = pathLenght != -1 ? pathLenght.ToString() : "X";
                     Console.Write($"s:{pathResult}\t");
                 }
@@ -447,6 +466,84 @@ namespace SMUBE_Utils.Simulator
             else
             {
                 Console.Write("N - Empty node, Ob - Obstacle node, Def - Defensive node, Uns - Unstable node\nNP - Path node, DefP - Path node on defensive node, UnsP - Path on unstable node\n\n");
+            }
+
+        }
+
+        private void DisplayGridReachablePositions(SMUBEVector2<int> start, List<SMUBEVector2<int>> reachablePosistions)
+        {
+            Console.SetWindowSize(150, 50);
+            Console.WriteLine($"Pathfinding algorithm: {pathfindingModel.GetType().Name}");
+
+            var predefinedPath = PathfindingConfigurations.PredefinedPaths[chosenPathId];
+            var startPos = GridBattleScene.Grid[start.x, start.y];
+
+            for (int i = GridBattleScene.Height - 1; i >= 0; i--)
+            {
+                for (int j = 0; j < GridBattleScene.Width; j++)
+                {
+                    bool isReachable = false;
+                    if (reachablePosistions.Contains(new SMUBEVector2<int>(j, i)))
+                    {
+                        isReachable = true;
+                    }
+
+                    if (SimplifiedGrid)
+                    {
+                        string contentString = string.Empty;
+                        switch (GridBattleScene.Grid[j, i].ContentType)
+                        {
+                            case BattleScenePositionContentType.None:
+                                contentString = isReachable ? " [-R-]" : "  [ ]";
+                                break;
+                            case BattleScenePositionContentType.Obstacle:
+                                contentString = isReachable ? "  [XR]" : "  [X]";
+                                break;
+                            case BattleScenePositionContentType.Defensive:
+                                contentString = isReachable ? "[-DR-]" : " [!D!]";
+                                break;
+                            case BattleScenePositionContentType.Unstable:
+                                contentString = isReachable ? " [-UR-]" : " [!U!]";
+                                break;
+                        }
+                        if (start == GridBattleScene.Grid[j, i].Coordinates)
+                        {
+                            contentString = " <SSS>";
+                        }
+
+                        Console.Write($"{contentString}\t");
+                    }
+                    else
+                    {
+                        string contentString = string.Empty;
+                        switch (GridBattleScene.Grid[j, i].ContentType)
+                        {
+                            case BattleScenePositionContentType.None:
+                                contentString = isReachable ? "NR" : "N";
+                                break;
+                            case BattleScenePositionContentType.Obstacle:
+                                contentString = isReachable ? "ObR" : "Ob";
+                                break;
+                            case BattleScenePositionContentType.Defensive:
+                                contentString = isReachable ? "DefR" : "Def";
+                                break;
+                            case BattleScenePositionContentType.Unstable:
+                                contentString = isReachable ? "UnsR" : "Uns";
+                                break;
+                        }
+                        Console.Write($"{j},{i}-{contentString}\t");
+                    }
+                }
+                Console.Write("\n\n\n");
+            }
+
+            if (SimplifiedGrid)
+            {
+                Console.Write("[ ] - Empty node, [X] - Obstacle node, [D] - Defensive node, [U] - Unstable node\n[-P-] - Reachable node, [-DP-] - Reachable node on defensive node, [-UP-] - Reachable on unstable node\n\n");
+            }
+            else
+            {
+                Console.Write("N - Empty node, Ob - Obstacle node, Def - Defensive node, Uns - Unstable node\nNP - reachable node, DefP - reachable node on defensive node, UnsP - reachable unstable node\n\n");
             }
 
         }

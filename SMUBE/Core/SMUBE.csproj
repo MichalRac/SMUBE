@@ -90,9 +90,9 @@
     <Compile Include="AI\StateMachine\StateMachineTransition.cs" />
     <Compile Include="BattleState\BattleScene.cs" />
     <Compile Include="BattleState\BattleStateModel.cs" />
-    <Compile Include="Commands\CommandArgs.cs" />
-    <Compile Include="Commands\CommandArgsHelper.cs" />
-    <Compile Include="Commands\CommandArgsValidator.cs" />
+    <Compile Include="Commands\SpecificCommands\Args\CommandArgs.cs" />
+    <Compile Include="Commands\SpecificCommands\Args\CommandArgsHelper.cs" />
+    <Compile Include="Commands\SpecificCommands\Args\CommandArgsValidator.cs" />
     <Compile Include="Commands\CommandId.cs" />
     <Compile Include="Commands\CommandResults.cs" />
     <Compile Include="Commands\Effects\BlockEffect.cs" />
@@ -101,6 +101,7 @@
     <Compile Include="Commands\Effects\HealEffect.cs" />
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\Skills\Skill.cs" />
+    <Compile Include="Commands\SpecificCommands\Args\PositionDelta.cs" />
     <Compile Include="Commands\SpecificCommands\BaseAttack\BaseAttack.cs" />
     <Compile Include="Commands\SpecificCommands\DefendAll\DefendAll.cs" />
     <Compile Include="Commands\SpecificCommands\HealAll\HealAll.cs" />

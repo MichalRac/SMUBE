@@ -12,41 +12,18 @@ namespace SMUBE.Pathfinding
 {
     public class DijkstraPathfindingAlgorithm : PathfindingAlgorithm
     {
-        private class DijkstraPositionCache
-        {
-
-            public BattleScenePosition Position { get; }
-            public bool WasVisited { get; set; } = false;
-            public int ShortestDistance { get; private set; } = int.MaxValue;
-            private List<BattleScenePosition> ShortestKnownPathBackingField { get; set; } = new List<BattleScenePosition>();
-            public List<BattleScenePosition> ShortestKnownPath 
-            { 
-                get => ShortestKnownPathBackingField; 
-                set
-                {
-                    ShortestKnownPathBackingField = value;
-                    ShortestDistance = ShortestKnownPathBackingField.Count;
-                } 
-            }
-
-            public DijkstraPositionCache(BattleScenePosition position)
-            {
-                Position = position;
-            }
-        }
-
         public override bool TryFindPathFromTo(GridBattleScene battleScene, BattleScenePosition start,
             BattleScenePosition target, out List<BattleScenePosition> path, out int visitedNodesCount)
         {
             path = null;
             visitedNodesCount = 0;
-            var allNodes = new DijkstraPositionCache[battleScene.Width, battleScene.Height];
+            var allNodes = new PathfindingPositionCache[battleScene.Width, battleScene.Height];
 
             for (int i = 0; i < battleScene.Width; i++)
             {
                 for (int j = 0; j < battleScene.Height; j++)
                 {
-                    allNodes[i, j] = new DijkstraPositionCache(battleScene.Grid[i,j]);
+                    allNodes[i, j] = new PathfindingPositionCache(battleScene.Grid[i,j]);
                 }
             }
 
@@ -92,7 +69,7 @@ namespace SMUBE.Pathfinding
                 currentNode.WasVisited = true;
                 visitedNodesCount++;
 
-                DijkstraPositionCache nextEvaluatedNode = null;
+                PathfindingPositionCache nextEvaluatedNode = null;
                 foreach (var node in allNodes)
                 {
                     if(node.WasVisited)
@@ -134,14 +111,6 @@ namespace SMUBE.Pathfinding
 
             path = targetNode.ShortestKnownPath;
             return true;
-        }
-
-        private List<BattleScenePosition> GetShorterPath(List<BattleScenePosition> pathA, List<BattleScenePosition> pathB)
-        {
-            var pathADiagonals = GetPathCost(pathA);
-            var pathBDiagonals = GetPathCost(pathB);
-
-            return pathADiagonals < pathBDiagonals ? pathA : pathB;
         }
     }
 }

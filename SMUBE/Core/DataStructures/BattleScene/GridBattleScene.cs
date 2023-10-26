@@ -1,5 +1,6 @@
 ﻿using SMUBE.DataStructures.Units;
 using SMUBE.DataStructures.Utils;
+using SMUBE.Pathfinding;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,6 +25,8 @@ namespace SMUBE.DataStructures.BattleScene
 
         private BattleScenePosition[,] _grid;
         public BattleScenePosition[,] Grid => _grid;
+
+        public AStarPathfindingAlgorithm Pathfinding { get; } = new AStarPathfindingAlgorithm();
 
         public GridBattleScene(InitialGridData initialGridData)
         {

@@ -12,27 +12,11 @@ namespace SMUBE.Pathfinding
 
     public class AStarPathfindingAlgorithm : PathfindingAlgorithm
     {
-        private class AStarPositionCache
+        private class AStarPositionCache : PathfindingPositionCache
         {
-            public BattleScenePosition Position { get; }
-            public bool WasVisited { get; set; } = false;
-            public int ShortestDistance { get; private set; } = int.MaxValue;
             public int EstimatedPathDistance { get; set; } = int.MaxValue;
-            private List<BattleScenePosition> ShortestKnownPathBackingField { get; set; } = new List<BattleScenePosition>();
-            public List<BattleScenePosition> ShortestKnownPath
-            {
-                get => ShortestKnownPathBackingField;
-                set
-                {
-                    ShortestKnownPathBackingField = value;
-                    ShortestDistance = ShortestKnownPathBackingField.Count;
-                }
-            }
 
-            public AStarPositionCache(BattleScenePosition position)
-            {
-                Position = position;
-            }
+            public AStarPositionCache(BattleScenePosition position) : base(position){ }
         }
 
         public override bool TryFindPathFromTo(GridBattleScene battleScene, BattleScenePosition start,
@@ -151,14 +135,6 @@ namespace SMUBE.Pathfinding
 
             path = targetNode.ShortestKnownPath;
             return true;
-        }
-
-        private List<BattleScenePosition> GetShorterPath(List<BattleScenePosition> pathA, List<BattleScenePosition> pathB)
-        {
-            var pathADistance = GetPathCost(pathA);
-            var pathBDistance = GetPathCost(pathB);
-
-            return pathADistance < pathBDistance ? pathA : pathB;
         }
 
         public int GetEstimatedCostRemaining(BattleScenePosition start, BattleScenePosition target)

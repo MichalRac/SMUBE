@@ -12,7 +12,7 @@ namespace Commands.SpecificCommands._Common
     public class CommonArgs : CommandArgs
     {
         public CommonArgs(UnitData activeUnit, List<UnitData> targetUnits, BattleStateModel battleStateModel) 
-            : base(activeUnit, targetUnits, battleStateModel)
+            : base(activeUnit, targetUnits, battleStateModel, null)
         {
         }
     }

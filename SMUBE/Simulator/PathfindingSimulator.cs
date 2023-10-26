@@ -118,21 +118,53 @@ namespace SMUBE_Utils.Simulator
                     }
                 case ConsoleKey.D4:
                     {
-                        Console.WriteLine("Input max number of steps: ");
+                        Console.WriteLine("Input initial number of steps: ");
                         int amount;
-                        while(!int.TryParse(Console.ReadLine(), out amount))
+                        while (!int.TryParse(Console.ReadLine(), out amount))
                         {
                             Console.WriteLine("Non int value! Try again: ");
                         }
 
-                        Console.Clear();
-                        var predefinedPath = PathfindingConfigurations.PredefinedPaths[chosenPathId];
-                        var start = GridBattleScene.Grid[predefinedPath.start.x, predefinedPath.start.y];
-                        var reachable = pathfindingModel.GetAllReachablePositions(GridBattleScene, start, amount);
-                        DisplayGridReachablePositions(start.Coordinates, reachable.Select(n => n.Coordinates).ToList());
-                        Console.ReadKey();
+                        var rangeKey = Console.ReadKey();
+                        while(rangeKey.Key != ConsoleKey.Q)
+                        {
+                            if(rangeKey.Key == ConsoleKey.LeftArrow)
+                            {
+                                amount--;
+                                if(amount < 0)
+                                {
+                                    amount = 0;
+                                }
+                            }
+                            if (rangeKey.Key == ConsoleKey.NumPad2)
+                            {
+                                amount -= 10;
+                                if (amount < 0)
+                                {
+                                    amount = 0;
+                                }
+                            }
+                            if (rangeKey.Key == ConsoleKey.RightArrow)
+                            {
+                                amount++;
+                            }
+                            if (rangeKey.Key == ConsoleKey.NumPad8)
+                            {
+                                amount += 10;
+                            }
+
+                            Console.Clear();
+                            var predefinedPath = PathfindingConfigurations.PredefinedPaths[chosenPathId];
+                            var start = GridBattleScene.Grid[predefinedPath.start.x, predefinedPath.start.y];
+                            var reachable = pathfindingModel.GetAllReachablePositions(GridBattleScene, start, amount);
+                            DisplayGridReachablePositions(start.Coordinates, reachable.Select(n => n.Coordinates).ToList());
+                            Console.WriteLine($"Range: {amount}");
+                            Console.WriteLine("Left arrow: shorter, right arrow: longer, Q: exit");
+                            rangeKey = Console.ReadKey();
+                        }
                         break;
                     }
+
                 case ConsoleKey.D0:
                     return;
             }

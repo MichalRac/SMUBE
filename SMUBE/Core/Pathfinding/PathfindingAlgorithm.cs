@@ -26,7 +26,7 @@ namespace SMUBE.Pathfinding
                 set
                 {
                     ShortestKnownPathBackingField = value;
-                    ShortestDistance = ShortestKnownPathBackingField.Count;
+                    ShortestDistance = GetPathCost(ShortestKnownPathBackingField);
                 }
             }
 
@@ -37,6 +37,7 @@ namespace SMUBE.Pathfinding
         }
 
 
+        protected readonly static float SINGLE_STEP_RANGE = 1f;
         protected readonly static int STRAIGHT_COST_APPROXIMATION = 10;
         protected readonly static int DIAGONAL_COST_APPROXIMATION = 14;
 
@@ -45,6 +46,7 @@ namespace SMUBE.Pathfinding
 
         public List<BattleScenePosition> GetAllReachablePositions(GridBattleScene battleScene, BattleScenePosition position, int maxSteps = int.MaxValue)
         {
+            var maxDistance = (maxSteps * SINGLE_STEP_RANGE);
             var allNodes = new PathfindingPositionCache[battleScene.Width, battleScene.Height];
             var reachableNodes = new List<PathfindingPositionCache>();
 
@@ -57,7 +59,7 @@ namespace SMUBE.Pathfinding
             }
 
             var currentNode = allNodes[position.Coordinates.x, position.Coordinates.y];
-            currentNode.ShortestKnownPath = new List<BattleScenePosition>();
+            currentNode.ShortestKnownPath = new List<BattleScenePosition>() { currentNode.Position };
 
             while (currentNode != null)
             {
@@ -71,25 +73,28 @@ namespace SMUBE.Pathfinding
                         }
 
                         var moveTargetPos = new SMUBEVector2<int>(currentNode.Position.Coordinates.x + xDelta, currentNode.Position.Coordinates.y + yDelta);
+                        
                         if (!battleScene.IsValid(moveTargetPos) || !battleScene.IsEmpty(moveTargetPos))
                         {
                             continue;
                         }
-                        if (allNodes[moveTargetPos.x, moveTargetPos.y] == null)
+
+                        var moveTarget = allNodes[moveTargetPos.x, moveTargetPos.y];
+
+                        if (moveTarget == null)
                         {
                             continue;
                         }
 
-                        var pathSoFar = new List<BattleScenePosition>(currentNode.ShortestKnownPath) { currentNode.Position };
+                        var pathSoFar = new List<BattleScenePosition>(currentNode.ShortestKnownPath) { moveTarget.Position };
 
-                        if (allNodes[moveTargetPos.x, moveTargetPos.y].ShortestDistance == int.MaxValue)
+                        if (moveTarget.ShortestDistance == int.MaxValue)
                         {
-                            allNodes[moveTargetPos.x, moveTargetPos.y].ShortestKnownPath = pathSoFar;
+                            moveTarget.ShortestKnownPath = pathSoFar;
                         }
-                        else if (pathSoFar.Count <= allNodes[moveTargetPos.x, moveTargetPos.y].ShortestDistance)
+                        else if (pathSoFar.Count <= moveTarget.ShortestDistance)
                         {
-                            allNodes[moveTargetPos.x, moveTargetPos.y].ShortestKnownPath
-                                = GetShorterPath(pathSoFar, allNodes[moveTargetPos.x, moveTargetPos.y].ShortestKnownPath);
+                            moveTarget.ShortestKnownPath = GetShorterPath(pathSoFar, moveTarget.ShortestKnownPath);
                         }
                     }
                 }
@@ -107,6 +112,11 @@ namespace SMUBE.Pathfinding
                     }
 
                     if (node.ShortestDistance == int.MaxValue)
+                    {
+                        continue;
+                    }
+
+                    if(node.ShortestDistance > maxDistance)
                     {
                         continue;
                     }
@@ -133,7 +143,7 @@ namespace SMUBE.Pathfinding
                 }
             }
 
-            var reachablePositions = reachableNodes.Where(n => n.ShortestDistance <= maxSteps).ToList();
+            var reachablePositions = reachableNodes.Where(n => n.ShortestDistance <= maxDistance).ToList();
 
             return reachablePositions.Select(n => n.Position).ToList();
         }
@@ -146,12 +156,17 @@ namespace SMUBE.Pathfinding
             return pathADistance < pathBDistance ? pathA : pathB;
         }
 
-        protected int GetPathCost(List<BattleScenePosition> path)
+        protected static int GetPathCost(List<BattleScenePosition> path)
         {
             int cost = 0;
 
+            if(path == null || path.Count == 0) 
+            {
+                return cost;
+            }
+
             var previousEntry = path[0];
-            for (int i = 0; i < path.Count; i++)
+            for (int i = 1; i < path.Count; i++)
             {
                 var horizontalStep = Math.Abs(previousEntry.Coordinates.x - path[i].Coordinates.x) != 0;
                 var verticallStep = Math.Abs(previousEntry.Coordinates.y - path[i].Coordinates.y) != 0;
@@ -164,6 +179,8 @@ namespace SMUBE.Pathfinding
                 {
                     cost += STRAIGHT_COST_APPROXIMATION;
                 }
+
+                previousEntry = path[i];
             }
 
             return cost;

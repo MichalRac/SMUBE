@@ -23,14 +23,14 @@ namespace SMUBE.Commands.SpecificCommands._Common
                 return false;
             }
 
-            if (args.battleStateModel == null)
+            if (args.BattleStateModel == null)
             {
                 return false;
             }
 
             if (args.ActiveUnit == null || args.ActiveUnit.UnitIdentifier == null)
                 return false;
-            if (!args.battleStateModel.TryGetUnit(args.ActiveUnit.UnitIdentifier, out var _))
+            if (!args.BattleStateModel.TryGetUnit(args.ActiveUnit.UnitIdentifier, out var _))
                 return false;
 
 
@@ -52,13 +52,13 @@ namespace SMUBE.Commands.SpecificCommands._Common
 
                     void append_ally_units()
                     {
-                        viableUnits.AddRange(args.battleStateModel
+                        viableUnits.AddRange(args.BattleStateModel
                             .GetTeamUnits(args.ActiveUnit.UnitIdentifier.TeamId)
                             .Where(unit => unit.UnitData.UnitStats.IsAlive()));
                     }
                     void append_enemy_units()
                     {
-                        viableUnits.AddRange(args.battleStateModel
+                        viableUnits.AddRange(args.BattleStateModel
                             .GetTeamUnits(args.ActiveUnit.UnitIdentifier.TeamId == 0 ? 1 : 0)
                             .Where(unit => unit.UnitData.UnitStats.IsAlive()));
                     }
@@ -71,7 +71,7 @@ namespace SMUBE.Commands.SpecificCommands._Common
 
             foreach(var targetUnit in args.TargetUnits)
             {
-                if (!args.battleStateModel.TryGetUnit(targetUnit.UnitIdentifier, out var _))
+                if (!args.BattleStateModel.TryGetUnit(targetUnit.UnitIdentifier, out var _))
                     return false;
             }
 

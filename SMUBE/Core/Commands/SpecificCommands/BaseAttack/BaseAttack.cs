@@ -39,6 +39,12 @@ namespace Commands.SpecificCommands.BaseAttack
                 return false;
             }
 
+            if (!battleStateModel.BattleSceneState.Pathfinding.CanGetNextTo(battleStateModel.BattleSceneState, activeUnit.UnitData.BattleScenePosition, 
+                targetUnit.UnitData.BattleScenePosition, out var _, activeUnit.UnitData.UnitStats.Speed))
+            {
+                return false;
+            }
+
             activeUnit.UnitData.UnitStats.TryUseAbility(this);
             targetUnit.UnitData.UnitStats.AffectByAbility(GetCommandResults(commandArgs));
 

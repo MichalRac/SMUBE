@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace SMUBE.Pathfinding
 {
-    public abstract class PathfindingAlgorithm
+    internal abstract class PathfindingAlgorithm
     {
         protected class PathfindingPositionCache
         {
@@ -43,6 +43,73 @@ namespace SMUBE.Pathfinding
 
         public abstract bool TryFindPathFromTo(GridBattleScene battleScene, BattleScenePosition start,
             BattleScenePosition target, out List<BattleScenePosition> path, out int visitedNodesCount);
+
+        public bool IsNextTo(GridBattleScene battleScene, BattleScenePosition start, BattleScenePosition target)
+        {
+            var potentialTargets = GetSurroundingPositions(battleScene, target, true);
+            foreach (var potentialTarget in potentialTargets)
+            {
+                if (potentialTarget.Coordinates == start.Coordinates)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool CanGetNextTo(GridBattleScene battleScene, BattleScenePosition start, BattleScenePosition target, out List<BattleScenePosition> validPositions, int maxSteps = int.MaxValue)
+        {
+            var reachablePositions = GetAllReachablePositions(battleScene, start, maxSteps);
+            var potentialTargets = GetSurroundingPositions(battleScene, target, true);
+
+            validPositions = new List<BattleScenePosition>();
+
+            foreach (var potentialTarget in potentialTargets)
+            {
+                foreach (var reachablePosition in reachablePositions)
+                {
+                    if(potentialTarget.Coordinates == reachablePosition.Coordinates)
+                    {
+                        validPositions.Add(potentialTarget); 
+                        break;
+                    }
+                }
+            }
+
+            return validPositions.Count > 0;
+        }
+
+        public List<BattleScenePosition> GetSurroundingPositions(GridBattleScene battleScene, BattleScenePosition position, bool onlyEmpty)
+        {
+            var result = new List<BattleScenePosition>();
+
+            for (int xDelta = -1; xDelta <= 1; xDelta++)
+            {
+                for (int yDelta = -1; yDelta <= 1; yDelta++)
+                {
+                    if (xDelta == 0 && yDelta == 0)
+                    {
+                        continue;
+                    }
+
+                    var checkPos = new SMUBEVector2<int>(position.Coordinates.x + xDelta, position.Coordinates.y + yDelta);
+
+                    if (!battleScene.IsValid(checkPos))
+                    {
+                        continue;
+                    }
+
+                    if(onlyEmpty && !battleScene.IsEmpty(checkPos))
+                    {
+                        continue;
+                    }
+
+                    result.Add(battleScene.Grid[checkPos.x, checkPos.y]);
+                }
+            }
+
+            return result;
+        }
 
         public List<BattleScenePosition> GetAllReachablePositions(GridBattleScene battleScene, BattleScenePosition position, int maxSteps = int.MaxValue)
         {

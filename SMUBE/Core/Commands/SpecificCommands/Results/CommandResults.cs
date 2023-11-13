@@ -1,4 +1,5 @@
 ﻿using SMUBE.Commands.Effects;
+using SMUBE.Commands.SpecificCommands.Args;
 using SMUBE.DataStructures.Units;
 using System;
 using System.Collections.Generic;
@@ -13,5 +14,8 @@ namespace Commands
         public UnitData performer;
         public List<UnitData> targets = new List<UnitData>();
         public List<Effect> effects = new List<Effect>();
+
+        public List<PositionDelta> PositionDeltas { get; set; }
+
     }
 }

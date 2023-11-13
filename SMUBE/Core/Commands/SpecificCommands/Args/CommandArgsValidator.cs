@@ -12,6 +12,7 @@ namespace Commands
 
         Ally = 1,
         Enemy = 2,
+        Position = 3,
     }
 
     public interface CommandArgsValidator

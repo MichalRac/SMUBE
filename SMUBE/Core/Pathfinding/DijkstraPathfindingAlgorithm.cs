@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SMUBE.Pathfinding
 {
-    public class DijkstraPathfindingAlgorithm : PathfindingAlgorithm
+    internal class DijkstraPathfindingAlgorithm : PathfindingAlgorithm
     {
         public override bool TryFindPathFromTo(GridBattleScene battleScene, BattleScenePosition start,
             BattleScenePosition target, out List<BattleScenePosition> path, out int visitedNodesCount)

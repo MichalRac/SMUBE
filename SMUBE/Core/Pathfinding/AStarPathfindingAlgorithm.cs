@@ -8,9 +8,7 @@ using System.Threading.Tasks;
 
 namespace SMUBE.Pathfinding
 {
-
-
-    public class AStarPathfindingAlgorithm : PathfindingAlgorithm
+    internal class AStarPathfindingAlgorithm : PathfindingAlgorithm
     {
         private class AStarPositionCache : PathfindingPositionCache
         {

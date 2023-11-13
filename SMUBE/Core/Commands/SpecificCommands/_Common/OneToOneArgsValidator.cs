@@ -27,20 +27,20 @@ namespace SMUBE.Commands.SpecificCommands._Common
                 return false;
             }
             
-            if (args.battleStateModel == null)
+            if (args.BattleStateModel == null)
             {
                 return false;
             }
 
             if (args.ActiveUnit == null || args.ActiveUnit.UnitIdentifier == null)
                 return false;
-            if (!args.battleStateModel.TryGetUnit(args.ActiveUnit.UnitIdentifier, out var _))
+            if (!args.BattleStateModel.TryGetUnit(args.ActiveUnit.UnitIdentifier, out var _))
                 return false;
 
             if (args.TargetUnits == null || args.TargetUnits.Count != 1 || args.TargetUnits.First().UnitIdentifier == null)
                 return false;
             var targetUnitIdentifier = args.TargetUnits.First().UnitIdentifier;
-            if (!args.battleStateModel.TryGetUnit(targetUnitIdentifier, out var targetUnit))
+            if (!args.BattleStateModel.TryGetUnit(targetUnitIdentifier, out var targetUnit))
                 return false;
 
             if (!targetUnit.UnitData.UnitStats.IsAlive())

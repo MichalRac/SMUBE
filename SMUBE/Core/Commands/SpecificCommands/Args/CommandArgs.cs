@@ -15,14 +15,14 @@ namespace Commands
         {
             ActiveUnit = activeUnit;
             TargetUnits = targetUnits;
-            this.battleStateModel = battleStateModel;
+            this.BattleStateModel = battleStateModel;
             this.PositionDeltas = positionDeltas;
         }
 
         public UnitData ActiveUnit { get; }
         public List<UnitData> TargetUnits { get; } = new List<UnitData>();
-        public BattleStateModel battleStateModel { get; }
+        public BattleStateModel BattleStateModel { get; }
 
-        public List<PositionDelta> PositionDeltas { get; }
+        public List<PositionDelta> PositionDeltas { get; set; }
     }
 }

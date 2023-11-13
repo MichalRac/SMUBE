@@ -18,7 +18,7 @@ namespace SMUBE.DataStructures.BattleScene
         public List<SMUBEVector2<int>> InitialUnstableCells = new List<SMUBEVector2<int>>();
     }
 
-    public class GridBattleScene
+    public class GridBattleScene : BattleSceneBase
     {
         public int Width { get; }
         public int Height { get; }
@@ -26,7 +26,6 @@ namespace SMUBE.DataStructures.BattleScene
         private BattleScenePosition[,] _grid;
         public BattleScenePosition[,] Grid => _grid;
 
-        public AStarPathfindingAlgorithm Pathfinding { get; } = new AStarPathfindingAlgorithm();
 
         public GridBattleScene(InitialGridData initialGridData)
         {

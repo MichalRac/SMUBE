@@ -4,21 +4,26 @@ using SMUBE.DataStructures.Units;
 using SMUBE.DataStructures.Utils;
 using SMUBE.Units;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 
 namespace SMUBE.BattleState
 {
     public class BattleStateModel
     {
-        public List<Unit> Units { get; private set; } = new List<Unit>();
+        public List<Unit> Units { get; }
         private Queue<Unit> ActionQueue { get; set; } = new Queue<Unit>();
-        public GridBattleScene BattleSceneState { get; set; }
-
-        public BattleStateModel(BattleStateModel sourceBattleStateModel) 
+        public GridBattleScene BattleSceneState { get; }
+        
+        public BattleStateModel(List<Unit> units)
+        {
+            Units = units;
+            var initGridData = PrepareInitialGridData();
+            BattleSceneState = new GridBattleScene(initGridData);
+            SetupQueue();
+        }
+        
+        private BattleStateModel(BattleStateModel sourceBattleStateModel) 
         {
             Units = new List<Unit>();
             ActionQueue = new Queue<Unit>();
@@ -40,11 +45,31 @@ namespace SMUBE.BattleState
                     Console.WriteLine($"Unable to find matching unit for id {unit.UnitData} when deep copying world state");
                 }
             }
+            BattleSceneState = sourceBattleStateModel.BattleSceneState;
         }
-        public BattleStateModel(List<Unit> units)
+
+        private InitialGridData PrepareInitialGridData()
         {
-            Units = units;
-            SetupQueue();
+            var initialUnitSetup = new List<(SMUBEVector2<int> pos, UnitIdentifier id)>();
+            var team0PosCount = 0;
+            var team1PosCount = 0;
+                
+            foreach (var u in Units)
+            {
+                var pos = u.UnitData.UnitIdentifier.TeamId == 0 
+                    ? BattleSceneBase.DefaultTeam0Positions[team0PosCount++] 
+                    : BattleSceneBase.DefaultTeam0Positions[team1PosCount++];
+                u.UnitData.BattleScenePosition = new BattleScenePosition(pos);
+                initialUnitSetup.Add((pos, u.UnitData.UnitIdentifier));
+            }
+
+            var initGridData = new InitialGridData
+            {
+                width = 10,
+                height = 10,
+                InitialUnitSetup = initialUnitSetup,
+            };
+            return initGridData;
         }
 
         public BattleStateModel DeepCopy()

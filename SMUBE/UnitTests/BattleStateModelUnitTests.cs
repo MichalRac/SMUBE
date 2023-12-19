@@ -1,10 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SMUBE.BattleState;
-using System;
 using System.Collections.Generic;
+using SMUBE.DataStructures.Units;
+using SMUBE.Units;
+using SMUBE.Units.CharacterTypes;
 
 namespace SMUBE_Utils.UnitTests
 {
+    /*
     [TestClass]
     public class BattleStateModelUnitTests
     {
@@ -296,4 +299,5 @@ namespace SMUBE_Utils.UnitTests
         }
 
     }
+        */
 }

@@ -44,10 +44,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PathfindingConfigurations.cs" />
-    <Compile Include="PathfindingSimulator.cs" />
+    <Compile Include="InternalRunner\Modules\GameSimulator\ActionContexts\InternalRunnerContextPicker.cs" />
+    <Compile Include="InternalRunner\Modules\GameSimulator\ActionContexts\PickTeamActionContext.cs" />
+    <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerSkipForward.cs" />
+    <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerStepForward.cs" />
+    <Compile Include="InternalRunner\Modules\GameSimulator\BattleCoreSimulationWrapper.cs" />
+    <Compile Include="InternalRunner\Modules\GameSimulator\Configurator\AutoGameSimulatorConfigurator.cs" />
+    <Compile Include="InternalRunner\Modules\GameSimulator\Configurator\IGameSimulatorConfigurator.cs" />
+    <Compile Include="InternalRunner\Modules\GameSimulator\Configurator\DefaultGameSimulatorConfigurator.cs" />
+    <Compile Include="InternalRunner\Modules\GameSimulator\GameSimulatorModule.cs" />
+    <Compile Include="InternalRunner\InternalRunner.cs" />
+    <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerAction.cs" />
+    <Compile Include="InternalRunner\Modules\GameSimulator\ActionContexts\InternalRunnerActionContext.cs" />
+    <Compile Include="InternalRunner\Modules\IInternalRunnerModule.cs" />
+    <Compile Include="InternalRunner\Modules\InternalRunnerModulePicker.cs" />
+    <Compile Include="InternalRunner\Modules\Pathfinding\PathfindingConfigurations.cs" />
+    <Compile Include="InternalRunner\Modules\Pathfinding\PathfindingSimulatorModule.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\GenericChoiceUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

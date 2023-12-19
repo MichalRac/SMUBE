@@ -1,18 +1,12 @@
-﻿using SMUBE.BattleState;
-using SMUBE.DataStructures.BattleScene;
-using SMUBE.DataStructures.Units;
+﻿using SMUBE.DataStructures.BattleScene;
 using SMUBE.DataStructures.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SMUBE.Pathfinding
 {
-    internal abstract class PathfindingAlgorithm
+    public abstract class PathfindingAlgorithm
     {
         protected class PathfindingPositionCache
         {

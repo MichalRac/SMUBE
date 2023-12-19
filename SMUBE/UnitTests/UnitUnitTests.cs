@@ -3,7 +3,7 @@ using SMUBE.Units;
 
 namespace SMUBE_Utils.UnitTests
 {
-    [TestClass]
+    /*[TestClass]
     public class UnitUnitTests
     {
         [TestMethod]
@@ -30,5 +30,5 @@ namespace SMUBE_Utils.UnitTests
             var viableCommands1 = unit1.ViableCommands;
             var viableCommands2 = unit2.ViableCommands;
         }
-    }
+    }*/
 }

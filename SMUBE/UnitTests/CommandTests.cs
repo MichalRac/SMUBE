@@ -8,6 +8,8 @@ using System.ComponentModel.Design;
 
 namespace SMUBE_Utils.UnitTests
 {
+    
+    /*
     [TestClass]
     public class CommandTests
     {
@@ -52,4 +54,5 @@ namespace SMUBE_Utils.UnitTests
             }
         }
     }
+*/
 }

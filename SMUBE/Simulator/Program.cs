@@ -4,17 +4,12 @@ using SMUBE.AI.BehaviorTree;
 using SMUBE.AI.DecisionTree;
 using SMUBE.AI.GoalOrientedBehavior;
 using SMUBE.AI.StateMachine;
-using SMUBE.BattleState;
 using SMUBE.Core;
 using SMUBE.Units;
-using SMUBE.Units.CharacterTypes;
+using SMUBE_Utils.Simulator.InternalRunner.Modules.Pathfinding;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SMUBE_Utils.Simulator
 {
@@ -22,7 +17,8 @@ namespace SMUBE_Utils.Simulator
     {
         static void Main(string[] args)
         {
-            Init();
+            new InternalRunner.InternalRunner().Run();
+            //Init();
         }
 
         private static BattleCore _core;
@@ -81,7 +77,7 @@ namespace SMUBE_Utils.Simulator
                     team1AIModelProvider = () => new BehaviorTreeAIModel(useSimpleBehavior);
                     break;
                 case ConsoleKey.D6:
-                    var pathfindingSimulator = new PathfindingSimulator();
+                    var pathfindingSimulator = new PathfindingSimulatorModule();
                     pathfindingSimulator.Run();
                     return;
                 case ConsoleKey.D0:

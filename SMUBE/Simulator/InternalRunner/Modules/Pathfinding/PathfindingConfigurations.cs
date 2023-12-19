@@ -1,16 +1,12 @@
 ﻿using SMUBE.DataStructures.BattleScene;
 using SMUBE.DataStructures.Utils;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SMUBE_Utils.Simulator
+namespace SMUBE_Utils.Simulator.InternalRunner.Modules.Pathfinding
 {
     internal static class PathfindingConfigurations
     {
-        private readonly static int WIDTH = 10; 
+        private readonly static int WIDTH = 10;
         private readonly static int HEIGHT = 10;
 
         public static List<(SMUBEVector2<int> start, SMUBEVector2<int> target)> PredefinedPaths = new List<(SMUBEVector2<int>, SMUBEVector2<int>)>()
@@ -19,7 +15,7 @@ namespace SMUBE_Utils.Simulator
             (new SMUBEVector2<int>(1, 1), new SMUBEVector2<int>(1, 8)),
             (new SMUBEVector2<int>(1, 1), new SMUBEVector2<int>(8, 1)),
             (new SMUBEVector2<int>(6, 6), new SMUBEVector2<int>(1, 1)),
-            
+
             (new SMUBEVector2<int>(8, 1), new SMUBEVector2<int>(1, 8)),
             (new SMUBEVector2<int>(3, 6), new SMUBEVector2<int>(6, 3)),
             (new SMUBEVector2<int>(3, 6), new SMUBEVector2<int>(8, 8)),
@@ -40,7 +36,7 @@ namespace SMUBE_Utils.Simulator
 
         private static List<SMUBEVector2<int>> MakeHorizontalLine(int y, int startX, int endX)
         {
-            if(startX > endX)
+            if (startX > endX)
             {
                 var buf = endX;
                 endX = startX;
@@ -71,11 +67,11 @@ namespace SMUBE_Utils.Simulator
         }
 
         private static InitialGridData initialGrid0;
-        public static InitialGridData InitialGrid0 
-        { 
+        public static InitialGridData InitialGrid0
+        {
             get
             {
-                if(initialGrid0 == null)
+                if (initialGrid0 == null)
                 {
                     initialGrid0 = new InitialGridData()
                     {
@@ -88,11 +84,11 @@ namespace SMUBE_Utils.Simulator
         }
 
         private static InitialGridData initialGrid1;
-        public static InitialGridData InitialGrid1 
-        { 
+        public static InitialGridData InitialGrid1
+        {
             get
             {
-                if(initialGrid1 == null)
+                if (initialGrid1 == null)
                 {
                     var ObstaclePos = new List<SMUBEVector2<int>>();
                     ObstaclePos.AddRange(MakeHorizontalLine(5, 1, 9));
@@ -111,11 +107,11 @@ namespace SMUBE_Utils.Simulator
         }
 
         private static InitialGridData initialGrid2;
-        public static InitialGridData InitialGrid2 
-        { 
+        public static InitialGridData InitialGrid2
+        {
             get
             {
-                if(initialGrid2 == null)
+                if (initialGrid2 == null)
                 {
                     var ObstaclePos = new List<SMUBEVector2<int>>();
                     ObstaclePos.AddRange(MakeHorizontalLine(2, 1, 9));
@@ -144,11 +140,11 @@ namespace SMUBE_Utils.Simulator
         }
 
         private static InitialGridData initialGrid3;
-        public static InitialGridData InitialGrid3 
-        { 
+        public static InitialGridData InitialGrid3
+        {
             get
             {
-                if(initialGrid3 == null)
+                if (initialGrid3 == null)
                 {
                     var ObstaclePos = new List<SMUBEVector2<int>>();
                     ObstaclePos.AddRange(MakeHorizontalLine(4, 0, 4));
@@ -168,11 +164,11 @@ namespace SMUBE_Utils.Simulator
         }
 
         private static InitialGridData initialGrid4;
-        public static InitialGridData InitialGrid4 
-        { 
+        public static InitialGridData InitialGrid4
+        {
             get
             {
-                if(initialGrid4 == null)
+                if (initialGrid4 == null)
                 {
                     var ObstaclePos = new List<SMUBEVector2<int>>();
                     ObstaclePos.AddRange(MakeVerticalLine(0, 9, 7));
@@ -199,11 +195,11 @@ namespace SMUBE_Utils.Simulator
         }
 
         private static InitialGridData initialGrid5;
-        public static InitialGridData InitialGrid5 
-        { 
+        public static InitialGridData InitialGrid5
+        {
             get
             {
-                if(initialGrid5 == null)
+                if (initialGrid5 == null)
                 {
                     var ObstaclePos = new List<SMUBEVector2<int>>();
                     ObstaclePos.AddRange(MakeHorizontalLine(4, 0, 9));
@@ -231,11 +227,11 @@ namespace SMUBE_Utils.Simulator
         }
 
         private static InitialGridData initialGrid6;
-        public static InitialGridData InitialGrid6 
-        { 
+        public static InitialGridData InitialGrid6
+        {
             get
             {
-                if(initialGrid6 == null)
+                if (initialGrid6 == null)
                 {
                     var ObstaclePos = new List<SMUBEVector2<int>>();
                     ObstaclePos.AddRange(MakeHorizontalLine(2, 2, 7));
@@ -264,11 +260,11 @@ namespace SMUBE_Utils.Simulator
         }
 
         private static InitialGridData initialGrid7;
-        public static InitialGridData InitialGrid7 
-        { 
+        public static InitialGridData InitialGrid7
+        {
             get
             {
-                if(initialGrid7 == null)
+                if (initialGrid7 == null)
                 {
                     var ObstaclePos = new List<SMUBEVector2<int>>();
                     ObstaclePos.AddRange(MakeHorizontalLine(1, 6, 7));

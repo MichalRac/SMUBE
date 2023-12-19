@@ -25,6 +25,11 @@ namespace SMUBE.DataStructures.BattleScene
             Coordinates = new SMUBEVector2<int>(x, y);
         }
 
+        public BattleScenePosition(SMUBEVector2<int> pos)
+        {
+            Coordinates = pos;
+        }
+
         public UnitIdentifier UnitIdentifier { get; private set; }
         public BattleScenePositionContentType ContentType { get; private set; }
 

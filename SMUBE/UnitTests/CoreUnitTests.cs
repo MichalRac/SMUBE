@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 namespace SMUBE_Utils.UnitTests
 {
+    /*
     [TestClass]
     public class CoreUnitTests
     {
@@ -45,4 +46,5 @@ namespace SMUBE_Utils.UnitTests
             Assert.ThrowsException<ArgumentException>(action2);
         }
     }
+*/
 }

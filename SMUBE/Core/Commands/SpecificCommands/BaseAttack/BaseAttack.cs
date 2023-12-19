@@ -1,12 +1,7 @@
-﻿using Commands.SpecificCommands._Common;
-using SMUBE.BattleState;
+﻿using SMUBE.BattleState;
 using SMUBE.Commands.Effects;
 using SMUBE.Commands.SpecificCommands._Common;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Commands.SpecificCommands.BaseAttack
 {
@@ -29,8 +24,7 @@ namespace Commands.SpecificCommands.BaseAttack
             {
                 return false;
             }
-
-
+            
             battleStateModel.TryGetUnit(commandArgs.ActiveUnit.UnitIdentifier, out var activeUnit);
             battleStateModel.TryGetUnit(commandArgs.TargetUnits.First().UnitIdentifier, out var targetUnit);
 
@@ -40,7 +34,7 @@ namespace Commands.SpecificCommands.BaseAttack
             }
 
             if (!battleStateModel.BattleSceneState.Pathfinding.CanGetNextTo(battleStateModel.BattleSceneState, activeUnit.UnitData.BattleScenePosition, 
-                targetUnit.UnitData.BattleScenePosition, out var _, activeUnit.UnitData.UnitStats.Speed))
+                targetUnit.UnitData.BattleScenePosition, out _, activeUnit.UnitData.UnitStats.Speed))
             {
                 return false;
             }

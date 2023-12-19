@@ -1,19 +1,15 @@
 ﻿using SMUBE.DataStructures.BattleScene;
 using SMUBE.DataStructures.Utils;
 using SMUBE.Pathfinding;
+using SMUBE_Utils.Simulator.InternalRunner.Modules;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
-namespace SMUBE_Utils.Simulator
+namespace SMUBE_Utils.Simulator.InternalRunner.Modules.Pathfinding
 {
-    internal class PathfindingSimulator
+    public class PathfindingSimulatorModule : IInternalRunnerModule
     {
         private int chosenPathId = 0;
         private int chosenGridId = 0;
@@ -21,7 +17,7 @@ namespace SMUBE_Utils.Simulator
         private bool SimplifiedGrid = true;
         private PathfindingAlgorithm pathfindingModel;
 
-        public PathfindingSimulator()
+        public PathfindingSimulatorModule()
         {
             GridBattleScene = new GridBattleScene(PathfindingConfigurations.InitialGrid0);
             pathfindingModel = new DijkstraPathfindingAlgorithm();
@@ -58,7 +54,7 @@ namespace SMUBE_Utils.Simulator
                     SimplifiedGrid = !SimplifiedGrid;
                     break;
                 case ConsoleKey.P:
-                    if(pathfindingModel is DijkstraPathfindingAlgorithm)
+                    if (pathfindingModel is DijkstraPathfindingAlgorithm)
                     {
                         pathfindingModel = new AStarPathfindingAlgorithm();
                     }
@@ -77,7 +73,7 @@ namespace SMUBE_Utils.Simulator
                     break;
                 case ConsoleKey.RightArrow:
                     chosenGridId++;
-                    if(chosenGridId >= PathfindingConfigurations.PredefinedGrids.Count)
+                    if (chosenGridId >= PathfindingConfigurations.PredefinedGrids.Count)
                     {
                         chosenGridId = 0;
                     }
@@ -126,12 +122,12 @@ namespace SMUBE_Utils.Simulator
                         }
 
                         var rangeKey = Console.ReadKey();
-                        while(rangeKey.Key != ConsoleKey.Q)
+                        while (rangeKey.Key != ConsoleKey.Q)
                         {
-                            if(rangeKey.Key == ConsoleKey.LeftArrow)
+                            if (rangeKey.Key == ConsoleKey.LeftArrow)
                             {
                                 amount--;
-                                if(amount < 0)
+                                if (amount < 0)
                                 {
                                     amount = 0;
                                 }
@@ -369,7 +365,7 @@ namespace SMUBE_Utils.Simulator
             Console.Clear();
 
             List<SMUBEVector2<int>> displayPath = null;
-            if(path != null)
+            if (path != null)
             {
                 displayPath = path.Select(x => x.Coordinates).ToList();
                 displayPath.Add(target.Coordinates);
@@ -380,7 +376,7 @@ namespace SMUBE_Utils.Simulator
                 Console.WriteLine("Path exists! It goes through following:");
 
 
-                foreach(var node in path) 
+                foreach (var node in path)
                 {
                     Console.Write(node.ToString() + " -> ");
                 }
@@ -456,11 +452,11 @@ namespace SMUBE_Utils.Simulator
                                 contentString = isPartOfPath ? " [-UP-]" : " [!U!]";
                                 break;
                         }
-                        if(start.Coordinates == GridBattleScene.Grid[j, i].Coordinates)
+                        if (start.Coordinates == GridBattleScene.Grid[j, i].Coordinates)
                         {
                             contentString = " <SSS>";
                         }
-                        if(target.Coordinates == GridBattleScene.Grid[j, i].Coordinates)
+                        if (target.Coordinates == GridBattleScene.Grid[j, i].Coordinates)
                         {
                             contentString = " <TTT>";
                         }
@@ -588,7 +584,7 @@ namespace SMUBE_Utils.Simulator
             var y = InputCoord();
 
             var battleScenePosition = new BattleScenePosition(x, y);
-            if(!GridBattleScene.IsValid(battleScenePosition.Coordinates))
+            if (!GridBattleScene.IsValid(battleScenePosition.Coordinates))
             {
                 Console.WriteLine("\nPosition out of bounds! Input it again!");
                 return InputPosition(posName);

@@ -2,11 +2,11 @@
 {
     internal class InternalRunnerStepForward : InternalRunnerAction
     {
-        public InternalRunnerStepForward(BattleCoreSimulationWrapper core) : base(core) { }
+        public InternalRunnerStepForward(BattleCoreSimulationWrapper coreWrapper) : base(coreWrapper) { }
 
         public override void OnPicked()
         {
-            Core.AutoResolveTurn();
+            CoreWrapper.AutoResolveTurn();
         }
     }
 }

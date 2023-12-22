@@ -3,12 +3,11 @@ using Commands.SpecificCommands._Common;
 using SMUBE.BattleState;
 using SMUBE.Commands.SpecificCommands._Common;
 using SMUBE.DataStructures.Units;
-using SMUBE.Units;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SMUBE.Commands.SpecificCommands.Args;
+using SMUBE.DataStructures.Utils;
 
 namespace SMUBE.Commands
 {
@@ -23,6 +22,7 @@ namespace SMUBE.Commands
                 {
                     return new CommonArgs(unit.UnitData, null, battleStateModel);
                 }
+
                 return null;
             }
             else if (command.CommandArgsValidator is OneToOneArgsValidator)
@@ -40,6 +40,7 @@ namespace SMUBE.Commands
 
                     return null;
                 }
+
                 return null;
             }
             else if (command.CommandArgsValidator is OneToEveryArgsValidator oneToEveryArgsValidator)
@@ -71,6 +72,7 @@ namespace SMUBE.Commands
                             viableTargets.Add(target.UnitData);
                         }
                     }
+
                     void add_enemy_targets()
                     {
                         var targets = battleStateModel.GetTeamUnits(activeUnitIdentifier.TeamId == 0 ? 1 : 0).Where(u => u.UnitData.UnitStats.IsAlive());
@@ -82,6 +84,7 @@ namespace SMUBE.Commands
 
                     return new CommonArgs(unit.UnitData, viableTargets, battleStateModel);
                 }
+
                 return null;
             }
             else
@@ -118,12 +121,13 @@ namespace SMUBE.Commands
 
                     return null;
                 }
+
                 return null;
             }
-            else if(command.CommandArgsValidator is OneToEveryArgsValidator)
+            else if (command.CommandArgsValidator is OneToEveryArgsValidator)
             {
                 listViable.Add(GetDumbCommandArgs(command, battleStateModel, activeUnitIdentifier));
-                return listViable;  
+                return listViable;
             }
             else
             {
@@ -139,6 +143,7 @@ namespace SMUBE.Commands
                 {
                     return new CommonArgs(unit.UnitData, null, battleStateModel);
                 }
+
                 return null;
             }
             else if (command.CommandArgsValidator is OneToOneArgsValidator)
@@ -156,6 +161,7 @@ namespace SMUBE.Commands
 
                     return null;
                 }
+
                 return null;
             }
             else if (command.CommandArgsValidator is OneToEveryArgsValidator oneToEveryArgsValidator)
@@ -187,6 +193,7 @@ namespace SMUBE.Commands
                             viableTargets.Add(target.UnitData);
                         }
                     }
+
                     void add_enemy_targets()
                     {
                         var targets = battleStateModel.GetTeamUnits(activeUnitIdentifier.TeamId == 0 ? 1 : 0).Where(u => u.UnitData.UnitStats.IsAlive());
@@ -198,13 +205,64 @@ namespace SMUBE.Commands
 
                     return new CommonArgs(unit.UnitData, viableTargets, battleStateModel);
                 }
+
+                return null;
+            }
+            else if (command.CommandArgsValidator is OneMoveToOneArgsValidator)
+            {
+                if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
+                {
+                    var validTargets
+                        = battleStateModel.GetTeamUnits(activeUnitIdentifier.TeamId == 0 ? 1 : 0)
+                            .Where(u => u.UnitData.UnitStats.IsAlive()).ToList();
+
+                    if (validTargets.Count == 0)
+                    {
+                        return null;
+                    }
+
+                    validTargets.Shuffle();
+
+                    foreach (var validTarget in validTargets)
+                    {
+                        var reachableSurrounding = battleStateModel.BattleSceneState.PathfindingHandler
+                            .GetReachableSurroundingPositions(battleStateModel, validTarget.UnitData.BattleScenePosition);
+
+                        if (reachableSurrounding.Count == 0)
+                            continue;
+
+                        reachableSurrounding.Shuffle();
+
+                        var posDelta = new PositionDelta(activeUnitIdentifier, unit.UnitData.BattleScenePosition.Coordinates, reachableSurrounding.First().Coordinates);
+                        var args = new CommonArgs(unit.UnitData, new List<UnitData>() { validTarget.UnitData }, battleStateModel, posDelta);
+
+                        return args;
+                    }
+
+                    return null;
+                }
+            }
+            else if (command.CommandArgsValidator is OneToPositionValidator)
+            {
+                if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
+                {
+                    var reachablePositions = battleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions;
+                    
+                    if (reachablePositions.Count == 0)
+                        return null;
+                    
+                    var target = reachablePositions.GetRandom();
+                    var positionDelta = new PositionDelta(unit.UnitData.UnitIdentifier, unit.UnitData.BattleScenePosition.Coordinates, target.Position.Coordinates);
+                    return new CommonArgs(unit.UnitData, null, battleStateModel, positionDelta);
+                }
                 return null;
             }
             else
             {
                 throw new NotImplementedException();
             }
-        }
 
+            return null;
+        }
     }
 }

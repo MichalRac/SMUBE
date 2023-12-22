@@ -8,7 +8,7 @@ namespace SMUBE.Pathfinding
 {
     public abstract class PathfindingAlgorithm
     {
-        protected class PathfindingPositionCache
+        public class PathfindingPathCache
         {
             public BattleScenePosition Position { get; }
             public bool WasVisited { get; set; } = false;
@@ -24,12 +24,11 @@ namespace SMUBE.Pathfinding
                 }
             }
 
-            public PathfindingPositionCache(BattleScenePosition position)
+            public PathfindingPathCache(BattleScenePosition position)
             {
                 Position = position;
             }
         }
-
 
         protected readonly static float SINGLE_STEP_RANGE = 1f;
         protected readonly static int STRAIGHT_COST_APPROXIMATION = 10;
@@ -37,7 +36,7 @@ namespace SMUBE.Pathfinding
 
         public abstract bool TryFindPathFromTo(GridBattleScene battleScene, BattleScenePosition start,
             BattleScenePosition target, out List<BattleScenePosition> path, out int visitedNodesCount);
-
+        
         public bool IsNextTo(GridBattleScene battleScene, BattleScenePosition start, BattleScenePosition target)
         {
             var potentialTargets = GetSurroundingPositions(battleScene, target, true);
@@ -107,15 +106,20 @@ namespace SMUBE.Pathfinding
 
         public List<BattleScenePosition> GetAllReachablePositions(GridBattleScene battleScene, BattleScenePosition position, int maxSteps = int.MaxValue)
         {
+            return GetAllReachablePaths(battleScene, position, maxSteps).Select(p => p.Position).ToList();
+        }
+        
+        public List<PathfindingPathCache> GetAllReachablePaths(GridBattleScene battleScene, BattleScenePosition position, int maxSteps = int.MaxValue)
+        {
             var maxDistance = (maxSteps * SINGLE_STEP_RANGE);
-            var allNodes = new PathfindingPositionCache[battleScene.Width, battleScene.Height];
-            var reachableNodes = new List<PathfindingPositionCache>();
+            var allNodes = new PathfindingPathCache[battleScene.Width, battleScene.Height];
+            var reachableNodes = new List<PathfindingPathCache>();
 
             for (int i = 0; i < battleScene.Width; i++)
             {
                 for (int j = 0; j < battleScene.Height; j++)
                 {
-                    allNodes[i, j] = new PathfindingPositionCache(battleScene.Grid[i, j]);
+                    allNodes[i, j] = new PathfindingPathCache(battleScene.Grid[i, j]);
                 }
             }
 
@@ -164,7 +168,7 @@ namespace SMUBE.Pathfinding
 
                 reachableNodes.Add(currentNode);
 
-                PathfindingPositionCache nextEvaluatedNode = null;
+                PathfindingPathCache nextEvaluatedNode = null;
                 foreach (var node in allNodes)
                 {
                     if (node.WasVisited)
@@ -204,9 +208,7 @@ namespace SMUBE.Pathfinding
                 }
             }
 
-            var reachablePositions = reachableNodes.Where(n => n.ShortestDistance <= maxDistance).ToList();
-
-            return reachablePositions.Select(n => n.Position).ToList();
+            return reachableNodes.Where(n => n.ShortestDistance <= maxDistance).ToList();
         }
 
         protected List<BattleScenePosition> GetShorterPath(List<BattleScenePosition> pathA, List<BattleScenePosition> pathB)
@@ -298,5 +300,32 @@ namespace SMUBE.Pathfinding
             return (stepsStraight, stepsDiagonal);
         }
 
+        /*
+        protected void CacheLearnedPaths(BattleScenePosition start, List<PathfindingPositionCache> learnedPositionCaches)
+        {
+            if (PathfindingCache.TryGetValue(start, out var knownPathsForPos))
+            {
+                if (knownPathsForPos.Count >= learnedPositionCaches.Count)
+                {
+                    return;
+                }
+                
+                knownPathsForPos.Clear();
+                knownPathsForPos.AddRange(learnedPositionCaches);
+            }
+            else
+            {
+                var pathfindingPositionCaches = new List<PathfindingPositionCache>();
+                pathfindingPositionCaches.AddRange(learnedPositionCaches);
+
+                PathfindingCache.Add(start, pathfindingPositionCaches);
+            }
+        }
+
+        public void ClearCache()
+        {
+            PathfindingCache.Clear();
+        }
+    */
     }
 }

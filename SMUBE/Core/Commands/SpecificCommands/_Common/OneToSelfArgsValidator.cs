@@ -1,9 +1,5 @@
 ﻿using Commands;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SMUBE.BattleState;
 
 namespace SMUBE.Commands.SpecificCommands._Common
 {
@@ -11,14 +7,9 @@ namespace SMUBE.Commands.SpecificCommands._Common
     {
         public ArgsConstraint ArgsConstraint => ArgsConstraint.None;
 
-        public bool Validate(CommandArgs args)
+        public bool Validate(CommandArgs args, BattleStateModel battleStateModel)
         {
-            if (args == null)
-            {
-                return false;
-            }
-
-            if (args.BattleStateModel == null)
+            if (args?.BattleStateModel == null)
             {
                 return false;
             }

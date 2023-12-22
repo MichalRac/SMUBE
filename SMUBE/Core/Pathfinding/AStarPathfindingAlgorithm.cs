@@ -1,20 +1,16 @@
 ﻿using SMUBE.DataStructures.BattleScene;
 using SMUBE.DataStructures.Utils;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SMUBE.Pathfinding
 {
     public class AStarPathfindingAlgorithm : PathfindingAlgorithm
     {
-        private class AStarPositionCache : PathfindingPositionCache
+        private class AStarPathCache : PathfindingPathCache
         {
             public int EstimatedPathDistance { get; set; } = int.MaxValue;
 
-            public AStarPositionCache(BattleScenePosition position) : base(position){ }
+            public AStarPathCache(BattleScenePosition position) : base(position){ }
         }
 
         public override bool TryFindPathFromTo(GridBattleScene battleScene, BattleScenePosition start,
@@ -22,13 +18,13 @@ namespace SMUBE.Pathfinding
         {
             path = null;
             visitedNodesCount = 0;
-            var allNodes = new AStarPositionCache[battleScene.Width, battleScene.Height];
+            var allNodes = new AStarPathCache[battleScene.Width, battleScene.Height];
 
             for (int i = 0; i < battleScene.Width; i++)
             {
                 for (int j = 0; j < battleScene.Height; j++)
                 {
-                    allNodes[i, j] = new AStarPositionCache(battleScene.Grid[i, j]);
+                    allNodes[i, j] = new AStarPathCache(battleScene.Grid[i, j]);
                 }
             }
 
@@ -91,7 +87,7 @@ namespace SMUBE.Pathfinding
                 currentNode.WasVisited = true;
                 visitedNodesCount++;
 
-                AStarPositionCache nextEvaluatedNode = null;
+                AStarPathCache nextEvaluatedNode = null;
                 foreach (var node in allNodes)
                 {
                     if (node.WasVisited)

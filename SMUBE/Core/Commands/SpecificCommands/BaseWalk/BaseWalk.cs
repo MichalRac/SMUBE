@@ -1,12 +1,8 @@
 ﻿using Commands;
 using SMUBE.BattleState;
-using SMUBE.Commands.Effects;
 using SMUBE.Commands.SpecificCommands._Common;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SMUBE.Commands.SpecificCommands.Args;
 
 namespace SMUBE.Commands.SpecificCommands.BaseWalk
 {
@@ -25,16 +21,21 @@ namespace SMUBE.Commands.SpecificCommands.BaseWalk
 
         public bool Execute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
-            if (!CommandArgsValidator.Validate(commandArgs))
+            if (!CommandArgsValidator.Validate(commandArgs, battleStateModel))
             {
                 return false;
             }
 
             var activeUnit = commandArgs.ActiveUnit;
+            
+            var startPos = commandArgs.BattleStateModel.BattleSceneState
+                .Grid[activeUnit.BattleScenePosition.Coordinates.x, activeUnit.BattleScenePosition.Coordinates.y];
+            startPos.Clear();
 
-            var target = commandArgs.PositionDeltas[0].Target;
+            var target = commandArgs.PositionDelta.Target;
             var targetPos = commandArgs.BattleStateModel.BattleSceneState.Grid[target.x, target.y];
             activeUnit.BattleScenePosition = targetPos;
+            activeUnit.BattleScenePosition.ApplyUnit(activeUnit.UnitIdentifier);
 
             activeUnit.UnitStats.TryUseAbility(this);
             activeUnit.UnitStats.AddEffects(GetCommandResults(commandArgs));
@@ -47,7 +48,7 @@ namespace SMUBE.Commands.SpecificCommands.BaseWalk
             var results = new CommandResults();
 
             results.performer = commandArgs.ActiveUnit;
-            results.PositionDeltas = commandArgs.PositionDeltas;
+            results.PositionDeltas = new List<PositionDelta> { commandArgs.PositionDelta };
 
             return results;
         }

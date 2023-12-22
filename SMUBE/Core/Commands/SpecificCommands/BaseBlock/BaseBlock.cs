@@ -2,11 +2,6 @@
 using SMUBE.BattleState;
 using SMUBE.Commands.Effects;
 using SMUBE.Commands.SpecificCommands._Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SMUBE.Commands.SpecificCommands.BaseBlock
 {
@@ -25,7 +20,7 @@ namespace SMUBE.Commands.SpecificCommands.BaseBlock
 
         public bool Execute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
-            if (!CommandArgsValidator.Validate(commandArgs))
+            if (!CommandArgsValidator.Validate(commandArgs, battleStateModel))
             {
                 return false;
             }

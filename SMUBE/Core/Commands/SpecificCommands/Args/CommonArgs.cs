@@ -1,19 +1,14 @@
 ﻿using SMUBE.BattleState;
 using SMUBE.Commands.SpecificCommands.Args;
-using SMUBE.DataStructures.BattleScene;
 using SMUBE.DataStructures.Units;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Commands.SpecificCommands._Common
 {
     public class CommonArgs : CommandArgs
     {
-        public CommonArgs(UnitData activeUnit, List<UnitData> targetUnits, BattleStateModel battleStateModel, List<PositionDelta> positionDeltas = null) 
-            : base(activeUnit, targetUnits, battleStateModel, positionDeltas)
+        public CommonArgs(UnitData activeUnit, List<UnitData> targetUnits, BattleStateModel battleStateModel, PositionDelta positionDelta = null) 
+            : base(activeUnit, targetUnits, battleStateModel, positionDelta)
         {
         }
     }

@@ -3,7 +3,6 @@ using SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Actions;
 using SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurator;
 using SMUBE_Utils.Simulator.Utils;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using SMUBE.AI;
 
@@ -34,11 +33,8 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 : 1;
 
             int simulationsRun = 0;
-            long setupTime = 0L;
             while (simulationsRun++ < simulationNumber)
             {
-                var stopwatch = new Stopwatch();
-
                 _coreSimulator.SetupSimulation(gameConfigurator.GetUnits(useSimpleBehavior));
                 
                 var roundAutoResolved = false;
@@ -46,10 +42,13 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 {
                     if(!simulationSeries)
                     {
-                        _coreSimulator.LogTurnInfo();
+                        ProcessCurrentTurn();
+                    }
+                    else
+                    {
+                        new InternalRunnerSkipForward(_coreSimulator).OnPicked();
                     }
                     
-                    _coreSimulator.AutoResolveTurn(!simulationSeries);
                     roundAutoResolved = _coreSimulator.IsFinished(out _);
                 }
                 
@@ -61,19 +60,20 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 }
             }
             
-            Console.WriteLine($"setup ticks: {setupTime}");
-  
             _coreSimulator.OnFinishedLog(ai1, ai2);
             Finish();
         }
 
         private void ProcessCurrentTurn()
         {
+            _coreSimulator.LogTurnInfo();
+         
             var result = GenericChoiceUtils.GetListChoice("Options:", true, new List<(string description, InternalRunnerAction result)>
             {
                 ("Continue", new InternalRunnerStepForward(_coreSimulator)),
-                ("Auto-Continue", new InternalRunnerSkipForward(_coreSimulator)),
-            });
+                ("Auto-Continue", new InternalRunnerSkipForward(_coreSimulator, true)),
+                ("Display Map", new InternalRunnerDisplayMap(_coreSimulator))
+            }, false);
 
             result.OnPicked();
         }

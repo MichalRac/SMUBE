@@ -2,7 +2,7 @@
 using SMUBE.Units;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using SMUBE.BattleState;
 
 namespace SMUBE.Commands.SpecificCommands._Common
 {
@@ -16,14 +16,9 @@ namespace SMUBE.Commands.SpecificCommands._Common
             _argsConstraint = argsConstraint;
         }
 
-        public bool Validate(CommandArgs args)
+        public bool Validate(CommandArgs args, BattleStateModel battleStateModel)
         {
-            if (args == null)
-            {
-                return false;
-            }
-
-            if (args.BattleStateModel == null)
+            if (args?.BattleStateModel == null)
             {
                 return false;
             }

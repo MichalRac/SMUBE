@@ -18,8 +18,8 @@ namespace SMUBE.DataStructures.BattleScene
             new SMUBEVector2<int>(4, 8),
             new SMUBEVector2<int>(6, 8),
         };
-        internal virtual PathfindingAlgorithm Pathfinding { get; } = new AStarPathfindingAlgorithm();
-
+        
+        internal PathfindingHandler PathfindingHandler { get; } = new PathfindingHandler();
 
     }
 }

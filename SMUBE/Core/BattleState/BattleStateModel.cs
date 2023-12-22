@@ -11,6 +11,7 @@ namespace SMUBE.BattleState
 {
     public class BattleStateModel
     {
+        public Unit ActiveUnit { get; private set; }
         public List<Unit> Units { get; }
         private Queue<Unit> ActionQueue { get; set; } = new Queue<Unit>();
         public GridBattleScene BattleSceneState { get; }
@@ -58,7 +59,7 @@ namespace SMUBE.BattleState
             {
                 var pos = u.UnitData.UnitIdentifier.TeamId == 0 
                     ? BattleSceneBase.DefaultTeam0Positions[team0PosCount++] 
-                    : BattleSceneBase.DefaultTeam0Positions[team1PosCount++];
+                    : BattleSceneBase.DefaultTeam1Positions[team1PosCount++];
                 u.UnitData.BattleScenePosition = new BattleScenePosition(pos);
                 initialUnitSetup.Add((pos, u.UnitData.UnitIdentifier));
             }
@@ -119,10 +120,12 @@ namespace SMUBE.BattleState
             if(GetNextActiveUnit(out var nextUnit))
             {
                 nextUnit.UnitData.UnitStats.OnTurnStartEvaluate();
+                ActiveUnit = nextUnit;
+
+                BattleSceneState.PathfindingHandler.OnNewTurn(this);
             }
         }
-
-
+        
         public bool TryAddUnit(Unit argUnit)
         {
             if (!Units.Contains(argUnit))
@@ -141,6 +144,10 @@ namespace SMUBE.BattleState
             {
                 Units.Remove(argUnit);
                 RemoveFromQueue(argUnit);
+
+                var coordinates= argUnit.UnitData.BattleScenePosition.Coordinates;
+                BattleSceneState.Grid[coordinates.x, coordinates.y].Clear();
+                
                 return true;
             }
 

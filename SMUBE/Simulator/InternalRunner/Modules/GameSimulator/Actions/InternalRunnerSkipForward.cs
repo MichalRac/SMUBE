@@ -2,8 +2,11 @@
 {
     internal class InternalRunnerSkipForward : InternalRunnerAction
     {
-        public InternalRunnerSkipForward(BattleCoreSimulationWrapper core) : base(core)
+        private readonly bool _log;
+
+        public InternalRunnerSkipForward(BattleCoreSimulationWrapper coreWrapper, bool log = false) : base(coreWrapper)
         {
+            _log = log;
         }
 
         public override void OnPicked()
@@ -11,12 +14,13 @@
             var gameAutoResolved = false;
             while (!gameAutoResolved)
             {
-                Core.AutoResolveTurn();
-                gameAutoResolved = Core.IsFinished(out _);
-                if (!gameAutoResolved)
+                if (_log)
                 {
-                    Core.LogTurnInfo();
+                    CoreWrapper.LogTurnInfo();
                 }
+                
+                CoreWrapper.AutoResolveTurn(_log);
+                gameAutoResolved = CoreWrapper.IsFinished(out _);
             }
         }
     }

@@ -5,7 +5,6 @@ using SMUBE.Units;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using SMUBE.AI;
 
 namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
@@ -13,6 +12,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
     internal class BattleCoreSimulationWrapper
     {
         private BattleCore _core;
+        public BattleCore Core => _core;
 
         private int turnCounter = 0;
 
@@ -135,11 +135,6 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
         public void AutoResolveTurn(bool log = true)
         {
-            if (turnCounter > 1000)
-            {
-                Console.WriteLine("oof");
-            }
-            
             if (!_core.currentStateModel.GetNextActiveUnit(out var unit))
             {
                 Console.WriteLine("ERROR - no units in the queue");
@@ -165,12 +160,15 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             }
             else
             {
-                commandStopwatch.Start();
-                nextCommand = unit.AiModel.ResolveNextCommand(_core.currentStateModel, unit.UnitData.UnitIdentifier);
-                commandStopwatch.Stop();
-                argsStopwatch.Start();
-                nextArgs = unit.AiModel.GetCommandArgs(nextCommand, _core.currentStateModel, unit.UnitData.UnitIdentifier);
-                argsStopwatch.Stop();
+                while (nextArgs == null)
+                {
+                    commandStopwatch.Start();
+                    nextCommand = unit.AiModel.ResolveNextCommand(_core.currentStateModel, unit.UnitData.UnitIdentifier);
+                    commandStopwatch.Stop();
+                    argsStopwatch.Start();
+                    nextArgs = unit.AiModel.GetCommandArgs(nextCommand, _core.currentStateModel, unit.UnitData.UnitIdentifier);
+                    argsStopwatch.Stop();
+                }
 
                 if (log)
                 {
@@ -222,7 +220,9 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                     {
                         var unitCache = loggedUnit;
                         var unitStats = unitCache.UnitData.UnitStats;
-                        return $"{unitCache.UnitData.Name} {unitCache.UnitData.UnitStats.BaseCharacter.GetType().Name}\thp{unitStats.CurrentHealth}/{unitStats.MaxHealth}\tsp{unitStats.CurrentStamina}/{unitStats.MaxStamina}   \tmp{unitStats.CurrentMana}/{unitStats.MaxMana}";
+                        return $"{unitCache.UnitData.Name} {unitCache.UnitData.UnitStats.BaseCharacter.GetType().Name}\t" +
+                               $"hp{unitStats.CurrentHealth}/{unitStats.MaxHealth}\tsp{unitStats.CurrentStamina}/{unitStats.MaxStamina}   \t" +
+                               $"mp{unitStats.CurrentMana}/{unitStats.MaxMana}\t pos: {unitCache.UnitData.BattleScenePosition}";
                     }
                 }
             }

@@ -1,9 +1,5 @@
 ﻿using Commands;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SMUBE.BattleState;
 
 namespace SMUBE.Commands.SpecificCommands._Common
 {
@@ -11,14 +7,9 @@ namespace SMUBE.Commands.SpecificCommands._Common
     {
         public ArgsConstraint ArgsConstraint => ArgsConstraint.Position;
 
-        public bool Validate(CommandArgs args)
+        public bool Validate(CommandArgs args, BattleStateModel battleStateModel)
         {
-            if (args == null)
-            {
-                return false;
-            }
-
-            if (args.BattleStateModel == null)
+            if (args?.BattleStateModel == null)
             {
                 return false;
             }
@@ -29,20 +20,13 @@ namespace SMUBE.Commands.SpecificCommands._Common
                 return false;
             if (args.TargetUnits != null)
                 return false;
-
-            var activeUnitMoveDeltas = args.PositionDeltas.Where(posDelta => posDelta.UnitIdentifier.Equals(args.ActiveUnit.UnitIdentifier));
-            if (activeUnitMoveDeltas.Count() != 1)
-            {
+            if (args.PositionDelta == null)
                 return false;
-            }
-            var activeUnitMoveDelta = activeUnitMoveDeltas.First();
-            if(activeUnitMoveDelta == null)
-            {
+            if (!args.PositionDelta.UnitIdentifier.Equals(args.ActiveUnit.UnitIdentifier))
                 return false;
-            }
-
+            
             var battleScene = args.BattleStateModel.BattleSceneState;
-            if (!battleScene.IsValid(activeUnitMoveDelta.Target) || !battleScene.IsEmpty(activeUnitMoveDelta.Target))
+            if (!battleScene.IsValid(args.PositionDelta.Target) || !battleScene.IsEmpty(args.PositionDelta.Target))
             {
                 return false;
             }

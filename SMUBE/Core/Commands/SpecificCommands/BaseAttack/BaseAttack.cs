@@ -1,7 +1,9 @@
-﻿using SMUBE.BattleState;
+﻿using System.Collections.Generic;
+using SMUBE.BattleState;
 using SMUBE.Commands.Effects;
 using SMUBE.Commands.SpecificCommands._Common;
 using System.Linq;
+using SMUBE.Commands.SpecificCommands.Args;
 
 namespace Commands.SpecificCommands.BaseAttack
 {
@@ -13,14 +15,14 @@ namespace Commands.SpecificCommands.BaseAttack
 
         public int ManaCost => 0;
 
-        public CommandArgsValidator CommandArgsValidator => new OneToOneArgsValidator(ArgsConstraint.Enemy);
+        public CommandArgsValidator CommandArgsValidator => new OneMoveToOneArgsValidator(ArgsConstraint.Enemy);
 
         private CommandArgs _argsCache;
         public CommandArgs ArgsCache { get => _argsCache; set => _argsCache = value; }
 
         public bool Execute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
-            if (!CommandArgsValidator.Validate(commandArgs))
+            if (!CommandArgsValidator.Validate(commandArgs, battleStateModel))
             {
                 return false;
             }
@@ -32,14 +34,15 @@ namespace Commands.SpecificCommands.BaseAttack
             {
                 return false;
             }
-
-            if (!battleStateModel.BattleSceneState.Pathfinding.CanGetNextTo(battleStateModel.BattleSceneState, activeUnit.UnitData.BattleScenePosition, 
-                targetUnit.UnitData.BattleScenePosition, out _, activeUnit.UnitData.UnitStats.Speed))
-            {
-                return false;
-            }
-
+            
             activeUnit.UnitData.UnitStats.TryUseAbility(this);
+            var startPos = commandArgs.BattleStateModel.BattleSceneState
+                .Grid[activeUnit.UnitData.BattleScenePosition.Coordinates.x, activeUnit.UnitData.BattleScenePosition.Coordinates.y];
+            startPos.Clear();
+            var targetCoords = commandArgs.PositionDelta.Target;
+            var targetPos = commandArgs.BattleStateModel.BattleSceneState.Grid[targetCoords.x, targetCoords.y];
+            activeUnit.UnitData.BattleScenePosition = targetPos;
+            activeUnit.UnitData.BattleScenePosition.ApplyUnit(activeUnit.UnitData.UnitIdentifier);
             targetUnit.UnitData.UnitStats.AffectByAbility(GetCommandResults(commandArgs));
 
             return true;
@@ -52,6 +55,7 @@ namespace Commands.SpecificCommands.BaseAttack
             results.performer = commandArgs.ActiveUnit;
             results.targets.Add(commandArgs.TargetUnits.First());
             results.effects.Add(new DamageEffect(commandArgs.ActiveUnit.UnitStats.Power));
+            results.PositionDeltas = new List<PositionDelta>() { commandArgs.PositionDelta };
             return results;
         }
     }

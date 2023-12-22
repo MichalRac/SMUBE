@@ -2,7 +2,6 @@
 using SMUBE.BattleState;
 using SMUBE.Commands.Effects;
 using SMUBE.Commands.SpecificCommands._Common;
-using System;
 
 namespace SMUBE.Commands.SpecificCommands.DefendAll
 {
@@ -24,7 +23,7 @@ namespace SMUBE.Commands.SpecificCommands.DefendAll
 
         public bool Execute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
-            if (!CommandArgsValidator.Validate(commandArgs))
+            if (!CommandArgsValidator.Validate(commandArgs, battleStateModel))
             {
                 return false;
             }

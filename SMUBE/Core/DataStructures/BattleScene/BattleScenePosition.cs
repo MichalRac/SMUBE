@@ -1,10 +1,5 @@
 ﻿using SMUBE.DataStructures.Units;
 using SMUBE.DataStructures.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SMUBE.DataStructures.BattleScene
 {
@@ -38,7 +33,7 @@ namespace SMUBE.DataStructures.BattleScene
             return UnitIdentifier == null && (ContentType != BattleScenePositionContentType.Obstacle);
         }
 
-        private void Clear()
+        public void Clear()
         {
             UnitIdentifier = null;
         }

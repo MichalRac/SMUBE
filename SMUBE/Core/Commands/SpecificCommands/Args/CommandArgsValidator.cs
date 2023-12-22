@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SMUBE.BattleState;
 
 namespace Commands
 {
@@ -18,6 +14,6 @@ namespace Commands
     public interface CommandArgsValidator
     {
         ArgsConstraint ArgsConstraint { get; }
-        bool Validate(CommandArgs args);
+        bool Validate(CommandArgs args, BattleStateModel battleStateModel);
     }
 }

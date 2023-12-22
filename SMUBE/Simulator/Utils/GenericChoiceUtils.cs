@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace SMUBE_Utils.Simulator.Utils
 {
@@ -47,9 +45,12 @@ namespace SMUBE_Utils.Simulator.Utils
 
         }
 
-        public static T GetListChoice<T>(string question, bool allowExit, List<(string description, T result)> choiceList)
+        public static T GetListChoice<T>(string question, bool allowExit, List<(string description, T result)> choiceList, bool cleanConsole = true)
         {
-            Console.Clear();
+            if (cleanConsole)
+            {
+                Console.Clear();
+            }
 
             Console.WriteLine(question);
             for (int i = 0; i < choiceList.Count; i++)

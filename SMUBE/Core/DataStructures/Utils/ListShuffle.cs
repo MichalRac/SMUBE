@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SMUBE.DataStructures.Utils
 {
@@ -11,6 +8,9 @@ namespace SMUBE.DataStructures.Utils
     {
         public static void Shuffle<T>(this IList<T> list)
         {
+            if(list.Count <= 1)
+                return;
+            
             RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();
             int n = list.Count;
             while (n > 1)
@@ -26,4 +26,24 @@ namespace SMUBE.DataStructures.Utils
             }
         }
     }
+    
+    public static class ListRandomPick
+    {
+        public static T GetRandom<T>(this IReadOnlyList<T> list)
+        {
+            if (list.Count == 0)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
+            if (list.Count == 1)
+            {
+                return list[0];
+            }
+            
+            Random random = new Random();
+            return list[random.Next(0, list.Count)];
+        }
+    }
+
 }

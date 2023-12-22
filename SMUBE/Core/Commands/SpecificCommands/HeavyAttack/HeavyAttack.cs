@@ -2,11 +2,9 @@
 using SMUBE.BattleState;
 using SMUBE.Commands.Effects;
 using SMUBE.Commands.SpecificCommands._Common;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SMUBE.Commands.SpecificCommands.Args;
 
 namespace SMUBE.Commands.SpecificCommands.HeavyAttack
 {
@@ -24,11 +22,11 @@ namespace SMUBE.Commands.SpecificCommands.HeavyAttack
 
         public CommandId CommandId => CommandId.HeavyAttack;
 
-        public CommandArgsValidator CommandArgsValidator => new OneToOneArgsValidator(ArgsConstraint.Enemy);
+        public CommandArgsValidator CommandArgsValidator => new OneMoveToOneArgsValidator(ArgsConstraint.Enemy);
 
         public bool Execute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
-            if (!CommandArgsValidator.Validate(commandArgs))
+            if (!CommandArgsValidator.Validate(commandArgs, battleStateModel))
             {
                 return false;
             }
@@ -48,6 +46,13 @@ namespace SMUBE.Commands.SpecificCommands.HeavyAttack
             }
 
             activeUnit.UnitData.UnitStats.TryUseAbility(this);
+            var startPos = commandArgs.BattleStateModel.BattleSceneState
+                .Grid[activeUnit.UnitData.BattleScenePosition.Coordinates.x, activeUnit.UnitData.BattleScenePosition.Coordinates.y];
+            startPos.Clear();
+            var targetCoords = commandArgs.PositionDelta.Target;
+            var targetPos = commandArgs.BattleStateModel.BattleSceneState.Grid[targetCoords.x, targetCoords.y];
+            activeUnit.UnitData.BattleScenePosition = targetPos;
+            activeUnit.UnitData.BattleScenePosition.ApplyUnit(activeUnit.UnitData.UnitIdentifier);
             targetUnit.UnitData.UnitStats.AffectByAbility(GetCommandResults(commandArgs));
 
             return true;
@@ -55,10 +60,10 @@ namespace SMUBE.Commands.SpecificCommands.HeavyAttack
 
         public CommandResults GetCommandResults(CommandArgs commandArgs)
         {
-            var results = new CommandResults();
-            results.performer = commandArgs.ActiveUnit;
+            var results = new CommandResults { performer = commandArgs.ActiveUnit };
             results.targets.Add(commandArgs.TargetUnits.First());
             results.effects.Add(new DamageEffect(commandArgs.ActiveUnit.UnitStats.Power * HEAVY_ATTACK_POWER_MULTIPLIER));
+            results.PositionDeltas = new List<PositionDelta>() { commandArgs.PositionDelta };
             return results;
         }
     }

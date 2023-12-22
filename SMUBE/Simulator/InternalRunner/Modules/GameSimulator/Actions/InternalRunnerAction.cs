@@ -2,11 +2,11 @@
 {
     internal abstract class InternalRunnerAction
     {
-        protected BattleCoreSimulationWrapper Core { get; }
+        protected BattleCoreSimulationWrapper CoreWrapper { get; }
 
-        public InternalRunnerAction(BattleCoreSimulationWrapper core)
+        public InternalRunnerAction(BattleCoreSimulationWrapper coreWrapper)
         {
-            Core = core;
+            CoreWrapper = coreWrapper;
         }
 
         public abstract void OnPicked();

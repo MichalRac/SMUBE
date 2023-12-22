@@ -2,14 +2,9 @@
 using Commands.SpecificCommands.BaseAttack;
 using SMUBE.AI;
 using SMUBE.Commands.SpecificCommands.BaseBlock;
-using SMUBE.DataStructures;
 using SMUBE.DataStructures.Units;
-using SMUBE.Units.CharacterTypes;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SMUBE.Commands.SpecificCommands.BaseWalk;
 
 namespace SMUBE.Units
 {
@@ -29,6 +24,7 @@ namespace SMUBE.Units
 
             ViableCommands.Add(new BaseAttack());
             ViableCommands.Add(new BaseBlock());
+            ViableCommands.Add(new BaseWalk());
 
             if (argViableCommands != null)
             {

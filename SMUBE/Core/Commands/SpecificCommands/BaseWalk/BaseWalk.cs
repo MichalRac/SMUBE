@@ -1,8 +1,9 @@
-﻿using Commands;
-using SMUBE.BattleState;
-using SMUBE.Commands.SpecificCommands._Common;
+﻿using SMUBE.BattleState;
 using System.Collections.Generic;
-using SMUBE.Commands.SpecificCommands.Args;
+using SMUBE.Commands._Common;
+using SMUBE.Commands.Args;
+using SMUBE.Commands.Args.ArgsValidators;
+using SMUBE.Commands.Results;
 
 namespace SMUBE.Commands.SpecificCommands.BaseWalk
 {

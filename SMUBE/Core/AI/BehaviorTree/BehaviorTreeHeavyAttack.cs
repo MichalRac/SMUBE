@@ -1,6 +1,4 @@
-﻿using Commands;
-using Commands.SpecificCommands.BaseAttack;
-using SMUBE.BattleState;
+﻿using SMUBE.BattleState;
 using SMUBE.Commands;
 using SMUBE.Commands.SpecificCommands.HeavyAttack;
 using SMUBE.DataStructures.Units;
@@ -9,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SMUBE.Commands.Args;
 
 namespace SMUBE.AI.BehaviorTree
 {

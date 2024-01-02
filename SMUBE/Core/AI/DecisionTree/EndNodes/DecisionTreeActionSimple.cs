@@ -1,10 +1,10 @@
-﻿using Commands;
-using SMUBE.Commands.SpecificCommands.HeavyAttack;
+﻿using SMUBE.Commands.SpecificCommands.HeavyAttack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SMUBE.Commands;
 
 namespace SMUBE.AI.DecisionTree.EndNodes
 {

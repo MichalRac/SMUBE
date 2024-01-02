@@ -1,6 +1,4 @@
-﻿using Commands;
-using Commands.Skills;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SMUBE.Commands.Effects;
 using System;
 using System.Collections.Generic;

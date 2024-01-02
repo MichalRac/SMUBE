@@ -1,6 +1,6 @@
-﻿using Commands.SpecificCommands.BaseAttack;
-using SMUBE.AI.DecisionTree.DecisionNodes;
+﻿using SMUBE.AI.DecisionTree.DecisionNodes;
 using SMUBE.AI.DecisionTree.EndNodes;
+using SMUBE.Commands.SpecificCommands.BaseAttack;
 using SMUBE.Commands.SpecificCommands.BaseBlock;
 using SMUBE.Commands.SpecificCommands.DefendAll;
 using SMUBE.Commands.SpecificCommands.HealAll;

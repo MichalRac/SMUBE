@@ -1,15 +1,13 @@
-﻿using Commands;
-using Commands.SpecificCommands._Common;
-using SMUBE.BattleState;
-using SMUBE.Commands.SpecificCommands._Common;
-using SMUBE.DataStructures.Units;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SMUBE.Commands.SpecificCommands.Args;
+using SMUBE.BattleState;
+using SMUBE.Commands._Common;
+using SMUBE.Commands.Args.ArgsValidators;
+using SMUBE.DataStructures.Units;
 using SMUBE.DataStructures.Utils;
 
-namespace SMUBE.Commands
+namespace SMUBE.Commands.Args
 {
     public static class CommandArgsHelper
     {

@@ -1,8 +1,7 @@
-﻿using Commands;
+﻿using SMUBE.Commands;
 using SMUBE.Commands.SpecificCommands.HealAll;
-using System;
 
-namespace SMUBE.AI.DecisionTree
+namespace SMUBE.AI.DecisionTree.EndNodes
 {
     public class DecisionTreeActionHealAll : DecisionTreeAction
     {

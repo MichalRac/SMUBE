@@ -1,9 +1,9 @@
-﻿using SMUBE.BattleState;
-using SMUBE.Commands.SpecificCommands.Args;
+﻿using System.Collections.Generic;
+using SMUBE.BattleState;
+using SMUBE.Commands._Common;
 using SMUBE.DataStructures.Units;
-using System.Collections.Generic;
 
-namespace Commands.SpecificCommands._Common
+namespace SMUBE.Commands.Args
 {
     public class CommonArgs : CommandArgs
     {

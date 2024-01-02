@@ -1,13 +1,9 @@
-﻿using SMUBE.Commands.Effects;
-using SMUBE.Commands.SpecificCommands.Args;
+﻿using System.Collections.Generic;
+using SMUBE.Commands._Common;
+using SMUBE.Commands.Effects;
 using SMUBE.DataStructures.Units;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Commands
+namespace SMUBE.Commands.Results
 {
     public class CommandResults
     {

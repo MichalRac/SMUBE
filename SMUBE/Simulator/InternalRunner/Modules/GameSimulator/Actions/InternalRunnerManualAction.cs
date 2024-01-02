@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Commands;
 using SMUBE_Utils.Simulator.Utils;
+using SMUBE.Commands;
 
 namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Actions
 {

@@ -1,12 +1,8 @@
 ﻿using SMUBE.BattleState;
-using SMUBE.Commands.Effects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SMUBE.Commands.Args;
+using SMUBE.Commands.Results;
 
-namespace Commands
+namespace SMUBE.Commands
 {
     public interface ICommand
     {

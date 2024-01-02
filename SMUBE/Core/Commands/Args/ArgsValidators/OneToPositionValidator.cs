@@ -1,7 +1,6 @@
-﻿using Commands;
-using SMUBE.BattleState;
+﻿using SMUBE.BattleState;
 
-namespace SMUBE.Commands.SpecificCommands._Common
+namespace SMUBE.Commands.Args.ArgsValidators
 {
     public class OneToPositionValidator : CommandArgsValidator
     {

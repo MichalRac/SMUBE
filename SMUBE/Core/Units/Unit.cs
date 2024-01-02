@@ -1,9 +1,9 @@
-﻿using Commands;
-using Commands.SpecificCommands.BaseAttack;
-using SMUBE.AI;
+﻿using SMUBE.AI;
 using SMUBE.Commands.SpecificCommands.BaseBlock;
 using SMUBE.DataStructures.Units;
 using System.Collections.Generic;
+using SMUBE.Commands;
+using SMUBE.Commands.SpecificCommands.BaseAttack;
 using SMUBE.Commands.SpecificCommands.BaseWalk;
 
 namespace SMUBE.Units

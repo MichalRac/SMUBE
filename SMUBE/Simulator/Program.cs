@@ -1,5 +1,4 @@
-﻿using Commands;
-using SMUBE.AI;
+﻿using SMUBE.AI;
 using SMUBE.AI.BehaviorTree;
 using SMUBE.AI.DecisionTree;
 using SMUBE.AI.GoalOrientedBehavior;
@@ -10,6 +9,8 @@ using SMUBE_Utils.Simulator.InternalRunner.Modules.Pathfinding;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using SMUBE.Commands;
+using SMUBE.Commands.Args;
 
 namespace SMUBE_Utils.Simulator
 {

@@ -1,18 +1,18 @@
 ﻿using System.Linq;
-using Commands;
 using SMUBE.BattleState;
 
-namespace SMUBE.Commands.SpecificCommands._Common
+namespace SMUBE.Commands.Args.ArgsValidators
 {
-    public class OneMoveToOneArgsValidator : CommandArgsValidator
+    public class OneToOneArgsValidator : CommandArgsValidator
     {
         private ArgsConstraint _argsConstraint;
         public ArgsConstraint ArgsConstraint => _argsConstraint;
 
-        public OneMoveToOneArgsValidator(ArgsConstraint argsConstraint)
+        public OneToOneArgsValidator(ArgsConstraint argsConstraint)
         {
             _argsConstraint = argsConstraint;
         }
+
 
         public bool Validate(CommandArgs args, BattleStateModel battleStateModel)
         {
@@ -39,31 +39,16 @@ namespace SMUBE.Commands.SpecificCommands._Common
 
             if (_argsConstraint != ArgsConstraint.None)
             {
-                if (_argsConstraint == ArgsConstraint.Ally)
+                if(_argsConstraint == ArgsConstraint.Ally)
                 {
                     return args.ActiveUnit.UnitIdentifier.TeamId == targetUnitIdentifier.TeamId;
                 }
-                else if (_argsConstraint == ArgsConstraint.Enemy)
+                else if(_argsConstraint == ArgsConstraint.Enemy)
                 {
                     return args.ActiveUnit.UnitIdentifier.TeamId != targetUnitIdentifier.TeamId;
                 }
             }
 
-            if (args.PositionDelta == null)
-            {
-                return false;
-            }
-            if (!args.PositionDelta.UnitIdentifier.Equals(args.ActiveUnit.UnitIdentifier))
-            {
-                return false;
-            }
-
-            var reachablePositions = battleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions;
-            if (!reachablePositions.Any(rp => rp.Position.Coordinates.Equals(args.PositionDelta.Target)))
-            {
-                return false;
-            }
-            
             return true;
         }
     }

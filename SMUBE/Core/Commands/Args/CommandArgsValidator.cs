@@ -1,6 +1,6 @@
 ﻿using SMUBE.BattleState;
 
-namespace Commands
+namespace SMUBE.Commands.Args
 {
     public enum ArgsConstraint
     {

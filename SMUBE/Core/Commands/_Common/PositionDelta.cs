@@ -1,12 +1,7 @@
 ﻿using SMUBE.DataStructures.Units;
 using SMUBE.DataStructures.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SMUBE.Commands.SpecificCommands.Args
+namespace SMUBE.Commands._Common
 {
     public class PositionDelta
     {

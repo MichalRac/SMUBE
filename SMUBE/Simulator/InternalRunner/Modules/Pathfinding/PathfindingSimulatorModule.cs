@@ -416,7 +416,6 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.Pathfinding
 
         private void DisplayGrid(List<SMUBEVector2<int>> path = null)
         {
-            Console.SetWindowSize(150, 50);
             Console.WriteLine($"Pathfinding algorithm: {pathfindingModel.GetType().Name}");
             
             var predefinedPath = PathfindingConfigurations.PredefinedPaths[chosenPathId];
@@ -431,7 +430,6 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.Pathfinding
 
         private void DisplayGridReachablePositions(SMUBEVector2<int> start, List<SMUBEVector2<int>> reachablePosistions)
         {
-            Console.SetWindowSize(150, 50);
             Console.WriteLine($"Pathfinding algorithm: {pathfindingModel.GetType().Name}");
 
             var gridMapGenericDisplayData =

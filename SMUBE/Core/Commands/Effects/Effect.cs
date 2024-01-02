@@ -1,5 +1,4 @@
-﻿using Commands;
-using SMUBE.DataStructures.Units;
+﻿using SMUBE.DataStructures.Units;
 using SMUBE.Units;
 using SMUBE.Units.CharacterTypes;
 using System;
@@ -8,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SMUBE.Commands.Results;
 
 namespace SMUBE.Commands.Effects
 {

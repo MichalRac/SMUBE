@@ -1,8 +1,8 @@
-﻿using Commands;
-using SMUBE.AI.DecisionTree;
+﻿using SMUBE.AI.DecisionTree;
 using SMUBE.AI.GoalOrientedBehavior;
 using SMUBE.BattleState;
 using SMUBE.Commands;
+using SMUBE.Commands.Args;
 using SMUBE.DataStructures.Units;
 using SMUBE.Units.CharacterTypes;
 

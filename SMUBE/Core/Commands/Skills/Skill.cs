@@ -1,11 +1,7 @@
-﻿using SMUBE.Commands.Effects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using SMUBE.Commands.Effects;
 
-namespace Commands.Skills
+namespace SMUBE.Commands.Skills
 {
     public class Skill
     {

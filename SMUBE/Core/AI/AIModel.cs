@@ -1,5 +1,6 @@
-﻿using Commands;
-using SMUBE.BattleState;
+﻿using SMUBE.BattleState;
+using SMUBE.Commands;
+using SMUBE.Commands.Args;
 using SMUBE.DataStructures.Units;
 
 namespace SMUBE.AI

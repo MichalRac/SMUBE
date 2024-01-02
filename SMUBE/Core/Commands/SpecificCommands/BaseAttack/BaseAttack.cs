@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
-using SMUBE.BattleState;
-using SMUBE.Commands.Effects;
-using SMUBE.Commands.SpecificCommands._Common;
 using System.Linq;
-using SMUBE.Commands.SpecificCommands.Args;
+using SMUBE.BattleState;
+using SMUBE.Commands._Common;
+using SMUBE.Commands.Args;
+using SMUBE.Commands.Args.ArgsValidators;
+using SMUBE.Commands.Effects;
+using SMUBE.Commands.Results;
 
-namespace Commands.SpecificCommands.BaseAttack
+namespace SMUBE.Commands.SpecificCommands.BaseAttack
 {
     public class BaseAttack : ICommand
     {

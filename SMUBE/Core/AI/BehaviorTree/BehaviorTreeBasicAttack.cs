@@ -1,6 +1,4 @@
-﻿using Commands;
-using Commands.SpecificCommands.BaseAttack;
-using SMUBE.BattleState;
+﻿using SMUBE.BattleState;
 using SMUBE.Commands;
 using SMUBE.Commands.SpecificCommands.DefendAll;
 using SMUBE.DataStructures.Units;
@@ -10,6 +8,8 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using SMUBE.Commands.Args;
+using SMUBE.Commands.SpecificCommands.BaseAttack;
 using static System.Collections.Specialized.BitVector32;
 
 namespace SMUBE.AI.BehaviorTree

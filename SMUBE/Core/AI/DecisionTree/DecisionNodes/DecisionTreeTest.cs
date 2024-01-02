@@ -1,12 +1,7 @@
-﻿using Commands;
-using SMUBE.BattleState;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SMUBE.BattleState;
+using SMUBE.Commands.Args;
 
-namespace SMUBE.AI.DecisionTree
+namespace SMUBE.AI.DecisionTree.DecisionNodes
 {
     public abstract class DecisionTreeTest : DecisionTreeNode
     {

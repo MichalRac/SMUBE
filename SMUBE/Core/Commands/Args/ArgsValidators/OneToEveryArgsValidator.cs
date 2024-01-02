@@ -1,10 +1,9 @@
-﻿using Commands;
-using SMUBE.Units;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using SMUBE.BattleState;
+using SMUBE.Units;
 
-namespace SMUBE.Commands.SpecificCommands._Common
+namespace SMUBE.Commands.Args.ArgsValidators
 {
     public class OneToEveryArgsValidator : CommandArgsValidator
     {

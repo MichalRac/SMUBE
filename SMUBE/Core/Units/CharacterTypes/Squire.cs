@@ -1,7 +1,7 @@
-﻿using Commands;
-using SMUBE.Commands.SpecificCommands.DefendAll;
+﻿using SMUBE.Commands.SpecificCommands.DefendAll;
 using SMUBE.DataStructures.Units;
 using System.Collections.Generic;
+using SMUBE.Commands;
 
 namespace SMUBE.Units.CharacterTypes
 {

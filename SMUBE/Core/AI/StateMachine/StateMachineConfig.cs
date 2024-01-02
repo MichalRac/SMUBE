@@ -1,5 +1,4 @@
-﻿using Commands.SpecificCommands.BaseAttack;
-using SMUBE.AI.DecisionTree;
+﻿using SMUBE.AI.DecisionTree;
 using SMUBE.Commands.SpecificCommands.BaseBlock;
 using SMUBE.Commands.SpecificCommands.DefendAll;
 using SMUBE.Commands.SpecificCommands.HealAll;
@@ -10,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SMUBE.Commands.SpecificCommands.BaseAttack;
 
 namespace SMUBE.AI.StateMachine
 {

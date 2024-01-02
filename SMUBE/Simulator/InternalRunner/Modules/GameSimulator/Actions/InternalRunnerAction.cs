@@ -4,7 +4,7 @@
     {
         protected BattleCoreSimulationWrapper CoreWrapper { get; }
 
-        public InternalRunnerAction(BattleCoreSimulationWrapper coreWrapper)
+        protected InternalRunnerAction(BattleCoreSimulationWrapper coreWrapper)
         {
             CoreWrapper = coreWrapper;
         }

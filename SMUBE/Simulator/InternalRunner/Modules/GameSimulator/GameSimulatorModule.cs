@@ -72,6 +72,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             {
                 ("Continue", new InternalRunnerStepForward(_coreSimulator)),
                 ("Auto-Continue", new InternalRunnerSkipForward(_coreSimulator, true)),
+                ("Pick Action Manually", new InternalRunnerManualAction(_coreSimulator)),
                 ("Display Map", new InternalRunnerDisplayMap(_coreSimulator))
             }, false);
 

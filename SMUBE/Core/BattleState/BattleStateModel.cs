@@ -22,6 +22,8 @@ namespace SMUBE.BattleState
             var initGridData = PrepareInitialGridData();
             BattleSceneState = new GridBattleScene(initGridData);
             SetupQueue();
+            
+            OnNewTurn();
         }
         
         private BattleStateModel(BattleStateModel sourceBattleStateModel) 
@@ -66,8 +68,8 @@ namespace SMUBE.BattleState
 
             var initGridData = new InitialGridData
             {
-                width = 10,
-                height = 10,
+                width = 9,
+                height = 9,
                 InitialUnitSetup = initialUnitSetup,
             };
             return initGridData;

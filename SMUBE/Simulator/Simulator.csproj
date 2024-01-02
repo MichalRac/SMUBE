@@ -34,8 +34,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Alba.CsConsoleFormat, Version=1.0.0.89, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Alba.CsConsoleFormat.1.0.0\lib\net40\Alba.CsConsoleFormat.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -47,6 +51,7 @@
     <Compile Include="InternalRunner\Modules\GameSimulator\ActionContexts\InternalRunnerContextPicker.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\ActionContexts\PickTeamActionContext.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerDisplayMap.cs" />
+    <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerManualAction.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerSkipForward.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerStepForward.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\BattleCoreSimulationWrapper.cs" />
@@ -64,9 +69,11 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\GenericChoiceUtils.cs" />
+    <Compile Include="Utils\MapPrinter\GridMapPrinter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\SMUBE.csproj">

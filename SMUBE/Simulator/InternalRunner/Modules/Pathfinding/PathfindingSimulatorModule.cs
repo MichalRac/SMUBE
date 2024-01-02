@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using SMUBE_Utils.Simulator.Utils.MapPrinter;
 
 namespace SMUBE_Utils.Simulator.InternalRunner.Modules.Pathfinding
 {
@@ -417,85 +418,15 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.Pathfinding
         {
             Console.SetWindowSize(150, 50);
             Console.WriteLine($"Pathfinding algorithm: {pathfindingModel.GetType().Name}");
-
+            
             var predefinedPath = PathfindingConfigurations.PredefinedPaths[chosenPathId];
             var start = GridBattleScene.Grid[predefinedPath.start.x, predefinedPath.start.y];
             var target = GridBattleScene.Grid[predefinedPath.target.x, predefinedPath.target.y];
-
+            
             Console.WriteLine($"Path id {chosenPathId}, {start} -> {target}:");
             Console.WriteLine($"Grid id {chosenGridId}:");
-            for (int i = GridBattleScene.Height - 1; i >= 0; i--)
-            {
-                for (int j = 0; j < GridBattleScene.Width; j++)
-                {
-                    bool isPartOfPath = false;
-                    if (path != null && path.Contains(new SMUBEVector2<int>(j, i)))
-                    {
-                        isPartOfPath = true;
-                    }
 
-                    if (SimplifiedGrid)
-                    {
-                        string contentString = string.Empty;
-                        switch (GridBattleScene.Grid[j, i].ContentType)
-                        {
-                            case BattleScenePositionContentType.None:
-                                contentString = isPartOfPath ? " [-P-]" : "  [ ]";
-                                break;
-                            case BattleScenePositionContentType.Obstacle:
-                                contentString = isPartOfPath ? "  [XP]" : "  [X]";
-                                break;
-                            case BattleScenePositionContentType.Defensive:
-                                contentString = isPartOfPath ? "[-DP-]" : " [!D!]";
-                                break;
-                            case BattleScenePositionContentType.Unstable:
-                                contentString = isPartOfPath ? " [-UP-]" : " [!U!]";
-                                break;
-                        }
-                        if (start.Coordinates == GridBattleScene.Grid[j, i].Coordinates)
-                        {
-                            contentString = " <SSS>";
-                        }
-                        if (target.Coordinates == GridBattleScene.Grid[j, i].Coordinates)
-                        {
-                            contentString = " <TTT>";
-                        }
-
-                        Console.Write($"{contentString}\t");
-                    }
-                    else
-                    {
-                        string contentString = string.Empty;
-                        switch (GridBattleScene.Grid[j, i].ContentType)
-                        {
-                            case BattleScenePositionContentType.None:
-                                contentString = isPartOfPath ? "NP" : "N";
-                                break;
-                            case BattleScenePositionContentType.Obstacle:
-                                contentString = isPartOfPath ? "ObP" : "Ob";
-                                break;
-                            case BattleScenePositionContentType.Defensive:
-                                contentString = isPartOfPath ? "DefP" : "Def";
-                                break;
-                            case BattleScenePositionContentType.Unstable:
-                                contentString = isPartOfPath ? "UnsP" : "Uns";
-                                break;
-                        }
-                        Console.Write($"{j},{i}-{contentString}\t");
-                    }
-                }
-                Console.Write("\n\n\n");
-            }
-
-            if (SimplifiedGrid)
-            {
-                Console.Write("[ ] - Empty node, [X] - Obstacle node, [D] - Defensive node, [U] - Unstable node\n[-P-] - Path node, [-DP-] - Path node on defensive node, [-UP-] - Path on unstable node\n\n");
-            }
-            else
-            {
-                Console.Write("N - Empty node, Ob - Obstacle node, Def - Defensive node, Uns - Unstable node\nNP - Path node, DefP - Path node on defensive node, UnsP - Path on unstable node\n\n");
-            }
-
+            GridMapPrinter.GridPrinterWithPath(GridBattleScene, new GridMapPathDisplayData(predefinedPath.start, predefinedPath.target, path)).PrintMap();
         }
 
         private void DisplayGridReachablePositions(SMUBEVector2<int> start, List<SMUBEVector2<int>> reachablePosistions)
@@ -503,77 +434,17 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.Pathfinding
             Console.SetWindowSize(150, 50);
             Console.WriteLine($"Pathfinding algorithm: {pathfindingModel.GetType().Name}");
 
-            var predefinedPath = PathfindingConfigurations.PredefinedPaths[chosenPathId];
-            var startPos = GridBattleScene.Grid[start.x, start.y];
-
-            for (int i = GridBattleScene.Height - 1; i >= 0; i--)
+            var gridMapGenericDisplayData =
+                reachablePosistions.Select(reachable => new GridMapGenericDisplayData()
+                    { Coordinates = reachable, Label = "Reachable", Color = ConsoleColor.Blue }).ToList();
+            gridMapGenericDisplayData.Add(new GridMapGenericDisplayData()
             {
-                for (int j = 0; j < GridBattleScene.Width; j++)
-                {
-                    bool isReachable = false;
-                    if (reachablePosistions.Contains(new SMUBEVector2<int>(j, i)))
-                    {
-                        isReachable = true;
-                    }
+                Coordinates = start,
+                Label = "Start",
+                Color = ConsoleColor.Cyan
+            });
 
-                    if (SimplifiedGrid)
-                    {
-                        string contentString = string.Empty;
-                        switch (GridBattleScene.Grid[j, i].ContentType)
-                        {
-                            case BattleScenePositionContentType.None:
-                                contentString = isReachable ? " [-R-]" : "  [ ]";
-                                break;
-                            case BattleScenePositionContentType.Obstacle:
-                                contentString = isReachable ? "  [XR]" : "  [X]";
-                                break;
-                            case BattleScenePositionContentType.Defensive:
-                                contentString = isReachable ? "[-DR-]" : " [!D!]";
-                                break;
-                            case BattleScenePositionContentType.Unstable:
-                                contentString = isReachable ? " [-UR-]" : " [!U!]";
-                                break;
-                        }
-                        if (start == GridBattleScene.Grid[j, i].Coordinates)
-                        {
-                            contentString = " <SSS>";
-                        }
-
-                        Console.Write($"{contentString}\t");
-                    }
-                    else
-                    {
-                        string contentString = string.Empty;
-                        switch (GridBattleScene.Grid[j, i].ContentType)
-                        {
-                            case BattleScenePositionContentType.None:
-                                contentString = isReachable ? "NR" : "N";
-                                break;
-                            case BattleScenePositionContentType.Obstacle:
-                                contentString = isReachable ? "ObR" : "Ob";
-                                break;
-                            case BattleScenePositionContentType.Defensive:
-                                contentString = isReachable ? "DefR" : "Def";
-                                break;
-                            case BattleScenePositionContentType.Unstable:
-                                contentString = isReachable ? "UnsR" : "Uns";
-                                break;
-                        }
-                        Console.Write($"{j},{i}-{contentString}\t");
-                    }
-                }
-                Console.Write("\n\n\n");
-            }
-
-            if (SimplifiedGrid)
-            {
-                Console.Write("[ ] - Empty node, [X] - Obstacle node, [D] - Defensive node, [U] - Unstable node\n[-P-] - Reachable node, [-DP-] - Reachable node on defensive node, [-UP-] - Reachable on unstable node\n\n");
-            }
-            else
-            {
-                Console.Write("N - Empty node, Ob - Obstacle node, Def - Defensive node, Uns - Unstable node\nNP - reachable node, DefP - reachable node on defensive node, UnsP - reachable unstable node\n\n");
-            }
-
+            GridMapPrinter.DefaultGridPrinter(GridBattleScene, gridMapGenericDisplayData).PrintMap();
         }
 
         private BattleScenePosition InputPosition(string posName)

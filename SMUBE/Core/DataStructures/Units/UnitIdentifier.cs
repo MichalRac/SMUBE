@@ -22,5 +22,10 @@ namespace SMUBE.DataStructures.Units
         {
             return PersonalId == other.PersonalId && TeamId == other.TeamId;
         }
+
+        public override string ToString()
+        {
+            return $"T{TeamId}:ID{PersonalId}";
+        }
     }
 }

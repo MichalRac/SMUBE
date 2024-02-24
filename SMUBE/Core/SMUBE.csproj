@@ -90,6 +90,12 @@
     <Compile Include="AI\StateMachine\StateMachineTransition.cs" />
     <Compile Include="BattleState\BattleScene.cs" />
     <Compile Include="BattleState\BattleStateModel.cs" />
+    <Compile Include="Commands\Args\ArgsPicker\ArgsPicker.cs" />
+    <Compile Include="Commands\Args\ArgsPicker\OneMoveToOneArgsPicker.cs" />
+    <Compile Include="Commands\Args\ArgsPicker\OneToEveryArgsPicker.cs" />
+    <Compile Include="Commands\Args\ArgsPicker\OneToOneArgsPicker.cs" />
+    <Compile Include="Commands\Args\ArgsPicker\OneToPositionArgsPicker.cs" />
+    <Compile Include="Commands\Args\ArgsPicker\OneToSelfArgsPicker.cs" />
     <Compile Include="Commands\Args\ArgsValidators\OneMoveToOneArgsValidator.cs" />
     <Compile Include="Commands\Args\ArgsValidators\OneToEveryArgsValidator.cs" />
     <Compile Include="Commands\Args\ArgsValidators\OneToOneArgsValidator.cs" />

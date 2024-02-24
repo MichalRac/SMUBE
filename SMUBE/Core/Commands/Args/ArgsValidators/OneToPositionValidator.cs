@@ -1,10 +1,16 @@
 ﻿using SMUBE.BattleState;
+using SMUBE.Commands.Args.ArgsPicker;
 
 namespace SMUBE.Commands.Args.ArgsValidators
 {
     public class OneToPositionValidator : CommandArgsValidator
     {
         public ArgsConstraint ArgsConstraint => ArgsConstraint.Position;
+        
+        public ArgsPicker.ArgsPicker GetArgsPicker(ICommand command, BattleStateModel battleStateModel)
+        {
+            return new OneToPositionArgsPicker(command, battleStateModel);
+        }
 
         public bool Validate(CommandArgs args, BattleStateModel battleStateModel)
         {

@@ -14,6 +14,7 @@ namespace SMUBE.Commands.Args
     public interface CommandArgsValidator
     {
         ArgsConstraint ArgsConstraint { get; }
+        ArgsPicker.ArgsPicker GetArgsPicker(ICommand command, BattleStateModel battleStateModel);
         bool Validate(CommandArgs args, BattleStateModel battleStateModel);
     }
 }

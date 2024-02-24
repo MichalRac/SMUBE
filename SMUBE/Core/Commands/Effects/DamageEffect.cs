@@ -1,10 +1,4 @@
 ﻿using SMUBE.DataStructures.Units;
-using SMUBE.Units;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SMUBE.Commands.Results;
 
 namespace SMUBE.Commands.Effects
@@ -16,6 +10,11 @@ namespace SMUBE.Commands.Effects
         public DamageEffect(int value)
         {
             Value = value;
+        }
+
+        public override string GetDescriptor()
+        {
+            return "Damaged";
         }
 
         public override void Apply(UnitStats unitStats, CommandResults commandResults)

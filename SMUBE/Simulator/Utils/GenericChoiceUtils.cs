@@ -83,5 +83,38 @@ namespace SMUBE_Utils.Simulator.Utils
             InvalidMessage();
             return GetListChoice(question, allowExit, choiceList);
         }
+        
+        public static T GetListChoiceKeyed<T>(string question, bool allowExit, Dictionary<ConsoleKey, (string description, T result)> choiceList, bool cleanConsole = true)
+        {
+            if (cleanConsole)
+            {
+                Console.Clear();
+            }
+
+            Console.WriteLine(question);
+            foreach (var choiceItemToDescribe in choiceList)
+            {
+                Console.WriteLine($"{choiceItemToDescribe.Key.ToString()}. {choiceItemToDescribe.Value.description}");
+            }
+            if (allowExit)
+            {
+                Console.WriteLine($"0. Exit");
+            }
+
+            var input = Console.ReadKey(true).Key;
+
+            if (choiceList.TryGetValue(input, out var choiceItemToInvoke))
+            {
+                return choiceItemToInvoke.result;
+            }
+            if(allowExit && input == ConsoleKey.D0)
+            {
+                return default;
+            }
+
+            InvalidMessage();
+            return GetListChoiceKeyed(question, allowExit, choiceList);
+        }
+
     }
 }

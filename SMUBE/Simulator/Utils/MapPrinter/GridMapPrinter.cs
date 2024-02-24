@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Alba.CsConsoleFormat;
+using SMUBE.BattleState;
+using SMUBE.Commands;
+using SMUBE.Commands.Args;
 using SMUBE.DataStructures.BattleScene;
 using SMUBE.DataStructures.Utils;
 
@@ -53,6 +56,49 @@ namespace SMUBE_Utils.Simulator.Utils.MapPrinter
         public static GridMapPrinter GridPrinterWithPath(GridBattleScene battleScene, GridMapPathDisplayData pathData, List<GridMapGenericDisplayData> genericDisplayData = null)
         {
             return new GridMapPrinter(battleScene, genericDisplayData, pathData);
+        }
+
+        public static GridMapPrinter GridPrinterForCommandArgs(BattleStateModel battleStateModel, ICommand command, CommandArgs commandArgs)
+        {
+            List<GridMapGenericDisplayData> genericDisplayData = new List<GridMapGenericDisplayData>();
+            if (commandArgs.ActiveUnit != null)
+            {
+                genericDisplayData.Add(new GridMapGenericDisplayData()
+                {
+                    Color = ConsoleColor.Yellow,
+                    Coordinates = commandArgs.ActiveUnit.BattleScenePosition.Coordinates,
+                    Label = "Active"
+                });
+            }
+
+            if (commandArgs.TargetUnits != null)
+            {
+                foreach (var target in commandArgs.TargetUnits)
+                {
+                    genericDisplayData.Add(new GridMapGenericDisplayData()
+                    {
+                        Color = ConsoleColor.DarkYellow,
+                        Coordinates = target.BattleScenePosition.Coordinates,
+                        Label = "Target"
+                    });
+                }
+            }
+            
+            GridMapPathDisplayData pathData = null;
+            // todo if many position deltas per command will be supported, this should be updated
+            if (commandArgs.PositionDelta != null)
+            {
+                var targetPosition = commandArgs.PositionDelta.Target;
+                foreach (var reachablePosition in battleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions)
+                {
+                    if (!reachablePosition.Position.Coordinates.Equals(targetPosition)) continue;
+                    var fullPathCoordinates = reachablePosition.ShortestKnownPath
+                        .Select(p => p.Coordinates).ToList();
+                    pathData = new GridMapPathDisplayData(commandArgs.PositionDelta.Start, commandArgs.PositionDelta.Target, fullPathCoordinates);
+                }
+            }
+            
+            return new GridMapPrinter(battleStateModel.BattleSceneState, genericDisplayData, pathData);
         }
 
         public void PrintMap()

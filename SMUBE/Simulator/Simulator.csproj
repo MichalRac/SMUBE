@@ -52,6 +52,7 @@
     <Compile Include="InternalRunner\Modules\GameSimulator\ActionContexts\PickTeamActionContext.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerDisplayMap.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerManualAction.cs" />
+    <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerLogUnitSummary.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerSkipForward.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerStepForward.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\BattleCoreSimulationWrapper.cs" />

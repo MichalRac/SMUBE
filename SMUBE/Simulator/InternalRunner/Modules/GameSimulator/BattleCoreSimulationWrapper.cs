@@ -213,21 +213,39 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
             if (log)
             {
-                Console.WriteLine("Unit Summary:");
-                for (int i = 0; i < _core.currentStateModel.Units.Count; i++)
-                {
-                    Console.WriteLine(write_unit_summary(_core.currentStateModel.Units[i]));
-                    string write_unit_summary(Unit loggedUnit)
-                    {
-                        var unitCache = loggedUnit;
-                        var unitStats = unitCache.UnitData.UnitStats;
-                        return $"{unitCache.UnitData.Name} {unitCache.UnitData.UnitStats.BaseCharacter.GetType().Name}\t" +
-                               $"hp{unitStats.CurrentHealth}/{unitStats.MaxHealth}\tsp{unitStats.CurrentStamina}/{unitStats.MaxStamina}   \t" +
-                               $"mp{unitStats.CurrentMana}/{unitStats.MaxMana}\t pos: {unitCache.UnitData.BattleScenePosition}";
-                    }
-                }
+                LogUnitSummary();
             }
+            OnTurnEnded();
+        }
+
+        public void OnTurnEnded()
+        {
             turnCounter++;
+        }
+
+        public void LogUnitSummary()
+        {
+            Console.WriteLine("Unit Summary:");
+            var team1Units = _core.currentStateModel.GetTeamUnits(0);
+            var team2Units = _core.currentStateModel.GetTeamUnits(1);
+            
+            foreach (var unit in team1Units)
+            {
+                Console.WriteLine(write_unit_summary(unit));
+            }
+            foreach (var unit in team2Units)
+            {
+                Console.WriteLine(write_unit_summary(unit));
+            }
+            
+            string write_unit_summary(Unit loggedUnit)
+            {
+                var unitCache = loggedUnit;
+                var unitStats = unitCache.UnitData.UnitStats;
+                return $"{unitCache.UnitData.Name} {unitCache.UnitData.UnitStats.BaseCharacter.GetType().Name}\t" +
+                       $"hp{unitStats.CurrentHealth}/{unitStats.MaxHealth}\tsp{unitStats.CurrentStamina}/{unitStats.MaxStamina}   \t" +
+                       $"mp{unitStats.CurrentMana}/{unitStats.MaxMana}\t pos: {unitCache.UnitData.BattleScenePosition}";
+            }
         }
     }
 }

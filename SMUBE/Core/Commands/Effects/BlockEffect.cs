@@ -1,9 +1,4 @@
 ﻿using SMUBE.DataStructures.Units;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SMUBE.Commands.Results;
 
 namespace SMUBE.Commands.Effects
@@ -16,6 +11,11 @@ namespace SMUBE.Commands.Effects
         public BlockEffect(int currentPersistance = DEFAULT_PERSISTANCE)
         {
             this.currentPersistance = currentPersistance;
+        }
+
+        public override string GetDescriptor()
+        {
+            return "Blocking";
         }
 
         public override int GetPersistence() => currentPersistance;

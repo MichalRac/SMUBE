@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using SMUBE.BattleState;
+using SMUBE.Commands.Args.ArgsPicker;
 using SMUBE.Units;
 
 namespace SMUBE.Commands.Args.ArgsValidators
@@ -14,7 +15,11 @@ namespace SMUBE.Commands.Args.ArgsValidators
         {
             _argsConstraint = argsConstraint;
         }
-
+        public ArgsPicker.ArgsPicker GetArgsPicker(ICommand command, BattleStateModel battleStateModel)
+        {
+            return new OneToEveryArgsPicker(command, battleStateModel);
+        }
+        
         public bool Validate(CommandArgs args, BattleStateModel battleStateModel)
         {
             if (args?.BattleStateModel == null)

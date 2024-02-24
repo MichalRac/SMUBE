@@ -1,9 +1,4 @@
 ﻿using SMUBE.DataStructures.Units;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SMUBE.Commands.Results;
 
 namespace SMUBE.Commands.Effects
@@ -15,6 +10,11 @@ namespace SMUBE.Commands.Effects
         public HealEffect(int value)
         {
             Value = value;
+        }
+
+        public override string GetDescriptor()
+        {
+            return "Heal";
         }
 
         public override void Apply(UnitStats unitStats, CommandResults commandResults)

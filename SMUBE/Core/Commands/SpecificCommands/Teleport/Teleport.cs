@@ -9,8 +9,8 @@ namespace SMUBE.Commands.SpecificCommands.Teleport
 {
     public class Teleport : BaseCommand
     {
-        public override int StaminaCost => 25;
-        public override int ManaCost => 0;
+        public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_Teleport;
+        public override int ManaCost => SpecificCommandCostConfiguration.Mana_Teleport;
         public override CommandId CommandId => CommandId.Teleport;
         public override BaseCommandArgsValidator CommandArgsValidator => new OneMoveToPositionValidator(true);
         

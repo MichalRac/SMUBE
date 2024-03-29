@@ -13,9 +13,9 @@ namespace SMUBE.Commands.SpecificCommands.BaseAttack
     {
         public override CommandId CommandId => CommandId.BaseAttack;
 
-        public override int StaminaCost => 0;
+        public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_BaseAttack;
 
-        public override int ManaCost => 0;
+        public override int ManaCost => SpecificCommandCostConfiguration.Mana_BaseAttack;
 
         public override BaseCommandArgsValidator CommandArgsValidator => new OneMoveToOneArgsValidator(ArgsConstraint.Enemy);
         

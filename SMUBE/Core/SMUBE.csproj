@@ -129,10 +129,12 @@
     <Compile Include="Commands\SpecificCommands\LowerEnemyDefense\LowerEnemyDefense.cs" />
     <Compile Include="Commands\SpecificCommands\RaiseObstacle\RaiseObstacle.cs" />
     <Compile Include="Commands\SpecificCommands\ShieldPosition\ShieldPosition.cs" />
+    <Compile Include="Commands\SpecificCommands\SpecificCommandCostConfiguration.cs" />
     <Compile Include="Commands\SpecificCommands\Tackle\Tackle.cs" />
     <Compile Include="Commands\SpecificCommands\Taunt\Taunt.cs" />
     <Compile Include="Commands\SpecificCommands\Taunt\TauntedAttack.cs" />
     <Compile Include="Commands\SpecificCommands\Teleport\Teleport.cs" />
+    <Compile Include="Commands\SpecificCommands\Wait\Wait.cs" />
     <Compile Include="Commands\_Common\PositionDelta.cs" />
     <Compile Include="Commands\_Common\UnitRoundStartTrigger.cs" />
     <Compile Include="Core\BattleCore.cs" />
@@ -161,9 +163,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Commands\SpecificCommands\Wait\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

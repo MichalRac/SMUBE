@@ -10,8 +10,9 @@ namespace SMUBE.Commands.SpecificCommands.LowerEnemyDefense
 {
     public class LowerEnemyDefense : BaseCommand
     {
-        public override int StaminaCost => 0;
-        public override int ManaCost => 0;
+        public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_LowerEnemyDefense;
+        public override int ManaCost => SpecificCommandCostConfiguration.Mana_LowerEnemyDefense;
+        
         public override CommandId CommandId => CommandId.LowerEnemyDefense;
         public override BaseCommandArgsValidator CommandArgsValidator => new OneToOneArgsValidator(ArgsConstraint.Enemy);
 

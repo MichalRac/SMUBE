@@ -13,8 +13,8 @@ namespace SMUBE.Commands.SpecificCommands.Tackle
     public class Tackle : BaseCommand
     {
         public const float TACKLE_ATTACK_POWER_MULTIPLIER = 1.5f;
-        public override int StaminaCost => 25;
-        public override int ManaCost => 0;
+        public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_Tackle;
+        public override int ManaCost => SpecificCommandCostConfiguration.Mana_Tackle;
         public override CommandId CommandId => CommandId.Tackle;
         public override BaseCommandArgsValidator CommandArgsValidator => new OneMoveToOneArgsValidator(ArgsConstraint.OtherUnit);
 

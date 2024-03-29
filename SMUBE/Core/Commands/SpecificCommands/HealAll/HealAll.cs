@@ -8,10 +8,8 @@ namespace SMUBE.Commands.SpecificCommands.HealAll
 {
     public class HealAll : BaseCommand
     {
-        public override int StaminaCost => 0;
-
-        public override int ManaCost => 25;
-
+        public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_HealAll;
+        public override int ManaCost => SpecificCommandCostConfiguration.Mana_HealAll;
         public override CommandId CommandId => CommandId.HealAll;
         public override BaseCommandArgsValidator CommandArgsValidator => new OneToEveryArgsValidator(ArgsConstraint.Ally);
 

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using SMUBE.Commands;
 using SMUBE.Commands.SpecificCommands.BaseAttack;
 using SMUBE.Commands.SpecificCommands.BaseWalk;
+using SMUBE.Commands.SpecificCommands.Wait;
 
 namespace SMUBE.Units
 {
@@ -26,6 +27,7 @@ namespace SMUBE.Units
             viableCommands.Add(new BaseAttack());
             viableCommands.Add(new BaseBlock());
             viableCommands.Add(new BaseWalk());
+            //viableCommands.Add(new Wait());
 
             if (argViableCommands != null)
             {

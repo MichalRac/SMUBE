@@ -7,8 +7,9 @@ namespace SMUBE.Commands.SpecificCommands.ShieldPosition
 {
     public class ShieldPosition : BaseCommand
     {
-        public override int StaminaCost => 0;
-        public override int ManaCost => 25;
+        public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_ShieldPosition;
+        public override int ManaCost => SpecificCommandCostConfiguration.Mana_ShieldPosition;
+        
         public override CommandId CommandId => CommandId.ShieldPosition;
         public override BaseCommandArgsValidator CommandArgsValidator => new OneToPositionValidator(true, false, true, false);
 

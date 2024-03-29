@@ -7,8 +7,9 @@ namespace SMUBE.Commands.SpecificCommands.RaiseObstacle
 {
     public class RaiseObstacle : BaseCommand
     {
-        public override int StaminaCost => 25;
-        public override int ManaCost => 0;
+        public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_RaiseObstacle;
+        public override int ManaCost => SpecificCommandCostConfiguration.Mana_RaiseObstacle;
+        
         public override CommandId CommandId => CommandId.RaiseObstacle;
         public override BaseCommandArgsValidator CommandArgsValidator => new OneToPositionValidator(false, false, true, false);
 

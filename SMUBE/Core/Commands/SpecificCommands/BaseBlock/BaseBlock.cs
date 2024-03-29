@@ -8,9 +8,9 @@ namespace SMUBE.Commands.SpecificCommands.BaseBlock
 {
     public class BaseBlock : BaseCommand
     {
-        public override int StaminaCost => 0;
+        public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_BaseBlock;
 
-        public override int ManaCost => 0;
+        public override int ManaCost => SpecificCommandCostConfiguration.Mana_BaseBlock;
 
         public override CommandId CommandId => CommandId.BaseBlock;
 

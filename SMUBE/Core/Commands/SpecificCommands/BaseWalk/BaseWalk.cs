@@ -9,10 +9,8 @@ namespace SMUBE.Commands.SpecificCommands.BaseWalk
 {
     public class BaseWalk : BaseCommand
     {
-        public override int StaminaCost => 0;
-
-        public override int ManaCost => 0;
-        
+        public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_BaseWalk;
+        public override int ManaCost => SpecificCommandCostConfiguration.Mana_BaseWalk;        
         public override CommandId CommandId => CommandId.BaseWalk;
 
         public override BaseCommandArgsValidator CommandArgsValidator => new OneMoveToPositionValidator(false);

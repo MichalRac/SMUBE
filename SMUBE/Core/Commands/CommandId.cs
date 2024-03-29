@@ -8,6 +8,7 @@
         BaseWalk = 163497,
         BaseAttack = 449375,
         BaseBlock = 296890,
+        Wait = 991970,
 
         //Squire
         DefendAll = 981175,

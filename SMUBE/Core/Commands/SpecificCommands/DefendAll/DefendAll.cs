@@ -10,10 +10,8 @@ namespace SMUBE.Commands.SpecificCommands.DefendAll
     {
         private const int DEFEND_ALL_PERSISTANCE = 2;
 
-        public override int StaminaCost => 25;
-
-        public override int ManaCost => 0;
-
+        public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_DefendAll;
+        public override int ManaCost => SpecificCommandCostConfiguration.Mana_DefendAll;
         public override CommandId CommandId => CommandId.DefendAll;
         public override BaseCommandArgsValidator CommandArgsValidator => new OneToEveryArgsValidator(ArgsConstraint.Ally);
 

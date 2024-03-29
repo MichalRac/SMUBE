@@ -9,8 +9,8 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
 {
     public class Taunt : BaseCommand
     {
-        public override int StaminaCost => 20;
-        public override int ManaCost => 0;
+        public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_Taunt;
+        public override int ManaCost => SpecificCommandCostConfiguration.Mana_Taunt;
         public override CommandId CommandId => CommandId.Taunt;
         public override BaseCommandArgsValidator CommandArgsValidator => new OneToOneArgsValidator(ArgsConstraint.Enemy);
         

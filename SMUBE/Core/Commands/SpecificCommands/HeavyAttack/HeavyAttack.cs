@@ -13,10 +13,8 @@ namespace SMUBE.Commands.SpecificCommands.HeavyAttack
     {
         public const int HEAVY_ATTACK_POWER_MULTIPLIER = 2;
 
-        public override int StaminaCost => 25;
-
-        public override int ManaCost => 0;
-        
+        public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_HeavyAttack;
+        public override int ManaCost => SpecificCommandCostConfiguration.Mana_HeavyAttack;
         public override CommandId CommandId => CommandId.HeavyAttack;
 
         public override BaseCommandArgsValidator CommandArgsValidator => new OneMoveToOneArgsValidator(ArgsConstraint.Enemy);

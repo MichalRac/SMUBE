@@ -12,7 +12,7 @@ namespace SMUBE.Units
     {
         private bool isDeepCopy = false;
         public UnitData UnitData { get; private set; }
-        public List<ICommand> ViableCommands { get; private set; } = new List<ICommand>();
+        public UnitCommandProvider UnitCommandProvider;
         public AIModel AiModel { get; }
 
 
@@ -21,24 +21,27 @@ namespace SMUBE.Units
             UnitData = new UnitData(argName, argUnitIdentifier, argUnitStats);
             AiModel = aiModel;
 
+            var viableCommands = new List<ICommand>();
 
-            ViableCommands.Add(new BaseAttack());
-            ViableCommands.Add(new BaseBlock());
-            ViableCommands.Add(new BaseWalk());
+            viableCommands.Add(new BaseAttack());
+            viableCommands.Add(new BaseBlock());
+            viableCommands.Add(new BaseWalk());
 
             if (argViableCommands != null)
             {
                 foreach (var argViableCommand in argViableCommands)
                 {
-                    ViableCommands.Add(argViableCommand);
+                    viableCommands.Add(argViableCommand);
                 }
             }
+
+            UnitCommandProvider = new UnitCommandProvider(UnitData, viableCommands);
         }
 
         private Unit(Unit sourceUnit)
         {
             UnitData = sourceUnit.UnitData.DeepCopy();
-            ViableCommands = sourceUnit.ViableCommands;
+            UnitCommandProvider = sourceUnit.UnitCommandProvider;
             AiModel = sourceUnit.AiModel;
             isDeepCopy = true;
         }

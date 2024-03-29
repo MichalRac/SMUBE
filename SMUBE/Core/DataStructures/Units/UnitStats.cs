@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SMUBE.BattleState;
 using SMUBE.Commands;
 using SMUBE.Commands.Results;
 
@@ -141,12 +142,25 @@ namespace SMUBE.DataStructures.Units
             }
         }
 
-        internal void OnTurnStartEvaluate()
+        internal void OnAnyTurnStartEvaluate(BattleStateModel battleStateModel)
         {
             for (int i = PersistentEffects.Count - 1; i >= 0; i--)
             {
                 Effect effect = PersistentEffects[i];
-                effect.OnTurnStartEvaluate(this);
+                effect.OnAnyTurnStartEvaluate(battleStateModel, this);
+                if(effect.GetPersistence() <= 0)
+                {
+                    PersistentEffects.RemoveAt(i);
+                }
+            }
+        }
+
+        internal void OnOwnTurnStartEvaluate(BattleStateModel battleStateModel)
+        {
+            for (int i = PersistentEffects.Count - 1; i >= 0; i--)
+            {
+                Effect effect = PersistentEffects[i];
+                effect.OnOwnTurnStartEvaluate(battleStateModel, this);
                 if(effect.GetPersistence() <= 0)
                 {
                     PersistentEffects.RemoveAt(i);

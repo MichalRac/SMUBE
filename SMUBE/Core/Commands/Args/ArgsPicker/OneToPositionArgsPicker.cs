@@ -1,15 +1,27 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using SMUBE.BattleState;
-using SMUBE.Commands._Common;
 using SMUBE.DataStructures.Utils;
 
 namespace SMUBE.Commands.Args.ArgsPicker
 {
     public sealed class OneToPositionArgsPicker : ArgsPicker
     {
+        private readonly bool _allowOccupied;
+        private readonly bool _allowSpecial;
+        private readonly bool _allowWalkable;
+        private readonly bool _allowNonWalkable;
+
         private SMUBEVector2<int> _currentTargetCoordinates;
-        public OneToPositionArgsPicker(ICommand command, BattleStateModel battleStateModel) : base(command, battleStateModel)
+
+        public OneToPositionArgsPicker(ICommand command, BattleStateModel battleStateModel, 
+            bool allowOccupied, bool allowSpecial, bool allowWalkable, bool allowNonWalkable) 
+            : base(command, battleStateModel)
         {
+            _allowOccupied = allowOccupied;
+            _allowSpecial = allowSpecial;
+            _allowWalkable = allowWalkable;
+            _allowNonWalkable = allowNonWalkable;
             SetDefaultTarget();
         }
         
@@ -34,7 +46,10 @@ namespace SMUBE.Commands.Args.ArgsPicker
 
         protected override void SetDefaultTarget()
         {
-            _currentTargetCoordinates = BattleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions.First().Position.Coordinates;
+            var validTargets = BattleStateModel.BattleSceneState.PathfindingHandler
+                .ActiveUnitReachablePositions.Where(target => !target.Position.Coordinates.Equals(BattleStateModel.ActiveUnit.UnitData.BattleScenePosition.Coordinates));
+            
+            _currentTargetCoordinates = validTargets.First().Position.Coordinates;
         }
 
         public override bool IsAnyValid()
@@ -45,9 +60,8 @@ namespace SMUBE.Commands.Args.ArgsPicker
         public override CommandArgs GetCommandArgs()
         {
             var activeUnit = BattleStateModel.ActiveUnit;
-            var positionDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, 
-                activeUnit.UnitData.BattleScenePosition.Coordinates, _currentTargetCoordinates);
-            return new CommonArgs(activeUnit.UnitData, null, BattleStateModel, positionDelta);
+            var targetPositions = new List<SMUBEVector2<int>>() { _currentTargetCoordinates };
+            return new CommonArgs(activeUnit.UnitData, null, BattleStateModel, null, targetPositions);
         }
 
         public override void Up()
@@ -75,7 +89,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
             TryMoveToOffset(xDelta, yDelta);
             ArgsUpdated?.Invoke(GetCommandArgs());
         }
-        
+
         private void TryMoveToOffset(int xDelta, int yDelta)
         {
             var targetPos = new SMUBEVector2<int>(_currentTargetCoordinates.x + xDelta, _currentTargetCoordinates.y + yDelta);
@@ -85,29 +99,49 @@ namespace SMUBE.Commands.Args.ArgsPicker
             }
         }
 
-
         public override string GetPickerInfo()
         {
-            return "Pick any empty reachable position!";
+            return "Pick any empty position!";
         }
 
         public override string GetPickerState()
         {
-            return IsResolved 
+            return IsResolved
                 ? "Resolved"
-                : "Pick any empty reachable position";
+                : "Pick any empty position";
         }
-        
+
         private bool IsValidTarget(SMUBEVector2<int> targetPos)
         {
-            foreach (var reachablePosition in BattleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions)
+            if (targetPos.x < 0 || targetPos.x >= BattleStateModel.BattleSceneState.Width)
+                return false;
+            if (targetPos.y < 0 || targetPos.y >= BattleStateModel.BattleSceneState.Height)
+                return false;
+
+            var targetPosition = BattleStateModel.BattleSceneState.Grid[targetPos.x, targetPos.y];
+
+            
+            if (!_allowSpecial && targetPosition.IsSpecial())
             {
-                if (reachablePosition.Position.Coordinates.Equals(targetPos))
-                {
-                    return true;
-                }
+                return false;
             }
-            return false;
+            
+            if (!_allowOccupied && targetPosition.IsOccupied())
+            {
+                return false;
+            }
+
+            if (!_allowWalkable && targetPosition.IsWalkable())
+            {
+                return false;
+            }
+
+            if (!_allowNonWalkable && !targetPosition.IsWalkable())
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

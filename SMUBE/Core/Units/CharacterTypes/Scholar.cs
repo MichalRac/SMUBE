@@ -2,6 +2,8 @@
 using SMUBE.DataStructures.Units;
 using System.Collections.Generic;
 using SMUBE.Commands;
+using SMUBE.Commands.SpecificCommands.LowerEnemyDefense;
+using SMUBE.Commands.SpecificCommands.ShieldPosition;
 
 namespace SMUBE.Units.CharacterTypes
 {
@@ -18,6 +20,8 @@ namespace SMUBE.Units.CharacterTypes
         public override List<ICommand> AvailableCommands => new List<ICommand>()
         {
             new HealAll(),
+            new ShieldPosition(),
+            new LowerEnemyDefense(),
         };
         public override BaseCharacterType BaseCharacterType => BaseCharacterType.Scholar;
 

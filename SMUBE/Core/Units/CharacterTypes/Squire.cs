@@ -2,6 +2,9 @@
 using SMUBE.DataStructures.Units;
 using System.Collections.Generic;
 using SMUBE.Commands;
+using SMUBE.Commands.SpecificCommands.LowerEnemyDefense;
+using SMUBE.Commands.SpecificCommands.Tackle;
+using SMUBE.Commands.SpecificCommands.Taunt;
 
 namespace SMUBE.Units.CharacterTypes
 {
@@ -18,6 +21,8 @@ namespace SMUBE.Units.CharacterTypes
         public override List<ICommand> AvailableCommands => new List<ICommand>()
         {
             new DefendAll(),
+            new Taunt(),
+            new Tackle(),
         };
         public override BaseCharacterType BaseCharacterType => BaseCharacterType.Squire;
     }

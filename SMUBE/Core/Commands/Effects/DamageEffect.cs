@@ -18,7 +18,7 @@ namespace SMUBE.Commands.Effects
         }
 
         public override void Apply(UnitStats unitStats, CommandResults commandResults)
-        {
+        {            
             unitStats.DeltaHealth((int)(Value * -1 * GetEffectTypeEffectivness(unitStats, commandResults)));
         }
     }

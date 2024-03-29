@@ -6,21 +6,16 @@ using SMUBE.Commands.Results;
 
 namespace SMUBE.Commands.SpecificCommands.HealAll
 {
-    public class HealAll : ICommand
+    public class HealAll : BaseCommand
     {
-        public int StaminaCost => 0;
+        public override int StaminaCost => 0;
 
-        public int ManaCost => 25;
+        public override int ManaCost => 25;
 
-        public CommandId CommandId => CommandId.HealAll;
-        public CommandArgsValidator CommandArgsValidator => new OneToEveryArgsValidator(ArgsConstraint.Ally);
+        public override CommandId CommandId => CommandId.HealAll;
+        public override BaseCommandArgsValidator CommandArgsValidator => new OneToEveryArgsValidator(ArgsConstraint.Ally);
 
-
-        private CommandArgs _argsCache;
-        public CommandArgs ArgsCache { get => _argsCache; set => _argsCache = value; }
-
-
-        public bool Execute(BattleStateModel battleStateModel, CommandArgs commandArgs)
+        public override bool TryExecute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
             if (!CommandArgsValidator.Validate(commandArgs, battleStateModel))
             {
@@ -58,7 +53,7 @@ namespace SMUBE.Commands.SpecificCommands.HealAll
             return true;
         }
 
-        public CommandResults GetCommandResults(CommandArgs commandArgs)
+        public override CommandResults GetCommandResults(CommandArgs commandArgs)
         {
             var results = new CommandResults();
             results.performer = commandArgs.ActiveUnit;

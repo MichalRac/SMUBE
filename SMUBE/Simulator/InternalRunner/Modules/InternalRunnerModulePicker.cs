@@ -12,6 +12,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules
             var result = GenericChoiceUtils.GetListChoice("Module:", true, new List<(string description, IInternalRunnerModule result)>
             {
                 ("Game Simulator", new GameSimulatorModule()),
+                ("Predefined Game Simulator", new PredefinedGameSimulatorModule()),
                 ("Pathfinding Simulator", new PathfindingSimulatorModule()),
             });
 

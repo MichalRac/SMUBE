@@ -10,13 +10,13 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 {
     internal class GameSimulatorModule : IInternalRunnerModule
     {
-        private BattleCoreSimulationWrapper _coreSimulator;
+        protected BattleCoreSimulationWrapper _coreSimulator;
         private AIModel ai1;
         private AIModel ai2;
 
-        private IGameSimulatorConfigurator GetGameSimulatorConfigurator() => new DefaultGameSimulatorConfigurator();
+        protected virtual IGameSimulatorConfigurator GetGameSimulatorConfigurator() => new DefaultGameSimulatorConfigurator();
         
-        public void Run()
+        public virtual void Run()
         {
             var useSimpleBehavior = GenericChoiceUtils.GetBooleanChoice("Setting up units AI, use simple behavior?");
             var gameConfigurator = GetGameSimulatorConfigurator();
@@ -35,26 +35,9 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             int simulationsRun = 0;
             while (simulationsRun++ < simulationNumber)
             {
-                _coreSimulator.SetupSimulation(gameConfigurator.GetUnits(useSimpleBehavior));
-                
-                var roundAutoResolved = false;
-                while (!roundAutoResolved)
-                {
-                    if(!simulationSeries)
-                    {
-                        ProcessCurrentTurn();
-                    }
-                    else
-                    {
-                        new InternalRunnerSkipForward(_coreSimulator).OnPicked();
-                    }
-                    
-                    roundAutoResolved = _coreSimulator.IsFinished(out _);
-                }
-                
-                _coreSimulator.OnFinished();
-                
-                if (simulationsRun % 250 == 0)
+                RunSingleSimulation(gameConfigurator, useSimpleBehavior, simulationSeries);
+
+                if (simulationsRun % 10 == 0)
                 {
                     Console.WriteLine($"simulation progress: {simulationsRun}/{simulationNumber}");
                 }
@@ -62,6 +45,28 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             
             _coreSimulator.OnFinishedLog(ai1, ai2);
             Finish();
+        }
+
+        protected void RunSingleSimulation(IGameSimulatorConfigurator gameConfigurator, bool useSimpleBehavior, bool simulationSeries)
+        {
+            _coreSimulator.SetupSimulation(gameConfigurator.GetUnits(useSimpleBehavior));
+                
+            var roundAutoResolved = false;
+            while (!roundAutoResolved)
+            {
+                if(!simulationSeries)
+                {
+                    ProcessCurrentTurn();
+                }
+                else
+                {
+                    new InternalRunnerSkipForward(_coreSimulator).OnPicked();
+                }
+                    
+                roundAutoResolved = _coreSimulator.IsFinished(out _);
+            }
+                
+            _coreSimulator.OnFinished();
         }
 
         private void ProcessCurrentTurn()
@@ -81,7 +86,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             result.OnPicked();
         }
 
-        private void Finish()
+        protected void Finish()
         {
             Console.WriteLine("Press r to retry, press anything else to quit");
             var key = Console.ReadKey();

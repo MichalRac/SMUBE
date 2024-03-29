@@ -1,9 +1,6 @@
 ﻿using SMUBE.DataStructures.Units;
 using SMUBE.DataStructures.Utils;
-using SMUBE.Pathfinding;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace SMUBE.DataStructures.BattleScene
 {
@@ -71,7 +68,7 @@ namespace SMUBE.DataStructures.BattleScene
 
             var gridEntry = _grid[pos.x, pos.y];
 
-            if(!gridEntry.IsEmpty())
+            if(!gridEntry.IsWalkable() || gridEntry.IsOccupied())
             {
                 return false;
             }
@@ -89,7 +86,7 @@ namespace SMUBE.DataStructures.BattleScene
 
             var gridEntry = _grid[pos.x, pos.y];
 
-            if (!gridEntry.IsEmpty())
+            if (gridEntry.IsOccupied() || gridEntry.ContentType != BattleScenePositionContentType.None)
             {
                 return false;
             }
@@ -131,7 +128,8 @@ namespace SMUBE.DataStructures.BattleScene
 
         public bool IsEmpty(SMUBEVector2<int> pos)
         {
-            return _grid[pos.x, pos.y].IsEmpty();
+            var target = _grid[pos.x, pos.y];
+            return !target.IsOccupied() && target.IsWalkable();
         }
 
         public bool TryFindUnitPosition(UnitIdentifier unitIdentifier, out BattleScenePosition battleScenePosition)
@@ -150,6 +148,26 @@ namespace SMUBE.DataStructures.BattleScene
                 }
             }
             return false;
+        }
+
+        public List<BattleScenePosition> AggregateAllPositions(bool emptyOnly)
+        {
+            var results = new List<BattleScenePosition>();
+            
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < Height; y++)
+                {
+                    if (emptyOnly && !IsEmpty(new SMUBEVector2<int>(x,y)))
+                    {
+                        continue;
+                    }
+                    
+                    results.Add(_grid[x,y]);
+                }
+            }
+
+            return results;
         }
     }
 }

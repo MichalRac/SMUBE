@@ -6,32 +6,31 @@ using SMUBE.Units;
 
 namespace SMUBE.Commands.Args.ArgsValidators
 {
-    public class OneToEveryArgsValidator : CommandArgsValidator
+    public class OneToEveryArgsValidator : BaseCommandArgsValidator
     {
         private ArgsConstraint _argsConstraint;
-        public ArgsConstraint ArgsConstraint => _argsConstraint;
+        public override  ArgsConstraint ArgsConstraint => _argsConstraint;
 
         public OneToEveryArgsValidator(ArgsConstraint argsConstraint)
         {
             _argsConstraint = argsConstraint;
         }
-        public ArgsPicker.ArgsPicker GetArgsPicker(ICommand command, BattleStateModel battleStateModel)
+        public override  ArgsPicker.ArgsPicker GetArgsPicker(ICommand command, BattleStateModel battleStateModel)
         {
             return new OneToEveryArgsPicker(command, battleStateModel);
         }
         
-        public bool Validate(CommandArgs args, BattleStateModel battleStateModel)
+        public override bool Validate(CommandArgs args, BattleStateModel battleStateModel)
         {
-            if (args?.BattleStateModel == null)
+            if (!base.Validate(args, battleStateModel))
             {
                 return false;
             }
 
-            if (args.ActiveUnit == null || args.ActiveUnit.UnitIdentifier == null)
+            if (!ValidateActiveUnit(args, out _))
+            {
                 return false;
-            if (!args.BattleStateModel.TryGetUnit(args.ActiveUnit.UnitIdentifier, out var _))
-                return false;
-
+            }
 
             var viableUnits = new List<Unit>();
             switch (ArgsConstraint)

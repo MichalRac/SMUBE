@@ -6,23 +6,18 @@ using SMUBE.Commands.Results;
 
 namespace SMUBE.Commands.SpecificCommands.DefendAll
 {
-    public class DefendAll : ICommand
+    public class DefendAll : BaseCommand
     {
         private const int DEFEND_ALL_PERSISTANCE = 2;
 
-        public int StaminaCost => 25;
+        public override int StaminaCost => 25;
 
-        public int ManaCost => 0;
+        public override int ManaCost => 0;
 
-        public CommandId CommandId => CommandId.DefendAll;
-        public CommandArgsValidator CommandArgsValidator => new OneToEveryArgsValidator(ArgsConstraint.Ally);
+        public override CommandId CommandId => CommandId.DefendAll;
+        public override BaseCommandArgsValidator CommandArgsValidator => new OneToEveryArgsValidator(ArgsConstraint.Ally);
 
-
-        private CommandArgs _argsCache;
-        public CommandArgs ArgsCache { get => _argsCache; set => _argsCache = value; }
-
-
-        public bool Execute(BattleStateModel battleStateModel, CommandArgs commandArgs)
+        public override bool TryExecute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
             if (!CommandArgsValidator.Validate(commandArgs, battleStateModel))
             {
@@ -58,7 +53,7 @@ namespace SMUBE.Commands.SpecificCommands.DefendAll
             return true;
         }
 
-        public CommandResults GetCommandResults(CommandArgs commandArgs)
+        public override CommandResults GetCommandResults(CommandArgs commandArgs)
         {
             var results = new CommandResults();
             results.performer = commandArgs.ActiveUnit;

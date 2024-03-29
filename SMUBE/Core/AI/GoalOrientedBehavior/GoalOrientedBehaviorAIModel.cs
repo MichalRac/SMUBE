@@ -41,7 +41,7 @@ namespace SMUBE.AI.GoalOrientedBehavior
                 var baseCharacter = activeUnit.UnitData.UnitStats.BaseCharacter;
                 var goals = GetGoals(baseCharacter);
 
-                var viableActions = activeUnit.ViableCommands;
+                var viableActions = activeUnit.UnitCommandProvider.ViableCommands;
 
                 ICommand bestAction = null;
                 CommandArgs bestArgs = null;
@@ -55,7 +55,7 @@ namespace SMUBE.AI.GoalOrientedBehavior
                     foreach (var commandArgs in validCommandArgs)
                     {
                         var battleStateModelArgDeepCopy = battleStateModelDeepCopy.DeepCopy();
-                        bool success = action.Execute(battleStateModelArgDeepCopy, commandArgs);
+                        bool success = action.TryExecute(battleStateModelArgDeepCopy, commandArgs);
 
                         if (!success)
                         {

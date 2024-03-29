@@ -4,32 +4,32 @@ using SMUBE.Commands.Args.ArgsPicker;
 
 namespace SMUBE.Commands.Args.ArgsValidators
 {
-    public class OneToOneArgsValidator : CommandArgsValidator
+    public class OneToOneArgsValidator : BaseCommandArgsValidator
     {
         private ArgsConstraint _argsConstraint;
-        public ArgsConstraint ArgsConstraint => _argsConstraint;
+        public override ArgsConstraint ArgsConstraint => _argsConstraint;
 
         public OneToOneArgsValidator(ArgsConstraint argsConstraint)
         {
             _argsConstraint = argsConstraint;
         }
 
-        public ArgsPicker.ArgsPicker GetArgsPicker(ICommand command, BattleStateModel battleStateModel)
+        public override ArgsPicker.ArgsPicker GetArgsPicker(ICommand command, BattleStateModel battleStateModel)
         {
             return new OneToOneArgsPicker(command, battleStateModel);
         }
         
-        public bool Validate(CommandArgs args, BattleStateModel battleStateModel)
+        public override bool Validate(CommandArgs args, BattleStateModel battleStateModel)
         {
-            if (args?.BattleStateModel == null)
+            if (!base.Validate(args, battleStateModel))
             {
                 return false;
             }
 
-            if (args.ActiveUnit == null || args.ActiveUnit.UnitIdentifier == null)
+            if (!ValidateActiveUnit(args, out _))
+            {
                 return false;
-            if (!args.BattleStateModel.TryGetUnit(args.ActiveUnit.UnitIdentifier, out var _))
-                return false;
+            }
 
             if (args.TargetUnits == null || args.TargetUnits.Count != 1 || args.TargetUnits.First().UnitIdentifier == null)
                 return false;
@@ -42,16 +42,9 @@ namespace SMUBE.Commands.Args.ArgsValidators
                 return false;
             }
 
-            if (_argsConstraint != ArgsConstraint.None)
+            if (!ValidateTargetConstraint(_argsConstraint, args.ActiveUnit.UnitIdentifier, targetUnitIdentifier))
             {
-                if(_argsConstraint == ArgsConstraint.Ally)
-                {
-                    return args.ActiveUnit.UnitIdentifier.TeamId == targetUnitIdentifier.TeamId;
-                }
-                else if(_argsConstraint == ArgsConstraint.Enemy)
-                {
-                    return args.ActiveUnit.UnitIdentifier.TeamId != targetUnitIdentifier.TeamId;
-                }
+                return false;
             }
 
             return true;

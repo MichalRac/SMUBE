@@ -7,20 +7,17 @@ using SMUBE.Commands.Results;
 
 namespace SMUBE.Commands.SpecificCommands.BaseWalk
 {
-    public class BaseWalk : ICommand
+    public class BaseWalk : BaseCommand
     {
-        public int StaminaCost => 0;
+        public override int StaminaCost => 0;
 
-        public int ManaCost => 0;
+        public override int ManaCost => 0;
+        
+        public override CommandId CommandId => CommandId.BaseWalk;
 
-        private CommandArgs _argsCache;
-        public CommandArgs ArgsCache { get => _argsCache; set => _argsCache = value; }
+        public override BaseCommandArgsValidator CommandArgsValidator => new OneMoveToPositionValidator(false);
 
-        public CommandId CommandId => CommandId.BaseWalk;
-
-        public CommandArgsValidator CommandArgsValidator => new OneToPositionValidator();
-
-        public bool Execute(BattleStateModel battleStateModel, CommandArgs commandArgs)
+        public override bool TryExecute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
             if (!CommandArgsValidator.Validate(commandArgs, battleStateModel))
             {
@@ -44,7 +41,7 @@ namespace SMUBE.Commands.SpecificCommands.BaseWalk
             return true;
         }
 
-        public CommandResults GetCommandResults(CommandArgs commandArgs)
+        public override CommandResults GetCommandResults(CommandArgs commandArgs)
         {
             var results = new CommandResults();
 

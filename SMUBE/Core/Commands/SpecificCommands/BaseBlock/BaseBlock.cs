@@ -6,20 +6,17 @@ using SMUBE.Commands.Results;
 
 namespace SMUBE.Commands.SpecificCommands.BaseBlock
 {
-    public class BaseBlock : ICommand
+    public class BaseBlock : BaseCommand
     {
-        public int StaminaCost => 0;
+        public override int StaminaCost => 0;
 
-        public int ManaCost => 0;
+        public override int ManaCost => 0;
 
-        public CommandId CommandId => CommandId.BaseBlock;
+        public override CommandId CommandId => CommandId.BaseBlock;
 
-        public CommandArgsValidator CommandArgsValidator => new OneToSelfArgsValidator();
+        public override BaseCommandArgsValidator CommandArgsValidator => new OneToSelfArgsValidator();
 
-        private CommandArgs _argsCache;
-        public CommandArgs ArgsCache { get => _argsCache; set => _argsCache = value; }
-
-        public bool Execute(BattleStateModel battleStateModel, CommandArgs commandArgs)
+        public override bool TryExecute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
             if (!CommandArgsValidator.Validate(commandArgs, battleStateModel))
             {
@@ -39,7 +36,7 @@ namespace SMUBE.Commands.SpecificCommands.BaseBlock
             return true;
         }
 
-        public CommandResults GetCommandResults(CommandArgs commandArgs)
+        public override CommandResults GetCommandResults(CommandArgs commandArgs)
         {
             var results = new CommandResults();
 

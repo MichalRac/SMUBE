@@ -22,11 +22,12 @@ namespace SMUBE.BattleState
             Units = units;
             var initGridData = PrepareInitialGridData();
             BattleSceneState = new GridBattleScene(initGridData);
+            PreAssignUnitsToPositions(initGridData);
             SetupQueue();
             
             OnNewTurn();
         }
-        
+
         private BattleStateModel(BattleStateModel sourceBattleStateModel) 
         {
             Units = new List<Unit>();
@@ -60,11 +61,10 @@ namespace SMUBE.BattleState
                 
             foreach (var u in Units)
             {
-                var pos = u.UnitData.UnitIdentifier.TeamId == 0 
+                var initCoordinates = u.UnitData.UnitIdentifier.TeamId == 0 
                     ? BattleSceneBase.DefaultTeam0Positions[team0PosCount++] 
                     : BattleSceneBase.DefaultTeam1Positions[team1PosCount++];
-                u.UnitData.BattleScenePosition = new BattleScenePosition(pos);
-                initialUnitSetup.Add((pos, u.UnitData.UnitIdentifier));
+                initialUnitSetup.Add((initCoordinates, u.UnitData.UnitIdentifier));
             }
 
             var initGridData = new InitialGridData
@@ -74,6 +74,16 @@ namespace SMUBE.BattleState
                 InitialUnitSetup = initialUnitSetup,
             };
             return initGridData;
+        }
+        
+        private void PreAssignUnitsToPositions(InitialGridData initGridData)
+        {
+            foreach (var unit in Units)
+            {
+                var initData = initGridData.InitialUnitSetup.First(unitSetup => unitSetup.id.Equals(unit.UnitData.UnitIdentifier));
+                var initPos = BattleSceneState.Grid[initData.pos.x, initData.pos.y];
+                unit.UnitData.BattleScenePosition = initPos;
+            }
         }
 
         public BattleStateModel DeepCopy()
@@ -100,7 +110,7 @@ namespace SMUBE.BattleState
 
         public bool ExecuteCommand(ICommand command, CommandArgs commandArgs)
         {
-            command.Execute(this, commandArgs);
+            command.TryExecute(this, commandArgs);
             if(TryGetUnit(commandArgs.ActiveUnit.UnitIdentifier, out var activeUnit))
             {
                 RemoveFromQueue(activeUnit);
@@ -122,10 +132,22 @@ namespace SMUBE.BattleState
         {
             if(GetNextActiveUnit(out var nextUnit))
             {
-                nextUnit.UnitData.UnitStats.OnTurnStartEvaluate();
+                nextUnit.UnitData.UnitStats.OnOwnTurnStartEvaluate(this);
                 ActiveUnit = nextUnit;
 
                 BattleSceneState.PathfindingHandler.OnNewTurn(this);
+                ActiveUnit.UnitCommandProvider.OnNewTurn();
+            }
+
+            foreach (var battleScenePosition in BattleSceneState.Grid)
+            {
+                battleScenePosition.OnNewTurn();
+            }
+            
+            foreach (var unit in Units)
+            {
+                unit.UnitData.UnitStats.OnAnyTurnStartEvaluate(this);
+                unit.UnitData.BattleScenePosition.ProcessAssignedUnit(unit);
             }
         }
         

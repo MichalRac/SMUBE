@@ -1,16 +1,17 @@
-﻿using SMUBE.DataStructures.Units;
+﻿using SMUBE.BattleState;
+using SMUBE.DataStructures.Units;
 using SMUBE.Commands.Results;
 
 namespace SMUBE.Commands.Effects
 {
     public class BlockEffect : Effect
     {
-        private const int DEFAULT_PERSISTANCE = 1;
-        private int currentPersistance = DEFAULT_PERSISTANCE;
+        private const int DEFAULT_PERSISTENCE = 1;
+        private int currentPersistence = DEFAULT_PERSISTENCE;
 
-        public BlockEffect(int currentPersistance = DEFAULT_PERSISTANCE)
+        public BlockEffect(int currentPersistence = DEFAULT_PERSISTENCE)
         {
-            this.currentPersistance = currentPersistance;
+            this.currentPersistence = currentPersistence;
         }
 
         public override string GetDescriptor()
@@ -18,11 +19,11 @@ namespace SMUBE.Commands.Effects
             return "Blocking";
         }
 
-        public override int GetPersistence() => currentPersistance;
-        public override void OnTurnStartEvaluate(UnitStats unitStats)
+        public override int GetPersistence() => currentPersistence;
+        public override void OnOwnTurnStartEvaluate(BattleStateModel battleStateModel, UnitStats unitStats)
         {
-            base.OnTurnStartEvaluate(unitStats);
-            currentPersistance--;
+            base.OnOwnTurnStartEvaluate(battleStateModel, unitStats);
+            currentPersistence--;
         }
         public override void ModifyCommandResult(CommandResults commandResults)
         {

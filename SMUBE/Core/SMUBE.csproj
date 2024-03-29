@@ -94,18 +94,25 @@
     <Compile Include="Commands\Args\ArgsPicker\OneMoveToOneArgsPicker.cs" />
     <Compile Include="Commands\Args\ArgsPicker\OneToEveryArgsPicker.cs" />
     <Compile Include="Commands\Args\ArgsPicker\OneToOneArgsPicker.cs" />
+    <Compile Include="Commands\Args\ArgsPicker\OneMoveToPositionArgsPicker.cs" />
     <Compile Include="Commands\Args\ArgsPicker\OneToPositionArgsPicker.cs" />
     <Compile Include="Commands\Args\ArgsPicker\OneToSelfArgsPicker.cs" />
+    <Compile Include="Commands\Args\ArgsPicker\TauntedArgsPicker.cs" />
     <Compile Include="Commands\Args\ArgsValidators\OneMoveToOneArgsValidator.cs" />
     <Compile Include="Commands\Args\ArgsValidators\OneToEveryArgsValidator.cs" />
     <Compile Include="Commands\Args\ArgsValidators\OneToOneArgsValidator.cs" />
+    <Compile Include="Commands\Args\ArgsValidators\OneMoveToPositionValidator.cs" />
     <Compile Include="Commands\Args\ArgsValidators\OneToPositionValidator.cs" />
     <Compile Include="Commands\Args\ArgsValidators\OneToSelfArgsValidator.cs" />
+    <Compile Include="Commands\Args\ArgsValidators\TauntedAttackArgsValidator.cs" />
     <Compile Include="Commands\Args\CommandArgs.cs" />
     <Compile Include="Commands\Args\CommandArgsHelper.cs" />
-    <Compile Include="Commands\Args\CommandArgsValidator.cs" />
+    <Compile Include="Commands\Args\BaseCommandArgsValidator.cs" />
     <Compile Include="Commands\Args\CommonArgs.cs" />
+    <Compile Include="Commands\BaseCommand.cs" />
     <Compile Include="Commands\CommandId.cs" />
+    <Compile Include="Commands\Effects\DamageAppliedMultiplier.cs" />
+    <Compile Include="Commands\Effects\TauntEffect.cs" />
     <Compile Include="Commands\Results\CommandResults.cs" />
     <Compile Include="Commands\SpecificCommands\BaseWalk\BaseWalk.cs" />
     <Compile Include="Commands\Effects\BlockEffect.cs" />
@@ -119,7 +126,15 @@
     <Compile Include="Commands\SpecificCommands\HealAll\HealAll.cs" />
     <Compile Include="Commands\SpecificCommands\HeavyAttack\HeavyAttack.cs" />
     <Compile Include="Commands\SpecificCommands\BaseBlock\BaseBlock.cs" />
+    <Compile Include="Commands\SpecificCommands\LowerEnemyDefense\LowerEnemyDefense.cs" />
+    <Compile Include="Commands\SpecificCommands\RaiseObstacle\RaiseObstacle.cs" />
+    <Compile Include="Commands\SpecificCommands\ShieldPosition\ShieldPosition.cs" />
+    <Compile Include="Commands\SpecificCommands\Tackle\Tackle.cs" />
+    <Compile Include="Commands\SpecificCommands\Taunt\Taunt.cs" />
+    <Compile Include="Commands\SpecificCommands\Taunt\TauntedAttack.cs" />
+    <Compile Include="Commands\SpecificCommands\Teleport\Teleport.cs" />
     <Compile Include="Commands\_Common\PositionDelta.cs" />
+    <Compile Include="Commands\_Common\UnitRoundStartTrigger.cs" />
     <Compile Include="Core\BattleCore.cs" />
     <Compile Include="DataStructures\BattleScene\BattleSceneBase.cs" />
     <Compile Include="DataStructures\BattleScene\BattleScenePosition.cs" />
@@ -142,9 +157,13 @@
     <Compile Include="Units\Unit.cs" />
     <Compile Include="Units\UnitConsts.cs" />
     <Compile Include="Units\UnitHelper.cs" />
+    <Compile Include="Units\UnitCommandProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Commands\SpecificCommands\Wait\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

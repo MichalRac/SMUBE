@@ -58,7 +58,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Actions
 
         private ICommand ChooseAction()
         {
-            var viableCommands = CoreWrapper.Core.currentStateModel.ActiveUnit.ViableCommands;
+            var viableCommands = CoreWrapper.Core.currentStateModel.ActiveUnit.UnitCommandProvider.ViableCommands;
 
             var choiceList = new List<(string, ICommand)>();
             foreach (var viableCommand in viableCommands)

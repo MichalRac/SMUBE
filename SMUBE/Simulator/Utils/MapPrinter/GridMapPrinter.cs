@@ -83,18 +83,40 @@ namespace SMUBE_Utils.Simulator.Utils.MapPrinter
                     });
                 }
             }
+            if (commandArgs.TargetPositions != null)
+            {
+                foreach (var target in commandArgs.TargetPositions)
+                {
+                    var targetPos = battleStateModel.BattleSceneState.Grid[target.x, target.y];
+                    
+                    genericDisplayData.Add(new GridMapGenericDisplayData()
+                    {
+                        Color = ConsoleColor.DarkYellow,
+                        Coordinates = targetPos.Coordinates,
+                        Label = "Target"
+                    });
+                }
+            }
             
             GridMapPathDisplayData pathData = null;
             // todo if many position deltas per command will be supported, this should be updated
             if (commandArgs.PositionDelta != null)
             {
                 var targetPosition = commandArgs.PositionDelta.Target;
-                foreach (var reachablePosition in battleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions)
+
+                if (commandArgs.PositionDelta.IsPathless)
                 {
-                    if (!reachablePosition.Position.Coordinates.Equals(targetPosition)) continue;
-                    var fullPathCoordinates = reachablePosition.ShortestKnownPath
-                        .Select(p => p.Coordinates).ToList();
-                    pathData = new GridMapPathDisplayData(commandArgs.PositionDelta.Start, commandArgs.PositionDelta.Target, fullPathCoordinates);
+                    pathData = new GridMapPathDisplayData(commandArgs.PositionDelta.Start, commandArgs.PositionDelta.Target, null);
+                }
+                else
+                {
+                    foreach (var reachablePosition in battleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions)
+                    {
+                        if (!reachablePosition.Position.Coordinates.Equals(targetPosition)) continue;
+                        var fullPathCoordinates = reachablePosition.ShortestKnownPath
+                            .Select(p => p.Coordinates).ToList();
+                        pathData = new GridMapPathDisplayData(commandArgs.PositionDelta.Start, commandArgs.PositionDelta.Target, fullPathCoordinates);
+                    }
                 }
             }
             
@@ -159,6 +181,26 @@ namespace SMUBE_Utils.Simulator.Utils.MapPrinter
                             var contentCell = new Cell("[Wall]")
                             {
                                 Color = ConsoleColor.White,
+                                Align = Align.Center,
+                            };
+                            gridCell.Children.Add(contentCell);
+                            break;
+                        }
+                        case BattleScenePositionContentType.ObstacleTimed:
+                        {
+                            var contentCell = new Cell($"[Wall:T{currentNode.RemainingDuration}]")
+                            {
+                                Color = ConsoleColor.White,
+                                Align = Align.Center,
+                            };
+                            gridCell.Children.Add(contentCell);
+                            break;
+                        }
+                        case BattleScenePositionContentType.DefensiveTimed:
+                        {
+                            var contentCell = new Cell($"<Fortified:T{currentNode.RemainingDuration}>")
+                            {
+                                Color = ConsoleColor.DarkCyan,
                                 Align = Align.Center,
                             };
                             gridCell.Children.Add(contentCell);

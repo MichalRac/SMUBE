@@ -19,7 +19,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
 
         private Stage _currentStage = Stage.ChooseTargetUnit;
         private UnitData _targetUnitData;
-        
+   
         private List<SMUBEVector2<int>> ValidTargets = new List<SMUBEVector2<int>>();
         private int _currentTargetIndex = 0;
 
@@ -215,7 +215,17 @@ namespace SMUBE.Commands.Args.ArgsPicker
 
         private bool IsStageOneValid(SMUBEVector2<int> targetPos)
         {
-            return ContainsValidTarget(targetPos) && IsTargetReachable(targetPos);
+            if (!ContainsValidTarget(targetPos))
+            {
+                return false;
+            }
+            
+            if (!IsTargetReachable(targetPos))
+            {
+                return false;
+            }
+            
+            return true;
         }
 
         private bool ContainsValidTarget(SMUBEVector2<int> targetPos)
@@ -225,9 +235,18 @@ namespace SMUBE.Commands.Args.ArgsPicker
                 return false;
             }
             
+            if (Command.CommandArgsValidator.ArgsConstraint == ArgsConstraint.None)
+            {
+                return true;
+            }
+            if (Command.CommandArgsValidator.ArgsConstraint == ArgsConstraint.OtherUnit)
+            {
+                var sameId = BattleStateModel.ActiveUnit.UnitData.UnitIdentifier.Equals(BattleStateModel.BattleSceneState.Grid[targetPos.x, targetPos.y].UnitIdentifier);
+                return !sameId;
+            }
+            
             var activeUnitTeamId = BattleStateModel.ActiveUnit.UnitData.UnitIdentifier.TeamId;
             var targetTeamId = BattleStateModel.BattleSceneState.Grid[targetPos.x, targetPos.y].UnitIdentifier.TeamId;
-            
             if (Command.CommandArgsValidator.ArgsConstraint == ArgsConstraint.Ally)
             {
                 return activeUnitTeamId == targetTeamId;

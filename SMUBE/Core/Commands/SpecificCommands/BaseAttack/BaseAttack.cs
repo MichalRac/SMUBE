@@ -9,20 +9,17 @@ using SMUBE.Commands.Results;
 
 namespace SMUBE.Commands.SpecificCommands.BaseAttack
 {
-    public class BaseAttack : ICommand
+    public class BaseAttack : BaseCommand
     {
-        public CommandId CommandId => CommandId.BaseAttack;
+        public override CommandId CommandId => CommandId.BaseAttack;
 
-        public int StaminaCost => 0;
+        public override int StaminaCost => 0;
 
-        public int ManaCost => 0;
+        public override int ManaCost => 0;
 
-        public CommandArgsValidator CommandArgsValidator => new OneMoveToOneArgsValidator(ArgsConstraint.Enemy);
-
-        private CommandArgs _argsCache;
-        public CommandArgs ArgsCache { get => _argsCache; set => _argsCache = value; }
-
-        public bool Execute(BattleStateModel battleStateModel, CommandArgs commandArgs)
+        public override BaseCommandArgsValidator CommandArgsValidator => new OneMoveToOneArgsValidator(ArgsConstraint.Enemy);
+        
+        public override bool TryExecute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
             if (!CommandArgsValidator.Validate(commandArgs, battleStateModel))
             {
@@ -51,7 +48,7 @@ namespace SMUBE.Commands.SpecificCommands.BaseAttack
             
         }
 
-        public CommandResults GetCommandResults(CommandArgs commandArgs)
+        public override CommandResults GetCommandResults(CommandArgs commandArgs)
         {
             var results = new CommandResults();
             results.performer = commandArgs.ActiveUnit;

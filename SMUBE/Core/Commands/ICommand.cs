@@ -11,8 +11,8 @@ namespace SMUBE.Commands
         CommandArgs ArgsCache { get; set; }
 
         CommandId CommandId { get; }
-        CommandArgsValidator CommandArgsValidator { get; }
-        bool Execute(BattleStateModel battleStateModel, CommandArgs commandArgs);
+        BaseCommandArgsValidator CommandArgsValidator { get; }
+        bool TryExecute(BattleStateModel battleStateModel, CommandArgs commandArgs);
         CommandResults GetCommandResults(CommandArgs commandArgs);
     }
 }

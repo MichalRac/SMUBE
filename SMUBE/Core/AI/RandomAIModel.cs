@@ -22,7 +22,7 @@ namespace SMUBE.AI
         {
             if(battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
             {
-                var viableCommands = unit.ViableCommands;
+                var viableCommands = unit.UnitCommandProvider.ViableCommands;
                 
                 if(viableCommands == null || viableCommands.Count == 0) 
                 {

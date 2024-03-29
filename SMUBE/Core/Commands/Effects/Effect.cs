@@ -1,6 +1,7 @@
 ﻿using SMUBE.DataStructures.Units;
 using SMUBE.Units.CharacterTypes;
 using System;
+using SMUBE.BattleState;
 using SMUBE.Commands.Results;
 
 namespace SMUBE.Commands.Effects
@@ -12,9 +13,15 @@ namespace SMUBE.Commands.Effects
         public virtual void Apply(UnitStats unitStats, CommandResults commandResults)
         {
         }
-        public virtual void OnTurnStartEvaluate(UnitStats unitStats)
+        
+        public virtual void OnOwnTurnStartEvaluate(BattleStateModel battleStateModel, UnitStats unitStats)
         {
         }
+        
+        public virtual void OnAnyTurnStartEvaluate(BattleStateModel battleStateModel, UnitStats unitStats)
+        {
+        }
+        
         public virtual void ModifyCommandResult(CommandResults commandResults)
         {
         }

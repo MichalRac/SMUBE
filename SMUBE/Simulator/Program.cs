@@ -467,7 +467,7 @@ namespace SMUBE_Utils.Simulator
                     var summary = showShortSummmary ? unit.UnitData.ToShortString() : unit.UnitData.ToString();
                     Console.Write(summary);
                     Console.Write("Available commands:\n");
-                    foreach (var viableCommand in unit.ViableCommands)
+                    foreach (var viableCommand in unit.UnitCommandProvider.ViableCommands)
                     {
                         Console.Write($"\t{viableCommand.GetType().Name}\n");
                     }

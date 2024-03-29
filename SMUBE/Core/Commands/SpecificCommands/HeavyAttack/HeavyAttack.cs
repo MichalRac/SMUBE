@@ -9,23 +9,19 @@ using SMUBE.Commands.Results;
 
 namespace SMUBE.Commands.SpecificCommands.HeavyAttack
 {
-    public class HeavyAttack : ICommand
+    public class HeavyAttack : BaseCommand
     {
         public const int HEAVY_ATTACK_POWER_MULTIPLIER = 2;
 
-        public int StaminaCost => 25;
+        public override int StaminaCost => 25;
 
-        public int ManaCost => 0;
+        public override int ManaCost => 0;
+        
+        public override CommandId CommandId => CommandId.HeavyAttack;
 
+        public override BaseCommandArgsValidator CommandArgsValidator => new OneMoveToOneArgsValidator(ArgsConstraint.Enemy);
 
-        private CommandArgs _argsCache;
-        public CommandArgs ArgsCache { get => _argsCache; set => _argsCache = value; }
-
-        public CommandId CommandId => CommandId.HeavyAttack;
-
-        public CommandArgsValidator CommandArgsValidator => new OneMoveToOneArgsValidator(ArgsConstraint.Enemy);
-
-        public bool Execute(BattleStateModel battleStateModel, CommandArgs commandArgs)
+        public override bool TryExecute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
             if (!CommandArgsValidator.Validate(commandArgs, battleStateModel))
             {
@@ -59,7 +55,7 @@ namespace SMUBE.Commands.SpecificCommands.HeavyAttack
             return true;
         }
 
-        public CommandResults GetCommandResults(CommandArgs commandArgs)
+        public override CommandResults GetCommandResults(CommandArgs commandArgs)
         {
             var results = new CommandResults { performer = commandArgs.ActiveUnit };
             results.targets.Add(commandArgs.TargetUnits.First());

@@ -4,33 +4,33 @@ using SMUBE.Commands.Args.ArgsPicker;
 
 namespace SMUBE.Commands.Args.ArgsValidators
 {
-    public class OneMoveToOneArgsValidator : CommandArgsValidator
+    public class OneMoveToOneArgsValidator : BaseCommandArgsValidator
     {
         private ArgsConstraint _argsConstraint;
-        public ArgsConstraint ArgsConstraint => _argsConstraint;
+        public override ArgsConstraint ArgsConstraint => _argsConstraint;
 
         public OneMoveToOneArgsValidator(ArgsConstraint argsConstraint)
         {
             _argsConstraint = argsConstraint;
         }
 
-        public ArgsPicker.ArgsPicker GetArgsPicker(ICommand command, BattleStateModel battleStateModel)
+        public override ArgsPicker.ArgsPicker GetArgsPicker(ICommand command, BattleStateModel battleStateModel)
         {
             return new OneMoveToOneArgsPicker(command, battleStateModel);
         }
 
-        public bool Validate(CommandArgs args, BattleStateModel battleStateModel)
+        public override bool Validate(CommandArgs args, BattleStateModel battleStateModel)
         {
-            if (args?.BattleStateModel == null)
+            if (!base.Validate(args, battleStateModel))
             {
                 return false;
             }
 
-            if (args.ActiveUnit == null || args.ActiveUnit.UnitIdentifier == null)
+            if (!ValidateActiveUnit(args, out _))
+            {
                 return false;
-            if (!args.BattleStateModel.TryGetUnit(args.ActiveUnit.UnitIdentifier, out var _))
-                return false;
-
+            }
+            
             if (args.TargetUnits == null || args.TargetUnits.Count != 1 || args.TargetUnits.First().UnitIdentifier == null)
                 return false;
             var targetUnitIdentifier = args.TargetUnits.First().UnitIdentifier;
@@ -41,17 +41,10 @@ namespace SMUBE.Commands.Args.ArgsValidators
             {
                 return false;
             }
-
-            if (_argsConstraint != ArgsConstraint.None)
+            
+            if (!ValidateTargetConstraint(_argsConstraint, args.ActiveUnit.UnitIdentifier, targetUnitIdentifier))
             {
-                if (_argsConstraint == ArgsConstraint.Ally)
-                {
-                    return args.ActiveUnit.UnitIdentifier.TeamId == targetUnitIdentifier.TeamId;
-                }
-                else if (_argsConstraint == ArgsConstraint.Enemy)
-                {
-                    return args.ActiveUnit.UnitIdentifier.TeamId != targetUnitIdentifier.TeamId;
-                }
+                return false;
             }
 
             if (args.PositionDelta == null)
@@ -62,11 +55,24 @@ namespace SMUBE.Commands.Args.ArgsValidators
             {
                 return false;
             }
-
+            
             var reachablePositions = battleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions;
             if (!reachablePositions.Any(rp => rp.Position.Coordinates.Equals(args.PositionDelta.Target)))
             {
                 return false;
+                /*
+                if (!_allowUnreachable)
+                {
+                    return false;
+                }
+                var targetScenePosition = battleStateModel.BattleSceneState.Grid[args.PositionDelta.Target.x, args.PositionDelta.Target.y];
+                var pathExists = battleStateModel.BattleSceneState.PathfindingHandler
+                    .PathExists(battleStateModel, args.ActiveUnit.BattleScenePosition, targetScenePosition, out _);
+                if (!pathExists)
+                {
+                    return false;
+                }
+            */
             }
             
             return true;

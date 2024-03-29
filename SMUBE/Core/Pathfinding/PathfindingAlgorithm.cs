@@ -219,7 +219,7 @@ namespace SMUBE.Pathfinding
             return pathADistance < pathBDistance ? pathA : pathB;
         }
 
-        protected static int GetPathCost(List<BattleScenePosition> path)
+        public static int GetPathCost(List<BattleScenePosition> path)
         {
             int cost = 0;
 

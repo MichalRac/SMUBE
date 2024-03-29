@@ -28,7 +28,7 @@ namespace SMUBE.AI.BehaviorTree
             finalCommand = null;
             if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
             {
-                var viableCommands = unit.ViableCommands;
+                var viableCommands = unit.UnitCommandProvider.ViableCommands;
 
                 foreach (var command in viableCommands)
                 {

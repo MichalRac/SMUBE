@@ -3,40 +3,72 @@ using SMUBE.Commands.Args.ArgsPicker;
 
 namespace SMUBE.Commands.Args.ArgsValidators
 {
-    public class OneToPositionValidator : CommandArgsValidator
+    public class OneToPositionValidator : BaseCommandArgsValidator
     {
-        public ArgsConstraint ArgsConstraint => ArgsConstraint.Position;
-        
-        public ArgsPicker.ArgsPicker GetArgsPicker(ICommand command, BattleStateModel battleStateModel)
-        {
-            return new OneToPositionArgsPicker(command, battleStateModel);
-        }
+        private readonly bool _allowOccupied;
+        private readonly bool _allowSpecial;
+        private readonly bool _allowWalkable;
+        private readonly bool _allowNonWalkable;
+        public override ArgsConstraint ArgsConstraint => ArgsConstraint.Position;
 
-        public bool Validate(CommandArgs args, BattleStateModel battleStateModel)
+        public OneToPositionValidator(bool allowOccupied, bool allowSpecial, bool allowWalkable, bool allowNonWalkable)
         {
-            if (args?.BattleStateModel == null)
+            _allowOccupied = allowOccupied;
+            _allowSpecial = allowSpecial;
+            _allowWalkable = allowWalkable;
+            _allowNonWalkable = allowNonWalkable;
+        }
+        
+        public override ArgsPicker.ArgsPicker GetArgsPicker(ICommand command, BattleStateModel battleStateModel)
+        {
+            return new OneToPositionArgsPicker(command, battleStateModel, _allowOccupied, _allowSpecial, _allowWalkable, _allowNonWalkable);
+        }
+        
+        public override bool Validate(CommandArgs args, BattleStateModel battleStateModel)
+        {
+            if (!base.Validate(args, battleStateModel))
             {
                 return false;
             }
 
-            if (args.ActiveUnit == null || args.ActiveUnit.UnitIdentifier == null)
+            if (!ValidateActiveUnit(args, out _))
+            {
                 return false;
-            if (!args.BattleStateModel.TryGetUnit(args.ActiveUnit.UnitIdentifier, out var _))
-                return false;
+            }
+
             if (args.TargetUnits != null)
                 return false;
-            if (args.PositionDelta == null)
+            if (args.PositionDelta != null)
                 return false;
-            if (!args.PositionDelta.UnitIdentifier.Equals(args.ActiveUnit.UnitIdentifier))
+            if (args.TargetPositions == null)
                 return false;
+            if (args.TargetPositions.Count != 1)
+                return false;
+
+            var targetCoordinates = args.TargetPositions[0];
+            var targetPosition = battleStateModel.BattleSceneState.Grid[targetCoordinates.x, targetCoordinates.y];
             
-            var battleScene = args.BattleStateModel.BattleSceneState;
-            if (!battleScene.IsValid(args.PositionDelta.Target) || !battleScene.IsEmpty(args.PositionDelta.Target))
+            if (!_allowSpecial && targetPosition.IsSpecial())
+            {
+                return false;
+            }
+            
+            if (!_allowOccupied && targetPosition.IsOccupied())
+            {
+                return false;
+            }
+
+            if (!_allowWalkable && targetPosition.IsWalkable())
+            {
+                return false;
+            }
+
+            if (!_allowNonWalkable && !targetPosition.IsWalkable())
             {
                 return false;
             }
 
             return true;
-        }
+        } 
     }
 }

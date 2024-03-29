@@ -3,26 +3,26 @@ using SMUBE.Commands.Args.ArgsPicker;
 
 namespace SMUBE.Commands.Args.ArgsValidators
 {
-    public class OneToSelfArgsValidator : CommandArgsValidator
+    public class OneToSelfArgsValidator : BaseCommandArgsValidator
     {
-        public ArgsConstraint ArgsConstraint => ArgsConstraint.None;
+        public override ArgsConstraint ArgsConstraint => ArgsConstraint.None;
 
-        public ArgsPicker.ArgsPicker GetArgsPicker(ICommand command, BattleStateModel battleStateModel)
+        public override ArgsPicker.ArgsPicker GetArgsPicker(ICommand command, BattleStateModel battleStateModel)
         {
             return new OneToSelfArgsPicker(command, battleStateModel);
         }
         
-        public bool Validate(CommandArgs args, BattleStateModel battleStateModel)
+        public override bool Validate(CommandArgs args, BattleStateModel battleStateModel)
         {
-            if (args?.BattleStateModel == null)
+            if (!base.Validate(args, battleStateModel))
             {
                 return false;
             }
 
-            if (args.ActiveUnit == null || args.ActiveUnit.UnitIdentifier == null)
+            if (!ValidateActiveUnit(args, out _))
+            {
                 return false;
-            if (!args.BattleStateModel.TryGetUnit(args.ActiveUnit.UnitIdentifier, out var _))
-                return false;
+            }
 
             if (args.TargetUnits != null)
             {

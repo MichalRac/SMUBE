@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SMUBE.BattleState;
 using SMUBE.Commands._Common;
+using SMUBE.Commands.Args.ArgsPicker;
 using SMUBE.Commands.Args.ArgsValidators;
 using SMUBE.DataStructures.Units;
 using SMUBE.DataStructures.Utils;
@@ -240,7 +241,7 @@ namespace SMUBE.Commands.Args
                     return null;
                 }
             }
-            else if (command.CommandArgsValidator is OneToPositionValidator)
+            else if (command.CommandArgsValidator is OneMoveToPositionValidator)
             {
                 if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
                 {
@@ -255,8 +256,46 @@ namespace SMUBE.Commands.Args
                 }
                 return null;
             }
+            else if (command.CommandArgsValidator is TauntedAttackArgsValidator)
+            {
+                if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
+                {
+                    var viableTargets = unit.UnitCommandProvider.ViableTargets;
+                    if (viableTargets != null && viableTargets.Count > 0)
+                    {
+                        if (battleStateModel.TryGetUnit(viableTargets[0], out var targetUnit))
+                        {
+                            return new CommonArgs(unit.UnitData, new List<UnitData>() { targetUnit.UnitData }, battleStateModel);
+                        }
+                    }
+                    return null;
+                }
+                return null;
+            }
+            else if (command.CommandArgsValidator is OneToPositionValidator)
+            {
+                if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
+                {
+                    var validTargets = battleStateModel.BattleSceneState.AggregateAllPositions(true);
+
+                    if (validTargets.Count == 0)
+                    {
+                        return null;
+                    }
+                
+                    validTargets.Shuffle();
+                    var targetPos = validTargets.First().Coordinates;
+                    
+                    return new CommonArgs(unit.UnitData, null, battleStateModel, null, new List<SMUBEVector2<int>>{targetPos});
+                }
+
+                return null;
+            }
             else
             {
+                Console.WriteLine($"ERROR, unhandled CommandArgsValidator: {command.CommandArgsValidator.GetType().Name}");
+                Console.WriteLine($"Tap anything to close.");
+                Console.ReadKey();
                 throw new NotImplementedException();
             }
 

@@ -17,12 +17,12 @@ namespace SMUBE.Units
         public AIModel AiModel { get; }
 
 
-        public Unit(string argName, UnitIdentifier argUnitIdentifier, UnitStats argUnitStats, AIModel aiModel, List<ICommand> argViableCommands = null)
+        public Unit(string argName, UnitIdentifier argUnitIdentifier, UnitStats argUnitStats, AIModel aiModel, List<BaseCommand> argViableCommands = null)
         {
             UnitData = new UnitData(argName, argUnitIdentifier, argUnitStats);
             AiModel = aiModel;
 
-            var viableCommands = new List<ICommand>();
+            var viableCommands = new List<BaseCommand>();
 
             viableCommands.Add(new BaseAttack());
             viableCommands.Add(new BaseBlock());

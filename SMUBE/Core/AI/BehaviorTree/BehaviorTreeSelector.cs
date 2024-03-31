@@ -19,7 +19,7 @@ namespace SMUBE.AI.BehaviorTree
             this.childTasks = childTasks;
         }
 
-        public override bool Run(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier, out ICommand finalCommand)
+        public override bool Run(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier, out BaseCommand finalCommand)
         {
             finalCommand = null;
             foreach (BehaviorTreeTask task in childTasks)

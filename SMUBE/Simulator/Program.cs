@@ -367,7 +367,7 @@ namespace SMUBE_Utils.Simulator
 
             var commandStopwatch = new Stopwatch();
             var argsStopwatch = new Stopwatch();
-            ICommand nextCommand = null;
+            BaseCommand nextCommand = null;
             CommandArgs nextArgs = null;
 
             if(unit.AiModel is BehaviorTreeAIModel)

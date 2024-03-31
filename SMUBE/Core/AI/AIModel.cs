@@ -14,8 +14,8 @@ namespace SMUBE.AI
             this.UseSimpleBehavior = useSimpleBehavior;
         }
 
-        public abstract ICommand ResolveNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier);
-        public abstract CommandArgs GetCommandArgs(ICommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier);
+        public abstract BaseCommand ResolveNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier);
+        public abstract CommandArgs GetCommandArgs(BaseCommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier);
 
         public void SimulationPrewarm(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {

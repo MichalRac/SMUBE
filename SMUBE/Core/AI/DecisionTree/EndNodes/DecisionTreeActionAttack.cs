@@ -5,7 +5,7 @@ namespace SMUBE.AI.DecisionTree.EndNodes
 {
     public class DecisionTreeActionAttack : DecisionTreeAction
     {
-        public override ICommand GetCommand()
+        public override BaseCommand GetCommand()
         {
             return new BaseAttack();
         }

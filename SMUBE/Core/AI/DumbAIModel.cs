@@ -2,11 +2,6 @@
 using SMUBE.Commands;
 using SMUBE.DataStructures.Units;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SMUBE.Commands.Args;
 
 namespace SMUBE.AI
@@ -18,7 +13,7 @@ namespace SMUBE.AI
         {
         }
 
-        public override ICommand ResolveNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
+        public override BaseCommand ResolveNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
             if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
             {
@@ -37,7 +32,7 @@ namespace SMUBE.AI
             return null;
         }
 
-        public override CommandArgs GetCommandArgs(ICommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
+        public override CommandArgs GetCommandArgs(BaseCommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
             return CommandArgsHelper.GetDumbCommandArgs(command, battleStateModel, activeUnitIdentifier);
         }

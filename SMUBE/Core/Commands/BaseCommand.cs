@@ -56,5 +56,7 @@ namespace SMUBE.Commands
             activeUnit.UnitData.BattleScenePosition = targetPos;
             activeUnit.UnitData.BattleScenePosition.ApplyUnit(activeUnit.UnitData.UnitIdentifier);
         }
+
+        //internal abstract CommandArgs GetSuggestedPseudoRandomArgs(BattleStateModel battleStateModel);
     }
 }

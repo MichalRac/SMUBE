@@ -29,12 +29,12 @@ namespace SMUBE.AI.GoalOrientedBehavior
         }
 
 
-        public override CommandArgs GetCommandArgs(ICommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
+        public override CommandArgs GetCommandArgs(BaseCommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
             return command.ArgsCache;
         }
 
-        public override ICommand ResolveNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
+        public override BaseCommand ResolveNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
             if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var activeUnit))
             {
@@ -43,7 +43,7 @@ namespace SMUBE.AI.GoalOrientedBehavior
 
                 var viableActions = activeUnit.UnitCommandProvider.ViableCommands;
 
-                ICommand bestAction = null;
+                BaseCommand bestAction = null;
                 CommandArgs bestArgs = null;
                 float minDiscontentment = float.MaxValue;
 

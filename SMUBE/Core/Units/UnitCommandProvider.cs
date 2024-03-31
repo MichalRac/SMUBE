@@ -9,14 +9,14 @@ namespace SMUBE.Units
     public class UnitCommandProvider
     {
         private UnitData _unitData;
-        public List<ICommand> AllCommands { get; }
-        public List<ICommand> ViableCommands { get; } = new List<ICommand>();
+        public List<BaseCommand> AllCommands { get; }
+        public List<BaseCommand> ViableCommands { get; } = new List<BaseCommand>();
         public List<UnitIdentifier> ViableTargets = new List<UnitIdentifier>();
 
         public bool IsTaunted { get; set; } = false;
 
 
-        public UnitCommandProvider(UnitData unitData, List<ICommand> unitCommands)
+        public UnitCommandProvider(UnitData unitData, List<BaseCommand> unitCommands)
         {
             AllCommands = unitCommands;
             _unitData = unitData;

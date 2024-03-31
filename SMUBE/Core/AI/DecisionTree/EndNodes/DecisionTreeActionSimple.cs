@@ -9,9 +9,9 @@ using SMUBE.Commands;
 namespace SMUBE.AI.DecisionTree.EndNodes
 {
     internal class DecisionTreeActionSimple<T> : DecisionTreeAction 
-        where T : ICommand, new()    
+        where T : BaseCommand, new()    
     {
-        public override ICommand GetCommand()
+        public override BaseCommand GetCommand()
         {
             return new T();
         }

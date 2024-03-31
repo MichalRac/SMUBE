@@ -38,14 +38,14 @@ namespace SMUBE.AI.StateMachine
             }
         }
 
-        public override ICommand ResolveNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
+        public override BaseCommand ResolveNextCommand(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
             ResolveTransitions(battleStateModel);
 
             return currentState.Command;
         }
 
-        public override CommandArgs GetCommandArgs(ICommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
+        public override CommandArgs GetCommandArgs(BaseCommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
             return CommandArgsHelper.GetDumbCommandArgs(command, battleStateModel, activeUnitIdentifier);
         }

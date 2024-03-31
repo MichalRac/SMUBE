@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using SMUBE.Commands;
 
 namespace SMUBE.AI.StateMachine
 {
     public class StateMachineState
     {
-        public ICommand Command { get; }
+        public BaseCommand Command { get; }
         public List<StateMachineTransition> Transitions { get; private set; }
 
-        public StateMachineState(ICommand command)
+        public StateMachineState(BaseCommand command)
         {
             Command = command;
         }

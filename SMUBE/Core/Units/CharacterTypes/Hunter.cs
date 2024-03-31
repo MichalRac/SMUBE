@@ -17,7 +17,7 @@ namespace SMUBE.Units.CharacterTypes
                                                                 UnitConsts.HunterInfo.Defense,
                                                                 UnitConsts.HunterInfo.Speed);
 
-        public override List<ICommand> AvailableCommands => new List<ICommand>()
+        public override List<BaseCommand> AvailableCommands => new List<BaseCommand>()
         {
             new HeavyAttack(),
             new RaiseObstacle(),

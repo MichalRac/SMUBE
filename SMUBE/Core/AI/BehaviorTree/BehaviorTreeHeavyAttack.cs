@@ -23,7 +23,7 @@ namespace SMUBE.AI.BehaviorTree
             return _commandArgsCache;
         }
 
-        public override bool Run(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier, out ICommand finalCommand)
+        public override bool Run(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier, out BaseCommand finalCommand)
         {
             finalCommand = null;
             if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))

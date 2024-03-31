@@ -11,6 +11,6 @@ namespace SMUBE.AI.BehaviorTree
 {
     public abstract class BehaviorTreeTask
     {
-        public abstract bool Run(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier, out ICommand finalCommand);
+        public abstract bool Run(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier, out BaseCommand finalCommand);
     }
 }

@@ -2,7 +2,6 @@
 using SMUBE.DataStructures.Units;
 using System.Collections.Generic;
 using SMUBE.Commands;
-using SMUBE.Commands.SpecificCommands.LowerEnemyDefense;
 using SMUBE.Commands.SpecificCommands.Tackle;
 using SMUBE.Commands.SpecificCommands.Taunt;
 
@@ -18,7 +17,7 @@ namespace SMUBE.Units.CharacterTypes
                                                                 UnitConsts.SquireInfo.Defense,
                                                                 UnitConsts.SquireInfo.Speed);
 
-        public override List<ICommand> AvailableCommands => new List<ICommand>()
+        public override List<BaseCommand> AvailableCommands => new List<BaseCommand>()
         {
             new DefendAll(),
             new Taunt(),

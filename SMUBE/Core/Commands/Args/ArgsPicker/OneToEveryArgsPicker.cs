@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SMUBE.BattleState;
 using SMUBE.DataStructures.Units;
 
@@ -100,5 +101,46 @@ namespace SMUBE.Commands.Args.ArgsPicker
             return "Confirm or cancel command on all targets";
         }
 
+        public override CommandArgs GetPseudoRandom()
+        {
+            var unit = BattleStateModel.ActiveUnit;
+            var activeUnitIdentifier = unit.UnitData.UnitIdentifier;
+            var constraint = Command.CommandArgsValidator.ArgsConstraint;
+
+            var viableTargets = new List<UnitData>();
+            switch (constraint)
+            {
+                case ArgsConstraint.None:
+                    add_ally_targets();
+                    add_enemy_targets();
+                    break;
+                case ArgsConstraint.Ally:
+                    add_ally_targets();
+                    break;
+                case ArgsConstraint.Enemy:
+                    add_enemy_targets();
+                    break;
+            }
+
+            return new CommonArgs(unit.UnitData, viableTargets, BattleStateModel);
+        
+            void add_ally_targets()
+            {
+                var targets = BattleStateModel.GetTeamUnits(activeUnitIdentifier.TeamId == 0 ? 0 : 1).Where(u => u.UnitData.UnitStats.IsAlive());
+                foreach (var target in targets)
+                {
+                    viableTargets.Add(target.UnitData);
+                }
+            }
+
+            void add_enemy_targets()
+            {
+                var targets = BattleStateModel.GetTeamUnits(activeUnitIdentifier.TeamId == 0 ? 1 : 0).Where(u => u.UnitData.UnitStats.IsAlive());
+                foreach (var target in targets)
+                {
+                    viableTargets.Add(target.UnitData);
+                }
+            }
+        }
     }
 }

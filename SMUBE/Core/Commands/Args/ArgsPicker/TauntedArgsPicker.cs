@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using SMUBE.BattleState;
-using SMUBE.Commands._Common;
 using SMUBE.DataStructures.BattleScene;
 using SMUBE.DataStructures.Units;
 using SMUBE.DataStructures.Utils;
@@ -92,7 +91,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
         {
             return "Pick target";
         }
-        
+
         private bool IsValid(SMUBEVector2<int> targetPos)
         {
             if (!ContainsValidTarget(targetPos))
@@ -167,6 +166,21 @@ namespace SMUBE.Commands.Args.ArgsPicker
             }
 
             return true;
+        }
+        
+        
+        public override CommandArgs GetPseudoRandom()
+        {
+            var unit = BattleStateModel.ActiveUnit;
+            var viableTargets = unit.UnitCommandProvider.ViableTargets;
+            if (viableTargets != null && viableTargets.Count > 0)
+            {
+                if (BattleStateModel.TryGetUnit(viableTargets[0], out var targetUnit))
+                {
+                    return new CommonArgs(unit.UnitData, new List<UnitData>() { targetUnit.UnitData }, BattleStateModel);
+                }
+            }
+            return null;
         }
     }
 }

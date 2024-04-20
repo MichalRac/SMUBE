@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SMUBE.Commands;
 using SMUBE.Commands.Args;
+using SMUBE.Pathfinding;
 
 namespace SMUBE.BattleState
 {
@@ -58,7 +59,8 @@ namespace SMUBE.BattleState
             var initialUnitSetup = new List<(SMUBEVector2<int> pos, UnitIdentifier id)>();
             var team0PosCount = 0;
             var team1PosCount = 0;
-                
+
+            
             foreach (var u in Units)
             {
                 var initCoordinates = u.UnitData.UnitIdentifier.TeamId == 0 
@@ -67,13 +69,16 @@ namespace SMUBE.BattleState
                 initialUnitSetup.Add((initCoordinates, u.UnitData.UnitIdentifier));
             }
 
+            var initialGrid = PathfindingConfigurations.InitialGrid6;
+            initialGrid.InitialUnitSetup = initialUnitSetup;
+            
             var initGridData = new InitialGridData
             {
                 width = 9,
                 height = 9,
                 InitialUnitSetup = initialUnitSetup,
             };
-            return initGridData;
+            return initialGrid;
         }
         
         private void PreAssignUnitsToPositions(InitialGridData initGridData)

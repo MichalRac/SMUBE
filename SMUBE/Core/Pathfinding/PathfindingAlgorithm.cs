@@ -13,6 +13,7 @@ namespace SMUBE.Pathfinding
             public BattleScenePosition Position { get; }
             public bool WasVisited { get; set; } = false;
             public int ShortestDistance { get; private set; } = int.MaxValue;
+            public bool IsReachable => ShortestDistance < int.MaxValue;
             private List<BattleScenePosition> ShortestKnownPathBackingField { get; set; } = new List<BattleScenePosition>();
             public List<BattleScenePosition> ShortestKnownPath
             {

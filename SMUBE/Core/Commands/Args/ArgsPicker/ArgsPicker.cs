@@ -40,5 +40,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
         public abstract string GetPickerInfo();
 
         public abstract string GetPickerState();
+
+        public abstract CommandArgs GetPseudoRandom();
     }
 }

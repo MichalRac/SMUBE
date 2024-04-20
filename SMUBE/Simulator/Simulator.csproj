@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="InternalRunner\Modules\GameSimulator\ActionContexts\InternalRunnerContextPicker.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\ActionContexts\PickTeamActionContext.cs" />
+    <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerDisplayHeatmap.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerDisplayMap.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerManualAction.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerLogUnitSummary.cs" />

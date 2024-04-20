@@ -90,6 +90,13 @@
     <Compile Include="AI\StateMachine\StateMachineTransition.cs" />
     <Compile Include="BattleState\BattleScene.cs" />
     <Compile Include="BattleState\BattleStateModel.cs" />
+    <Compile Include="BattleState\Heatmap\BaseHeatmap.cs" />
+    <Compile Include="BattleState\Heatmap\CommandBased\TeleportTargetScoreHeatmap.cs" />
+    <Compile Include="BattleState\Heatmap\GeneralHeatmaps\CountReachingUnitsOfTeamIdHeatmap.cs" />
+    <Compile Include="BattleState\Heatmap\GeneralHeatmaps\DistanceToUnitOfTeamIdHeatmap.cs" />
+    <Compile Include="BattleState\Heatmap\GeneralHeatmaps\GetReachablePositionsHeatmap.cs" />
+    <Compile Include="BattleState\Heatmap\HeatmapHelper.cs" />
+    <Compile Include="BattleState\Heatmap\HeatmapService.cs" />
     <Compile Include="Commands\Args\ArgsPicker\ArgsPicker.cs" />
     <Compile Include="Commands\Args\ArgsPicker\OneMoveToOneArgsPicker.cs" />
     <Compile Include="Commands\Args\ArgsPicker\OneToEveryArgsPicker.cs" />
@@ -149,6 +156,7 @@
     <Compile Include="Pathfinding\AStarPathfindingAlgorithm.cs" />
     <Compile Include="Pathfinding\DijkstraPathfindingAlgorithm.cs" />
     <Compile Include="Pathfinding\PathfindingAlgorithm.cs" />
+    <Compile Include="Pathfinding\PathfindingConfigurations.cs" />
     <Compile Include="Pathfinding\PathfindingHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

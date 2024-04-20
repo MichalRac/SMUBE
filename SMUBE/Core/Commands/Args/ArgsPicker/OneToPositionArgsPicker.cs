@@ -143,5 +143,22 @@ namespace SMUBE.Commands.Args.ArgsPicker
 
             return true;
         }
+        
+        public override CommandArgs GetPseudoRandom()
+        {
+            var unit = BattleStateModel.ActiveUnit;
+            var validTargets = BattleStateModel.BattleSceneState.AggregateAllPositions(true);
+
+            if (validTargets.Count == 0)
+            {
+                return null;
+            }
+                
+            validTargets.Shuffle();
+            var targetPos = validTargets.First().Coordinates;
+                    
+            return new CommonArgs(unit.UnitData, null, BattleStateModel, null, new List<SMUBEVector2<int>>{targetPos});
+        }
+        
     }
 }

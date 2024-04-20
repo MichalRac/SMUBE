@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SMUBE.BattleState;
 using SMUBE.Commands._Common;
 using SMUBE.DataStructures.Units;
@@ -122,7 +123,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
         {
             return "Choose target unit!";
         }
-        
+
         private bool ContainsValidTarget(SMUBEVector2<int> targetPos)
         {
             if (BattleStateModel.BattleSceneState.Grid[targetPos.x, targetPos.y].UnitIdentifier == null)
@@ -143,6 +144,22 @@ namespace SMUBE.Commands.Args.ArgsPicker
             }
             
             throw new ArgumentOutOfRangeException();
+        }
+        
+        public override CommandArgs GetPseudoRandom()
+        {
+            var unit = BattleStateModel.ActiveUnit;
+            
+            // todo hardcoded 2 teams limit
+            var enemyTeamId = unit.UnitData.UnitIdentifier.TeamId == 0 ? 1 : 0;
+            var enemyTeamUnits = BattleStateModel.GetTeamUnits(enemyTeamId).Where(u => u.UnitData.UnitStats.IsAlive()).ToList();
+            if (enemyTeamUnits.Any())
+            {
+                var targetUnitData = enemyTeamUnits.ElementAt(new Random().Next(enemyTeamUnits.Count() - 1)).UnitData;
+                return new CommonArgs(unit.UnitData, new List<UnitData>() { targetUnitData }, BattleStateModel);
+            }
+
+            return null;
         }
     }
 }

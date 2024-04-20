@@ -39,7 +39,7 @@ namespace SMUBE.AI
 
         public override CommandArgs GetCommandArgs(BaseCommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
-            return CommandArgsHelper.GetRandomCommandArgs(command, battleStateModel, activeUnitIdentifier);
+            return command.GetSuggestedPseudoRandomArgs(battleStateModel);
         }
     }
 }

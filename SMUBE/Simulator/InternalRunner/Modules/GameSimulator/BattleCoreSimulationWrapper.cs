@@ -31,6 +31,8 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
         private static int team2WinCount = 0;
         
         private static bool prewarm = false;
+
+        private List<(ICommand, CommandArgs)> CurrentListOfActions = new List<(ICommand, CommandArgs)>();
         
         public void SetupSimulation(List<Unit> initialUnits)
         {
@@ -67,6 +69,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
         public void OnFinished()
         {
+            CurrentListOfActions.Clear();
             if (!_core.currentStateModel.IsFinished(out var winningTeamId))
             {
                 throw new NotSupportedException();
@@ -175,7 +178,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 {
                     if (nextArgs.TargetUnits != null && nextArgs.TargetUnits.Count > 0)
                     {
-                        Console.WriteLine($"\nUnit {unit.UnitData.Name} Used {nextCommand.GetType().Name} on {nextArgs.TargetUnits[0].Name}\n");
+                        Console.WriteLine($"\nUnit {unit.UnitData.Name} Used {nextCommand.GetType().Name} on {nextArgs.TargetUnits[0]?.Name ?? "self"}\n");
                     }
                     else
                     {
@@ -210,6 +213,8 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             {
                 _core.currentStateModel.ExecuteCommand(nextCommand, nextArgs);
             }
+            
+            CurrentListOfActions.Add((nextCommand, nextArgs));
 
             if (log)
             {

@@ -21,12 +21,12 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
             return new List<Unit>
                 {
                     UnitHelper.CreateUnit<Squire>(0, team1AiModel, useSimpleBehaviour),
-                    UnitHelper.CreateUnit<Hunter>(0, team1AiModel, useSimpleBehaviour),
-                    UnitHelper.CreateUnit<Scholar>(0, team1AiModel, useSimpleBehaviour),
+                    //UnitHelper.CreateUnit<Hunter>(0, team1AiModel, useSimpleBehaviour),
+                    //UnitHelper.CreateUnit<Scholar>(0, team1AiModel, useSimpleBehaviour),
 
                     UnitHelper.CreateUnit<Squire>(1, team2AiModel, useSimpleBehaviour),
-                    UnitHelper.CreateUnit<Hunter>(1, team2AiModel, useSimpleBehaviour),
-                    UnitHelper.CreateUnit<Scholar>(1, team2AiModel, useSimpleBehaviour),
+                    //UnitHelper.CreateUnit<Hunter>(1, team2AiModel, useSimpleBehaviour),
+                    //UnitHelper.CreateUnit<Scholar>(1, team2AiModel, useSimpleBehaviour),
                 };
         }
     }

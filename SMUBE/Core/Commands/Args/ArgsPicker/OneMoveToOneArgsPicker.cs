@@ -307,5 +307,39 @@ namespace SMUBE.Commands.Args.ArgsPicker
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        public override CommandArgs GetPseudoRandom()
+        {
+            var activeUnit = BattleStateModel.ActiveUnit;
+            
+            var validTargets
+                = BattleStateModel.GetTeamUnits(activeUnit.UnitData.UnitIdentifier.TeamId == 0 ? 1 : 0)
+                    .Where(u => u.UnitData.UnitStats.IsAlive()).ToList();
+
+            if (validTargets.Count == 0)
+            {
+                return null;
+            }
+
+            validTargets.Shuffle();
+
+            foreach (var validTarget in validTargets)
+            {
+                var reachableSurrounding = BattleStateModel.BattleSceneState.PathfindingHandler
+                    .GetReachableSurroundingPositions(BattleStateModel, validTarget.UnitData.BattleScenePosition);
+
+                if (reachableSurrounding.Count == 0)
+                    continue;
+
+                reachableSurrounding.Shuffle();
+
+                var posDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, activeUnit.UnitData.BattleScenePosition.Coordinates, reachableSurrounding.First().Coordinates);
+                var args = new CommonArgs(activeUnit.UnitData, new List<UnitData>() { validTarget.UnitData }, BattleStateModel, posDelta);
+
+                return args;
+            }
+
+            return null;
+        }
     }
 }

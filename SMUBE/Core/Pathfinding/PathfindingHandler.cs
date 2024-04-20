@@ -2,6 +2,7 @@
 using System.Linq;
 using SMUBE.BattleState;
 using SMUBE.DataStructures.BattleScene;
+using SMUBE.DataStructures.Units;
 
 namespace SMUBE.Pathfinding
 {
@@ -12,13 +13,24 @@ namespace SMUBE.Pathfinding
         
         private List<PathfindingAlgorithm.PathfindingPathCache> _activeUnitReachablePositions = new List<PathfindingAlgorithm.PathfindingPathCache>();
         public IReadOnlyList<PathfindingAlgorithm.PathfindingPathCache> ActiveUnitReachablePositions => _activeUnitReachablePositions;
+        
 
+        private Dictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>> _allUnitPaths = new Dictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>>();
+        public IReadOnlyDictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>> AllUnitPaths => _allUnitPaths;
+        
+        
+        private Dictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>> _allUnitReachablePaths = new Dictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>>();
+        public IReadOnlyDictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>> AllUnitReachablePaths => _allUnitReachablePaths;
+        
+        
         public void OnNewTurn(BattleStateModel battleState)
         {
-            EvaluateActiveUnitReachablePositions(battleState);
+            // todo some paths are recalculated, can be optimized
+            EvaluateAllUnitReachablePositions(battleState);
+            EvaluateAllPaths(battleState);
         }
 
-        private void EvaluateActiveUnitReachablePositions(BattleStateModel battleState)
+        private void EvaluateAllUnitReachablePositions(BattleStateModel battleState)
         {
             _activeUnitReachablePositions.Clear();
 
@@ -27,8 +39,23 @@ namespace SMUBE.Pathfinding
             
             var reachablePositions
                 = Pathfinding.GetAllReachablePaths(battleState.BattleSceneState, unit.UnitData.BattleScenePosition, unit.UnitData.UnitStats.Speed);
-
+            
             _activeUnitReachablePositions = reachablePositions;
+            
+            foreach (var currentUnit in battleState.Units)
+            {
+                var allPaths = Pathfinding.GetAllReachablePaths(battleState.BattleSceneState, currentUnit.UnitData.BattleScenePosition, unit.UnitData.UnitStats.Speed);
+                _allUnitReachablePaths[currentUnit.UnitData.UnitIdentifier] = allPaths;
+            }
+        }
+
+        private void EvaluateAllPaths(BattleStateModel battleState)
+        {
+            foreach (var unit in battleState.Units)
+            {
+                var allPaths = Pathfinding.GetAllReachablePaths(battleState.BattleSceneState, unit.UnitData.BattleScenePosition);
+                _allUnitPaths[unit.UnitData.UnitIdentifier] = allPaths;
+            }
         }
         
         public List<BattleScenePosition> GetSurroundingPositions(BattleStateModel battleState, BattleScenePosition target)

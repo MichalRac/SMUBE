@@ -76,7 +76,8 @@ namespace SMUBE.Commands.SpecificCommands.Tackle
             var targetUnitPos = target.BattleScenePosition.Coordinates;
             var positionDiff = new SMUBEVector2<int>(targetUnitPos.x - activeUnitPos.x, targetUnitPos.y - activeUnitPos.y);
             var potentialTargetMoveCoordinates = new SMUBEVector2<int>(targetUnitPos.x + positionDiff.x, targetUnitPos.y + positionDiff.y);
-            var canMove = commandArgs.BattleStateModel.BattleSceneState.IsValid(potentialTargetMoveCoordinates);
+            var canMove = commandArgs.BattleStateModel.BattleSceneState.IsValid(potentialTargetMoveCoordinates)
+                && commandArgs.BattleStateModel.BattleSceneState.IsEmpty(potentialTargetMoveCoordinates);
             if (canMove)
             {
                 positionDeltas.Add(new PositionDelta(target.UnitIdentifier, targetUnitPos, potentialTargetMoveCoordinates));

@@ -98,7 +98,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
                 ? "Resolved"
                 : "Pick any empty reachable position";
         }
-        
+
         private bool IsValidTarget(SMUBEVector2<int> targetPos)
         {
             if (targetPos.x < 0 || targetPos.x >= BattleStateModel.BattleSceneState.Width)
@@ -121,6 +121,19 @@ namespace SMUBE.Commands.Args.ArgsPicker
                 }
             }
             return false;
+        }
+        
+        public override CommandArgs GetPseudoRandom()
+        {
+            var unit = BattleStateModel.ActiveUnit;
+            var reachablePositions = BattleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions;
+                    
+            if (reachablePositions.Count == 0)
+                return null;
+                    
+            var target = reachablePositions.GetRandom();
+            var positionDelta = new PositionDelta(unit.UnitData.UnitIdentifier, unit.UnitData.BattleScenePosition.Coordinates, target.Position.Coordinates);
+            return new CommonArgs(unit.UnitData, null, BattleStateModel, positionDelta);
         }
     }
 }

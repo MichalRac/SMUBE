@@ -80,6 +80,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 ("Pick Action Manually", new InternalRunnerManualAction(_coreSimulator)),
                 ("Display Map", new InternalRunnerDisplayMap(_coreSimulator, false)),
                 ("Display Map With Descriptors", new InternalRunnerDisplayMap(_coreSimulator, true)),
+                ("Display Ally Distance Heatmap", new InternalRunnerDisplayHeatmap(_coreSimulator)),
                 ("Log Unit Summary", new InternalRunnerLogUnitSummary(_coreSimulator)),
             }, false);
 

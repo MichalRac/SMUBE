@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SMUBE.BattleState;
 using SMUBE.Commands._Common;
@@ -16,7 +17,22 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
         public override int ManaCost => SpecificCommandCostConfiguration.Mana_TauntedAttack;
         public override CommandId CommandId => CommandId.TauntedAttack;
         public override BaseCommandArgsValidator CommandArgsValidator => new TauntedAttackArgsValidator();
+        
+        internal override CommandArgs GetSuggestedPseudoRandomArgs(BattleStateModel battleStateModel)
+        {
+            var activeUnit = battleStateModel.ActiveUnit;
 
+            var tauntEffect = activeUnit.UnitData.UnitStats.PersistentEffects.Find(effect => effect is TauntEffect) as TauntEffect;
+            battleStateModel.TryGetUnit(tauntEffect?.Target, out var target);
+
+            if (target == null)
+            {
+                throw new ArgumentException();
+            }
+            
+            return new CommonArgs(battleStateModel.ActiveUnit.UnitData, target.UnitData, battleStateModel);
+        }
+        
         public override bool TryExecute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
             if (!base.TryExecute(battleStateModel, commandArgs))
@@ -104,7 +120,7 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
             commandResults.PositionDeltas = new List<PositionDelta>() { commandArgs.PositionDelta };
             return commandResults;
         }
-        
+
         private static bool ActionReachesTarget(BattleStateModel battleStateModel, CommandArgs commandArgs, out BattleScenePosition optimalMovePosition)
         {
             optimalMovePosition = null;

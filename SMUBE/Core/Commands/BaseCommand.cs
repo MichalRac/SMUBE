@@ -57,6 +57,9 @@ namespace SMUBE.Commands
             activeUnit.UnitData.BattleScenePosition.ApplyUnit(activeUnit.UnitData.UnitIdentifier);
         }
 
-        //internal abstract CommandArgs GetSuggestedPseudoRandomArgs(BattleStateModel battleStateModel);
+        internal virtual CommandArgs GetSuggestedPseudoRandomArgs(BattleStateModel battleStateModel)
+        {
+            return CommandArgsValidator.GetArgsPicker(this, battleStateModel).GetPseudoRandom();
+        }
     }
 }

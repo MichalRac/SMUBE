@@ -1,13 +1,21 @@
-﻿using SMUBE.Commands.SpecificCommands.HeavyAttack;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SMUBE.Commands;
+﻿using SMUBE.Commands;
 
 namespace SMUBE.AI.DecisionTree.EndNodes
 {
+    internal class DecisionTreeActionSimple : DecisionTreeAction
+    {
+        private readonly BaseCommand _result;
+
+        public DecisionTreeActionSimple(BaseCommand result)
+        {
+            _result = result;
+        }
+        public override BaseCommand GetCommand()
+        {
+            return _result;
+        }
+    }
+    
     internal class DecisionTreeActionSimple<T> : DecisionTreeAction 
         where T : BaseCommand, new()    
     {
@@ -16,4 +24,5 @@ namespace SMUBE.AI.DecisionTree.EndNodes
             return new T();
         }
     }
+
 }

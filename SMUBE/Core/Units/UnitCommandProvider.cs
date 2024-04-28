@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SMUBE.BattleState;
 using SMUBE.Commands;
 using SMUBE.Commands.Effects;
 using SMUBE.Commands.SpecificCommands.Taunt;
@@ -22,21 +23,21 @@ namespace SMUBE.Units
             _unitData = unitData;
         }
 
-        public void OnNewTurn()
+        public void OnNewTurn(BattleStateModel battleStateModel)
         {
             ViableCommands.Clear();
             ViableTargets.Clear();
             IsTaunted = false;
             
-            FindBaseViableCommands();
+            FindBaseViableCommands(battleStateModel);
             ProcessPersistentEffects();
         }
 
-        private void FindBaseViableCommands()
+        private void FindBaseViableCommands(BattleStateModel battleStateModel)
         {
             foreach (var command in AllCommands)
             {
-                if (_unitData.UnitStats.CanUseAbility(command))
+                if (_unitData.UnitStats.CanUseAbility(command) && command.CommandArgsValidator.GetArgsPicker(command, battleStateModel).IsAnyValid())
                 {
                     ViableCommands.Add(command);
                 }

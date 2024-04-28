@@ -141,7 +141,7 @@ namespace SMUBE.BattleState
                 ActiveUnit = nextUnit;
 
                 BattleSceneState.PathfindingHandler.OnNewTurn(this);
-                ActiveUnit.UnitCommandProvider.OnNewTurn();
+                ActiveUnit.UnitCommandProvider.OnNewTurn(this);
             }
 
             foreach (var battleScenePosition in BattleSceneState.Grid)

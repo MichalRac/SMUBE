@@ -6,6 +6,7 @@ namespace SMUBE.AI.DecisionTree.DecisionNodes
 {
     public class DecisionTreeTestRandom : DecisionTreeTest
     {
+        private Random _random = new Random();
         private double _chance;
 
         public DecisionTreeTestRandom(double chance, DecisionTreeNode nodeIfTrue, DecisionTreeNode nodeIfFalse) : base(nodeIfTrue, nodeIfFalse)
@@ -15,7 +16,7 @@ namespace SMUBE.AI.DecisionTree.DecisionNodes
 
         protected override bool Test(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
-            return new Random().NextDouble() <= _chance;
+            return _random.NextDouble() <= _chance;
         }
     }
 }

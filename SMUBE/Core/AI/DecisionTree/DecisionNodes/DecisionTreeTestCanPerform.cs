@@ -1,9 +1,5 @@
-﻿using SMUBE.BattleState;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
+using SMUBE.BattleState;
 using SMUBE.Commands;
 using SMUBE.Commands.Args;
 
@@ -20,7 +16,7 @@ namespace SMUBE.AI.DecisionTree.DecisionNodes
         {
             if(battleStateModel.GetNextActiveUnit(out var nextUnit))
             {
-                return nextUnit.UnitData.UnitStats.CanUseAbility(new T());
+                return nextUnit.UnitCommandProvider.ViableCommands.Any(command => command is T);
             }
             return false;
         }

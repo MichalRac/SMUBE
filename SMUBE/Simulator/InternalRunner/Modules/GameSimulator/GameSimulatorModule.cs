@@ -89,14 +89,24 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
         protected void Finish()
         {
-            Console.WriteLine("Press r to retry, press anything else to quit");
-            var key = Console.ReadKey();
+            bool quit = false;
+            Console.WriteLine("Press r to retry, press q to quit");
 
-            if (key.Key == ConsoleKey.R)
+            while (!quit)
             {
-                Console.Clear();
-                _coreSimulator.Restart();
-                Run();
+                var key = Console.ReadKey();
+            
+                if (key.Key == ConsoleKey.R)
+                {
+                    Console.Clear();
+                    _coreSimulator.Restart();
+                    Run();
+                    quit = true;
+                }
+                else if (key.Key == ConsoleKey.Q)
+                {
+                    quit = true;
+                }
             }
         }
     }

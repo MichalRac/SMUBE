@@ -1,13 +1,8 @@
-﻿using SMUBE.AI.BehaviorTree;
-using SMUBE.BattleState;
+﻿using SMUBE.BattleState;
 using SMUBE.Commands;
 using SMUBE.DataStructures.Units;
 using SMUBE.Units.CharacterTypes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SMUBE.AI.DecisionTree.EndNodes;
 using SMUBE.Commands.Args;
 
@@ -48,7 +43,7 @@ namespace SMUBE.AI.DecisionTree
 
         public override CommandArgs GetCommandArgs(BaseCommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
-            return CommandArgsHelper.GetRandomCommandArgs(command, battleStateModel, activeUnitIdentifier);
+            return command.GetSuggestedPseudoRandomArgs(battleStateModel);
         }
 
     }

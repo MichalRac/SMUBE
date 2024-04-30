@@ -47,14 +47,20 @@ namespace SMUBE.Commands.Args.ArgsPicker
         protected override void SetDefaultTarget()
         {
             var validTargets = BattleStateModel.BattleSceneState.PathfindingHandler
-                .ActiveUnitReachablePositions.Where(target => !target.Position.Coordinates.Equals(BattleStateModel.ActiveUnit.UnitData.BattleScenePosition.Coordinates));
-            
-            _currentTargetCoordinates = validTargets.First().Position.Coordinates;
+                .ActiveUnitReachablePositions.Where(target => !target.Position.Coordinates.Equals(BattleStateModel.ActiveUnit.UnitData.BattleScenePosition.Coordinates)).ToList();
+
+            if (validTargets.Any())
+            {
+                _currentTargetCoordinates = validTargets.First().Position.Coordinates;
+            }
         }
 
         public override bool IsAnyValid()
         {
-            return BattleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions.Count > 0;
+            var activeUnitPosition = BattleStateModel.ActiveUnit.UnitData.BattleScenePosition.Coordinates;
+            return BattleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions
+                .Count(target => !target.Position.Coordinates.Equals(activeUnitPosition)) 
+                   > 0;
         }
 
         public override CommandArgs GetCommandArgs()
@@ -148,6 +154,11 @@ namespace SMUBE.Commands.Args.ArgsPicker
         {
             var unit = BattleStateModel.ActiveUnit;
             var validTargets = BattleStateModel.BattleSceneState.AggregateAllPositions(true);
+            
+            if (!_allowSpecial)
+            {
+                validTargets = validTargets.Where(target => !target.IsSpecial()).ToList();
+            }
 
             if (validTargets.Count == 0)
             {

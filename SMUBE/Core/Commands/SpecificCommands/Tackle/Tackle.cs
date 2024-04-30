@@ -12,6 +12,7 @@ namespace SMUBE.Commands.SpecificCommands.Tackle
 {
     public class Tackle : BaseCommand
     {
+        public static int UseCounter = 0;
         public const float TACKLE_ATTACK_POWER_MULTIPLIER = 1.5f;
         public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_Tackle;
         public override int ManaCost => SpecificCommandCostConfiguration.Mana_Tackle;
@@ -55,6 +56,7 @@ namespace SMUBE.Commands.SpecificCommands.Tackle
             }
             targetUnit.UnitData.UnitStats.AffectByAbility(GetCommandResults(commandArgs));
             
+            UseCounter++;
             return true;
         }
 

@@ -11,6 +11,7 @@ namespace SMUBE.Commands.SpecificCommands.Teleport
 {
     public class Teleport : BaseCommand
     {
+        public static int UseCounter = 0;
         public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_Teleport;
         public override int ManaCost => SpecificCommandCostConfiguration.Mana_Teleport;
         public override CommandId CommandId => CommandId.Teleport;
@@ -34,7 +35,12 @@ namespace SMUBE.Commands.SpecificCommands.Teleport
             activeUnit.UnitData.BattleScenePosition = targetPos;
             activeUnit.UnitData.BattleScenePosition.ApplyUnit(activeUnit.UnitData.UnitIdentifier);
 
-            return TryUseCommand(commandArgs, activeUnit);
+            var success = TryUseCommand(commandArgs, activeUnit);
+            if (success)
+            {
+                UseCounter++;
+            }
+            return success;
         }
 
         public override CommandResults GetCommandResults(CommandArgs commandArgs)
@@ -69,10 +75,15 @@ namespace SMUBE.Commands.SpecificCommands.Teleport
             {
                 var minScore = distanceToUnitOfTeamIdHeatmap.GetMaxScoreCoordinates();
                 targetPos.x = minScore.x;
-                targetPos.y = minScore.y;}
+                targetPos.y = minScore.y;
+            }
 
-            return new CommonArgs(battleStateModel.ActiveUnit.UnitData, null, battleStateModel, 
-                targetPositions: new List<SMUBEVector2<int>> {targetPos});
+            var positionDelta = new PositionDelta(
+                battleStateModel.ActiveUnit.UnitData.UnitIdentifier, 
+                battleStateModel.ActiveUnit.UnitData.BattleScenePosition.Coordinates, targetPos);
+            
+            return new CommonArgs(battleStateModel.ActiveUnit.UnitData, null, 
+                battleStateModel, positionDelta, new List<SMUBEVector2<int>> {targetPos});
         }
     }
 }

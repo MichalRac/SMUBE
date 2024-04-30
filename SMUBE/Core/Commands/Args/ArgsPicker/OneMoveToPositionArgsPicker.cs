@@ -126,12 +126,14 @@ namespace SMUBE.Commands.Args.ArgsPicker
         public override CommandArgs GetPseudoRandom()
         {
             var unit = BattleStateModel.ActiveUnit;
-            var reachablePositions = BattleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions;
+            var reachablePositions = BattleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions
+                .Where(pos => !pos.Position.IsOccupied()).ToList();
                     
-            if (reachablePositions.Count == 0)
+            if (!reachablePositions.Any())
                 return null;
-                    
+            
             var target = reachablePositions.GetRandom();
+            
             var positionDelta = new PositionDelta(unit.UnitData.UnitIdentifier, unit.UnitData.BattleScenePosition.Coordinates, target.Position.Coordinates);
             return new CommonArgs(unit.UnitData, null, BattleStateModel, positionDelta);
         }

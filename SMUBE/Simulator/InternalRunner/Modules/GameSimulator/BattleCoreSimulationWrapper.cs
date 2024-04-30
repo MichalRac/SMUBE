@@ -5,8 +5,22 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using SMUBE.AI;
+using SMUBE.BattleState;
 using SMUBE.Commands;
 using SMUBE.Commands.Args;
+using SMUBE.Commands.SpecificCommands.BaseAttack;
+using SMUBE.Commands.SpecificCommands.BaseBlock;
+using SMUBE.Commands.SpecificCommands.BaseWalk;
+using SMUBE.Commands.SpecificCommands.DefendAll;
+using SMUBE.Commands.SpecificCommands.HealAll;
+using SMUBE.Commands.SpecificCommands.HeavyAttack;
+using SMUBE.Commands.SpecificCommands.LowerEnemyDefense;
+using SMUBE.Commands.SpecificCommands.RaiseObstacle;
+using SMUBE.Commands.SpecificCommands.ShieldPosition;
+using SMUBE.Commands.SpecificCommands.Tackle;
+using SMUBE.Commands.SpecificCommands.Taunt;
+using SMUBE.Commands.SpecificCommands.Teleport;
+using SMUBE.Commands.SpecificCommands.Wait;
 
 namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 {
@@ -41,7 +55,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             _core = new BattleCore(initialUnits);
         }
 
-        public void Restart()
+        public void RestartDebugCounters()
         {
             teamOneAICommandTime = 0;
             teamTwoAICommandTime = 0;
@@ -60,6 +74,27 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             UnitHelper.ScholarCount = 0;
             UnitHelper.HunterCount = 0;
             UnitHelper.SquireCount = 0;
+
+            BattleStateModel.FailedCommandExecutions = 0;
+            
+            BaseAttack.UseCounter = 0;
+            BaseBlock.UseCounter = 0;
+            BaseWalk.UseCounter = 0;
+            
+            HealAll.UseCounter = 0;
+            LowerEnemyDefense.UseCounter = 0;
+            ShieldPosition.UseCounter = 0;
+
+            HeavyAttack.UseCounter = 0;
+            RaiseObstacle.UseCounter = 0;
+            Teleport.UseCounter = 0;
+
+            Tackle.UseCounter = 0;
+            Taunt.UseCounter = 0;
+            DefendAll.UseCounter = 0;
+            
+            TauntedAttack.UseCounter = 0;
+            Wait.UseCounter = 0;
         }
         
         public bool IsFinished(out int winningTeamId)
@@ -106,6 +141,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             Console.WriteLine($"team 2 ai ({team2AIName}) runtime: command {teamTwoAICommandTime}ticks / args {teamTwoAIArgsTime}ticks / total {teamTwoAICommandTime + teamTwoAIArgsTime}");
             Console.WriteLine($"team 1 actions: {teamOneActions}");
             Console.WriteLine($"team 2 actions: {teamTwoActions}");
+            Console.WriteLine($"total actions: {teamOneActions + teamTwoActions}");
 
             Console.WriteLine($"team 1 ticks per action: {(float)(teamOneAICommandTime + teamOneAIArgsTime) / teamOneActions}");
             Console.WriteLine($"team 2 ticks per action: {(float)(teamTwoAICommandTime + teamTwoAIArgsTime) / teamTwoActions}");
@@ -119,6 +155,35 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 Console.WriteLine($"total offensive character type count: {UnitHelper.HunterCount}");
                 Console.WriteLine($"total defensive character type count: {UnitHelper.SquireCount}");
             }
+            
+            Console.WriteLine($"{nameof(BaseAttack)} uses:\t{BaseAttack.UseCounter}");
+            Console.WriteLine($"{nameof(BaseBlock)} uses:\t{BaseBlock.UseCounter}");
+            Console.WriteLine($"{nameof(BaseWalk)} uses:\t{BaseWalk.UseCounter}");
+            
+            Console.WriteLine($"{nameof(HealAll)} uses:\t{HealAll.UseCounter}");
+            Console.WriteLine($"{nameof(LowerEnemyDefense)} uses:\t{LowerEnemyDefense.UseCounter}");
+            Console.WriteLine($"{nameof(ShieldPosition)} uses:\t{ShieldPosition.UseCounter}");
+
+            Console.WriteLine($"{nameof(HeavyAttack)} uses:\t{HeavyAttack.UseCounter}");
+            Console.WriteLine($"{nameof(RaiseObstacle)} uses:\t{RaiseObstacle.UseCounter}");
+            Console.WriteLine($"{nameof(Teleport)} uses:\t{Teleport.UseCounter}");
+
+            Console.WriteLine($"{nameof(Tackle)} uses:\t{Tackle.UseCounter}");
+            Console.WriteLine($"{nameof(Taunt)} uses:\t{Taunt.UseCounter}");
+            Console.WriteLine($"{nameof(DefendAll)} uses:\t{DefendAll.UseCounter}");
+
+            Console.WriteLine($"{nameof(TauntedAttack)} uses:\t{TauntedAttack.UseCounter}");
+            Console.WriteLine($"{nameof(Wait)} uses:\t{Wait.UseCounter}");
+
+            var totalCommandUses = BaseAttack.UseCounter + BaseBlock.UseCounter + BaseWalk.UseCounter 
+                                   + DefendAll.UseCounter + HealAll.UseCounter + HeavyAttack.UseCounter 
+                                   + LowerEnemyDefense.UseCounter + RaiseObstacle.UseCounter + ShieldPosition.UseCounter 
+                                   + Tackle.UseCounter + Taunt.UseCounter + Teleport.UseCounter 
+                                   + TauntedAttack.UseCounter + Wait.UseCounter;
+            
+            Console.WriteLine($"Total uses:\t{totalCommandUses}");
+            Console.WriteLine($"Failed turns: {BattleStateModel.FailedCommandExecutions}");
+            Console.WriteLine($"(Total actions - total command use count) diff: {teamOneActions + teamTwoActions - totalCommandUses}");
 
             if(team1AIName == team2AIName)
             {
@@ -199,14 +264,21 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 {
                     teamOneAICommandTime += commandStopwatch.ElapsedTicks;
                     teamOneAIArgsTime += argsStopwatch.ElapsedTicks;
-                    teamOneActions++;
                 }
                 else
                 {
                     teamTwoAICommandTime += commandStopwatch.ElapsedTicks;
                     teamTwoAIArgsTime += argsStopwatch.ElapsedTicks;
-                    teamTwoActions++;
                 }
+            }
+            
+            if (unit.UnitData.UnitIdentifier.TeamId == 0)
+            {
+                teamOneActions++;
+            }
+            else
+            {
+                teamTwoActions++;
             }
 
             if (!(unit.AiModel is BehaviorTreeAIModel))

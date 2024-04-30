@@ -13,6 +13,7 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
 {
     public class TauntedAttack : BaseCommand
     {
+        public static int UseCounter = 0;
         public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_TauntedAttack;
         public override int ManaCost => SpecificCommandCostConfiguration.Mana_TauntedAttack;
         public override CommandId CommandId => CommandId.TauntedAttack;
@@ -74,8 +75,9 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
                 
                 if(!anyPathFound)
                 {
-                    // no valid path to target
-                    return false;
+                    // no valid path to target, do nothing by design
+                    UseCounter++;
+                    return true;
                 }
             }
             else if(optimalMove != null)
@@ -98,6 +100,7 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
                 MoveUnitToDelta(commandArgs, activeUnit);
             }
 
+            UseCounter++;
             return true;
         }
 
@@ -115,7 +118,6 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
                 commandResults.targets.Add(commandArgs.TargetUnits.First());
                 commandResults.effects.Add(new DamageEffect(commandArgs.ActiveUnit.UnitStats.Power));
             }
-            
             
             commandResults.PositionDeltas = new List<PositionDelta>() { commandArgs.PositionDelta };
             return commandResults;

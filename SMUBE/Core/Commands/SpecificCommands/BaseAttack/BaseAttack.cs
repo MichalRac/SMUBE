@@ -11,6 +11,7 @@ namespace SMUBE.Commands.SpecificCommands.BaseAttack
 {
     public class BaseAttack : BaseCommand
     {
+        public static int UseCounter = 0;
         public override CommandId CommandId => CommandId.BaseAttack;
 
         public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_BaseAttack;
@@ -44,6 +45,7 @@ namespace SMUBE.Commands.SpecificCommands.BaseAttack
             activeUnit.UnitData.BattleScenePosition.ApplyUnit(activeUnit.UnitData.UnitIdentifier);
             targetUnit.UnitData.UnitStats.AffectByAbility(GetCommandResults(commandArgs));
 
+            UseCounter++;
             return true;
             
         }

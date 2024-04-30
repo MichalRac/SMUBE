@@ -13,6 +13,8 @@ namespace SMUBE.BattleState
 {
     public class BattleStateModel
     {
+        public static int FailedCommandExecutions = 0;
+        
         public Unit ActiveUnit { get; private set; }
         public List<Unit> Units { get; }
         private Queue<Unit> ActionQueue { get; set; } = new Queue<Unit>();
@@ -59,7 +61,6 @@ namespace SMUBE.BattleState
             var initialUnitSetup = new List<(SMUBEVector2<int> pos, UnitIdentifier id)>();
             var team0PosCount = 0;
             var team1PosCount = 0;
-
             
             foreach (var u in Units)
             {
@@ -115,7 +116,13 @@ namespace SMUBE.BattleState
 
         public bool ExecuteCommand(ICommand command, CommandArgs commandArgs)
         {
-            command.TryExecute(this, commandArgs);
+            bool success = command.TryExecute(this, commandArgs);
+
+            if (!success)
+            {
+                FailedCommandExecutions++;
+            }
+            
             if(TryGetUnit(commandArgs.ActiveUnit.UnitIdentifier, out var activeUnit))
             {
                 RemoveFromQueue(activeUnit);
@@ -129,6 +136,19 @@ namespace SMUBE.BattleState
                     TryRemoveUnit(unit);
                 }
             }
+
+            /*
+            var commandResults = command.GetCommandResults(commandArgs);
+            if (commandResults.PositionDeltas != null)
+            {
+                foreach (var positionDelta in commandResults.PositionDeltas)
+                {
+                    PathfindingAlgorithm.DirtyPositionCache.Add(positionDelta.Start);
+                    PathfindingAlgorithm.DirtyPositionCache.Add(positionDelta.Target);
+                }
+            }
+            */
+            
             OnNewTurn();
             return true;
         }

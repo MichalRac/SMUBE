@@ -7,6 +7,7 @@ namespace SMUBE.Commands.SpecificCommands.ShieldPosition
 {
     public class ShieldPosition : BaseCommand
     {
+        public static int UseCounter = 0;
         public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_ShieldPosition;
         public override int ManaCost => SpecificCommandCostConfiguration.Mana_ShieldPosition;
         
@@ -27,6 +28,7 @@ namespace SMUBE.Commands.SpecificCommands.ShieldPosition
             
             var target = commandArgs.TargetPositions[0];
             battleStateModel.BattleSceneState.Grid[target.x, target.y].ApplyDefensiveTimed(9);
+            UseCounter++;
             return true;
         }
 

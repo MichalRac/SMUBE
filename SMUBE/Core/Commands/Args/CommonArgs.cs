@@ -8,8 +8,8 @@ namespace SMUBE.Commands.Args
 {
     public class CommonArgs : CommandArgs
     {
-        public CommonArgs(UnitData activeUnit, UnitData targetUnit, BattleStateModel battleStateModel) 
-            : base(activeUnit, new List<UnitData>{targetUnit}, battleStateModel)
+        public CommonArgs(UnitData activeUnit, UnitData targetUnit, BattleStateModel battleStateModel)
+            : base(activeUnit, targetUnit == null ? null : new List<UnitData>{targetUnit}, battleStateModel)
         {
         }
 

@@ -7,6 +7,7 @@ namespace SMUBE.Commands.SpecificCommands.RaiseObstacle
 {
     public class RaiseObstacle : BaseCommand
     {
+        public static int UseCounter = 0;
         public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_RaiseObstacle;
         public override int ManaCost => SpecificCommandCostConfiguration.Mana_RaiseObstacle;
         
@@ -27,6 +28,7 @@ namespace SMUBE.Commands.SpecificCommands.RaiseObstacle
             
             var target = commandArgs.TargetPositions[0];
             battleStateModel.BattleSceneState.Grid[target.x, target.y].ApplyObstacleTimed(9);
+            UseCounter++;
             return true;
         }
 

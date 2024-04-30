@@ -99,7 +99,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 if (key.Key == ConsoleKey.R)
                 {
                     Console.Clear();
-                    _coreSimulator.Restart();
+                    _coreSimulator.RestartDebugCounters();
                     Run();
                     quit = true;
                 }

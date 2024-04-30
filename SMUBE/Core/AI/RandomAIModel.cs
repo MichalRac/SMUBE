@@ -2,8 +2,6 @@
 using SMUBE.Commands;
 using SMUBE.DataStructures.Units;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using SMUBE.Commands.Args;
 
 namespace SMUBE.AI

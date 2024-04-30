@@ -4,11 +4,13 @@ using SMUBE.Commands._Common;
 using SMUBE.Commands.Args;
 using SMUBE.Commands.Args.ArgsValidators;
 using SMUBE.Commands.Results;
+using SMUBE.Pathfinding;
 
 namespace SMUBE.Commands.SpecificCommands.BaseWalk
 {
     public class BaseWalk : BaseCommand
     {
+        public static int UseCounter = 0;
         public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_BaseWalk;
         public override int ManaCost => SpecificCommandCostConfiguration.Mana_BaseWalk;        
         public override CommandId CommandId => CommandId.BaseWalk;
@@ -34,8 +36,10 @@ namespace SMUBE.Commands.SpecificCommands.BaseWalk
             activeUnit.BattleScenePosition.ApplyUnit(activeUnit.UnitIdentifier);
 
             activeUnit.UnitStats.TryUseAbility(this);
-            activeUnit.UnitStats.AddEffects(GetCommandResults(commandArgs));
+            var commandResults = GetCommandResults(commandArgs);
+            activeUnit.UnitStats.AddEffects(commandResults);
 
+            UseCounter++;
             return true;
         }
 

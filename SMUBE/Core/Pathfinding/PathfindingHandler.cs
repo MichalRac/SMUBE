@@ -21,7 +21,12 @@ namespace SMUBE.Pathfinding
         
         private Dictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>> _allUnitReachablePaths = new Dictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>>();
         public IReadOnlyDictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>> AllUnitReachablePaths => _allUnitReachablePaths;
-        
+
+        public void Initialize(BattleStateModel battleState)
+        {
+            EvaluateAllUnitReachablePositions(battleState);
+            EvaluateAllPaths(battleState);
+        }
         
         public void OnNewTurn(BattleStateModel battleState)
         {

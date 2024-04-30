@@ -10,6 +10,7 @@ namespace SMUBE.Commands.SpecificCommands.LowerEnemyDefense
 {
     public class LowerEnemyDefense : BaseCommand
     {
+        public static int UseCounter = 0;
         public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_LowerEnemyDefense;
         public override int ManaCost => SpecificCommandCostConfiguration.Mana_LowerEnemyDefense;
         
@@ -26,7 +27,12 @@ namespace SMUBE.Commands.SpecificCommands.LowerEnemyDefense
             battleStateModel.TryGetUnit(commandArgs.ActiveUnit.UnitIdentifier, out var activeUnit);
             battleStateModel.TryGetUnit(commandArgs.TargetUnits.First().UnitIdentifier, out var targetUnit);
 
-            return TryUseCommand(commandArgs, activeUnit, targetUnit);
+            var success = TryUseCommand(commandArgs, activeUnit, targetUnit);
+            if (success)
+            {
+                UseCounter++;
+            }
+            return success;
         }
 
         public override CommandResults GetCommandResults(CommandArgs commandArgs)

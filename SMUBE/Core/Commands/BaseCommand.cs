@@ -1,6 +1,7 @@
 ﻿using SMUBE.BattleState;
 using SMUBE.Commands.Args;
 using SMUBE.Commands.Results;
+using SMUBE.Pathfinding;
 using SMUBE.Units;
 
 namespace SMUBE.Commands

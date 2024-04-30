@@ -56,6 +56,10 @@ namespace SMUBE.BattleState.Heatmap
                 for (var y = 0; y < column.Count; y++)
                 {
                     var cell = column[y];
+                    if (cell == PrefillValue)
+                    {
+                        continue;
+                    }
                     if (cell > max)
                     {
                         max = cell;
@@ -84,6 +88,10 @@ namespace SMUBE.BattleState.Heatmap
                 for (var y = 0; y < column.Count; y++)
                 {
                     var cell = column[y];
+                    if (cell == PrefillValue)
+                    {
+                        continue;
+                    }
                     if (cell < min)
                     {
                         min = cell;

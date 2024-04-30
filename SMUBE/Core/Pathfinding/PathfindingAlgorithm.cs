@@ -8,6 +8,8 @@ namespace SMUBE.Pathfinding
 {
     public abstract class PathfindingAlgorithm
     {
+        public static List<SMUBEVector2<int>> DirtyPositionCache = new List<SMUBEVector2<int>>();
+        
         public class PathfindingPathCache
         {
             public BattleScenePosition Position { get; }
@@ -29,6 +31,8 @@ namespace SMUBE.Pathfinding
             {
                 Position = position;
             }
+
+            public bool IsDirty => ShortestKnownPath.Any(pathNode => DirtyPositionCache.Contains(pathNode.Coordinates));
         }
 
         protected readonly static float SINGLE_STEP_RANGE = 1f;
@@ -124,6 +128,13 @@ namespace SMUBE.Pathfinding
                 }
             }
 
+            GreedyPathfindingLoop(battleScene, position, allNodes, reachableNodes, maxDistance);
+
+            return reachableNodes.Where(n => n.ShortestDistance <= maxDistance).ToList();
+        }
+
+        private void GreedyPathfindingLoop(GridBattleScene battleScene, BattleScenePosition position, PathfindingPathCache[,] allNodes, List<PathfindingPathCache> reachableNodes, float maxDistance)
+        {
             var currentNode = allNodes[position.Coordinates.x, position.Coordinates.y];
             currentNode.ShortestKnownPath = new List<BattleScenePosition>() { currentNode.Position };
 
@@ -131,8 +142,14 @@ namespace SMUBE.Pathfinding
             {
                 for (int xDelta = -1; xDelta <= 1; xDelta++)
                 {
+                    if (currentNode.WasVisited)
+                    {
+                        break;
+                    }
+
                     for (int yDelta = -1; yDelta <= 1; yDelta++)
                     {
+                        
                         if (xDelta == 0 && yDelta == 0)
                         {
                             continue;
@@ -208,7 +225,36 @@ namespace SMUBE.Pathfinding
                     currentNode = nextEvaluatedNode;
                 }
             }
+        }
 
+        public List<PathfindingPathCache> UpdateAllReachablePaths(List<PathfindingPathCache> knownPaths, GridBattleScene battleScene, BattleScenePosition position, int maxSteps = int.MaxValue)
+        {
+            var maxDistance = (maxSteps * SINGLE_STEP_RANGE);
+            var allNodes = new PathfindingPathCache[battleScene.Width, battleScene.Height];
+            var reachableNodes = new List<PathfindingPathCache>();
+
+            for (int i = 0; i < battleScene.Width; i++)
+            {
+                for (int j = 0; j < battleScene.Height; j++)
+                {
+                    allNodes[i, j] = new PathfindingPathCache(battleScene.Grid[i, j]);
+                }
+            }
+            
+            foreach (var knownPathNode in knownPaths)
+            {
+                // if a node or it's any neighbour has changed, recalculate any paths going through them
+                var surrounding = GetSurroundingPositions(battleScene, knownPathNode.Position, true);
+                if (knownPathNode.IsDirty || surrounding.Any(node => DirtyPositionCache.Contains(node.Coordinates)))
+                {
+                    continue;
+                }
+
+                allNodes[knownPathNode.Position.Coordinates.x, knownPathNode.Position.Coordinates.y] = knownPathNode;
+            }
+            
+            GreedyPathfindingLoop(battleScene, position, allNodes, reachableNodes, maxDistance);
+            
             return reachableNodes.Where(n => n.ShortestDistance <= maxDistance).ToList();
         }
 

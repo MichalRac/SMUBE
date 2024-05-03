@@ -132,6 +132,12 @@ namespace SMUBE.DataStructures.BattleScene
             return !target.IsOccupied() && target.IsWalkable();
         }
 
+        public bool IsWalkable(SMUBEVector2<int> pos)
+        {
+            var target = _grid[pos.x, pos.y];
+            return target.IsWalkable();
+        }
+
         public bool TryFindUnitPosition(UnitIdentifier unitIdentifier, out BattleScenePosition battleScenePosition)
         {
             battleScenePosition = null;
@@ -168,6 +174,21 @@ namespace SMUBE.DataStructures.BattleScene
             }
 
             return results;
+        }
+
+        public override string ToString()
+        {
+            var result = string.Empty;
+
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < Height; y++)
+                {
+                    result += $"[{x},{y}:{_grid[x,y]?.UnitIdentifier}]";
+                }
+                result += "\n";
+            }
+            return result;
         }
     }
 }

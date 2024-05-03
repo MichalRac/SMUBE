@@ -325,6 +325,27 @@ namespace SMUBE.Pathfinding
                 return initialGrid7;
             }
         }
+        private static InitialGridData initialGridSimple;
+        public static InitialGridData InitialGridSimple
+        {
+            get
+            {
+                if (initialGridSimple == null)
+                {
+                    var ObstaclePos = new List<SMUBEVector2<int>>();
+                    //ObstaclePos.Add(new SMUBEVector2<int>(1, 1));
+
+                    initialGrid7 = new InitialGridData()
+                    {
+                        width = 4,
+                        height = 4,
+                        InitialObstacleCells = ObstaclePos,
+                    };
+
+                }
+                return initialGrid7;
+            }
+        }
 
     }
 }

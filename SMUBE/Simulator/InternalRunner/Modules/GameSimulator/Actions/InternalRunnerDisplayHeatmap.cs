@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SMUBE_Utils.Simulator.Utils.MapPrinter;
 using SMUBE.BattleState.Heatmap;
 using SMUBE.BattleState.Heatmap.CommandBased;
+using SMUBE.BattleState.Heatmap.GeneralHeatmaps;
 using SMUBE.DataStructures.Utils;
 
 namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Actions
@@ -28,10 +29,11 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Actions
 
             var stateModel = CoreWrapper.Core.currentStateModel;
             var activeUnitTeamId = stateModel.ActiveUnit.UnitData.UnitIdentifier.TeamId;
+            var enemyTeamId = activeUnitTeamId == 0 ? 1 : 0;
             
             //var heatmap = new CountReachingUnitsOfTeamIdHeatmap(activeUnitTeamId, stateModel);
-            //var heatmap = new DistanceToUnitOfTeamIdHeatmap(activeUnitTeamId, false, stateModel, stateModel.ActiveUnit.UnitData.UnitIdentifier);
-            var heatmap = new TeleportTargetScoreHeatmap(stateModel);
+            var heatmap = new DistanceToUnitOfTeamIdHeatmap(enemyTeamId, false, stateModel, stateModel.ActiveUnit.UnitData.UnitIdentifier);
+            //var heatmap = new TeleportTargetScoreHeatmap(stateModel);
             
             heatmap.ProcessHeatmap(stateModel);
 

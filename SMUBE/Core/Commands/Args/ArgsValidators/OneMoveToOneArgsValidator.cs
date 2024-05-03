@@ -57,7 +57,7 @@ namespace SMUBE.Commands.Args.ArgsValidators
             }
             
             var reachablePositions = battleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions;
-            if (!reachablePositions.Any(rp => rp.Position.Coordinates.Equals(args.PositionDelta.Target)))
+            if (!reachablePositions.Any(rp => rp.TargetPosition.Coordinates.Equals(args.PositionDelta.Target)))
             {
                 return false;
                 /*

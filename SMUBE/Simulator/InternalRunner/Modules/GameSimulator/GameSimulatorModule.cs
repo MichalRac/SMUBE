@@ -35,9 +35,23 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             int simulationsRun = 0;
             while (simulationsRun++ < simulationNumber)
             {
-                RunSingleSimulation(gameConfigurator, useSimpleBehavior, simulationSeries);
+                /*
+                try
+                {
+                    */
+                    RunSingleSimulation(gameConfigurator, useSimpleBehavior, simulationSeries);
+                /*
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Simulation {simulationsRun} corrupted, press anything to continue;");
+                    new InternalRunnerDisplayMap(_coreSimulator, true).OnPicked();
+                    new InternalRunnerDisplayHeatmap(_coreSimulator).OnPicked();
+                    Console.ReadKey();
+                }
+                */
 
-                if (simulationsRun % 10 == 0)
+                if (simulationsRun % 100 == 0)
                 {
                     Console.WriteLine($"simulation progress: {simulationsRun}/{simulationNumber}");
                 }

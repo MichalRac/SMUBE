@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using SMUBE.DataStructures.Units;
+using SMUBE.DataStructures.Utils;
 
 namespace SMUBE.BattleState.Heatmap.GeneralHeatmaps
 {
@@ -22,7 +23,17 @@ namespace SMUBE.BattleState.Heatmap.GeneralHeatmaps
         public override void ProcessHeatmap(BattleStateModel battleStateModel)
         {
             base.ProcessHeatmap(battleStateModel);
-            
+
+            if (PathStrategy(battleStateModel))
+            {
+                return;
+            }
+            FallbackStrategy(battleStateModel);
+        }
+
+        private bool PathStrategy(BattleStateModel battleStateModel)
+        {
+            bool nodesWithPathFound = false;
             foreach (var unitOfTeamId in battleStateModel.Units.Where(u => u.UnitData.UnitIdentifier.TeamId.Equals(_teamId)))
             {
                 if (_ignored != null && _ignored.Contains(unitOfTeamId.UnitData.UnitIdentifier))
@@ -42,8 +53,8 @@ namespace SMUBE.BattleState.Heatmap.GeneralHeatmaps
                         continue;
                     }
 
-                    var xIndex = pathCache.Position.Coordinates.x;
-                    var yIndex = pathCache.Position.Coordinates.y;
+                    var xIndex = pathCache.TargetPosition.Coordinates.x;
+                    var yIndex = pathCache.TargetPosition.Coordinates.y;
 
                     if (_aggregated)
                     {
@@ -53,13 +64,46 @@ namespace SMUBE.BattleState.Heatmap.GeneralHeatmaps
                         }
 
                         Set(xIndex, yIndex, Heatmap[xIndex][yIndex] + distance);
+                        nodesWithPathFound = true;
                     }
                     else
                     {
                         if (distance < Heatmap[xIndex][yIndex])
                         {
                             Set(xIndex, yIndex, distance);
+                            nodesWithPathFound = true;
                         }
+                    }
+                }
+            }
+
+            return nodesWithPathFound;
+        }
+
+        private void FallbackStrategy(BattleStateModel battleStateModel)
+        {
+            foreach (var emptyPos in battleStateModel.BattleSceneState.AggregateAllPositions(true))
+            {
+                var minDistance = int.MaxValue;
+                foreach (var unitOfTeamId in battleStateModel.Units.Where(u => u.UnitData.UnitIdentifier.TeamId.Equals(_teamId)))
+                {
+                    if (_ignored != null && _ignored.Contains(unitOfTeamId.UnitData.UnitIdentifier))
+                    {
+                        continue;
+                    }
+
+                    var coord1 = emptyPos.Coordinates;
+                    var coord2 = unitOfTeamId.UnitData.BattleScenePosition.Coordinates;
+
+                    var xPart = Math.Pow(coord2.x - coord1.x, 2);
+                    var yPart = Math.Pow(coord2.y - coord1.y, 2);
+
+                    var distance = (int)(Math.Sqrt(xPart + yPart) * 10);
+
+                    if (distance < minDistance)
+                    {
+                        minDistance = distance;
+                        Heatmap[coord1.x][coord1.y] = distance;
                     }
                 }
             }

@@ -73,6 +73,11 @@ namespace SMUBE.BattleState.Heatmap
                 }
             }
 
+            if (equalScores.Count == 0)
+            {
+                throw new Exception();
+            }
+            
             equalScores.Shuffle();
             return equalScores.First();
         }
@@ -104,6 +109,11 @@ namespace SMUBE.BattleState.Heatmap
                         equalScores.Add((x,y));
                     }
                 }
+            }
+            
+            if (equalScores.Count == 0)
+            {
+                throw new Exception();
             }
 
             equalScores.Shuffle();

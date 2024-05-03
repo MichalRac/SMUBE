@@ -112,7 +112,7 @@ namespace SMUBE_Utils.Simulator.Utils.MapPrinter
                 {
                     foreach (var reachablePosition in battleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions)
                     {
-                        if (!reachablePosition.Position.Coordinates.Equals(targetPosition)) continue;
+                        if (!reachablePosition.TargetPosition.Coordinates.Equals(targetPosition)) continue;
                         var fullPathCoordinates = reachablePosition.ShortestKnownPath
                             .Select(p => p.Coordinates).ToList();
                         pathData = new GridMapPathDisplayData(commandArgs.PositionDelta.Start, commandArgs.PositionDelta.Target, fullPathCoordinates);

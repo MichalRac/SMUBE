@@ -36,7 +36,14 @@ namespace SMUBE.Commands.Args.ArgsPicker
 
         protected override void SetDefaultTarget()
         {
-            _currentTargetCoordinates = BattleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions.First().Position.Coordinates;
+            var viablePositions = BattleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions;
+
+            if (viablePositions == null || viablePositions.Count == 0)
+            {
+                return;
+            }
+            
+            _currentTargetCoordinates = BattleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions.First().TargetPosition.Coordinates;
         }
 
         public override bool IsAnyValid()
@@ -114,7 +121,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
             {
                 foreach (var reachablePosition in BattleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions)
                 {
-                    if (reachablePosition.Position.Coordinates.Equals(targetPos))
+                    if (reachablePosition.TargetPosition.Coordinates.Equals(targetPos))
                     {
                         return true;
                     }
@@ -127,14 +134,14 @@ namespace SMUBE.Commands.Args.ArgsPicker
         {
             var unit = BattleStateModel.ActiveUnit;
             var reachablePositions = BattleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions
-                .Where(pos => !pos.Position.IsOccupied()).ToList();
+                .Where(pos => !pos.TargetPosition.IsOccupied() && pos.TargetPosition.IsWalkable()).ToList();
                     
             if (!reachablePositions.Any())
                 return null;
             
             var target = reachablePositions.GetRandom();
             
-            var positionDelta = new PositionDelta(unit.UnitData.UnitIdentifier, unit.UnitData.BattleScenePosition.Coordinates, target.Position.Coordinates);
+            var positionDelta = new PositionDelta(unit.UnitData.UnitIdentifier, unit.UnitData.BattleScenePosition.Coordinates, target.TargetPosition.Coordinates);
             return new CommonArgs(unit.UnitData, null, BattleStateModel, positionDelta);
         }
     }

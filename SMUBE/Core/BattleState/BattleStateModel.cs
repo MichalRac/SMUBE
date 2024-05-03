@@ -70,7 +70,7 @@ namespace SMUBE.BattleState
                 initialUnitSetup.Add((initCoordinates, u.UnitData.UnitIdentifier));
             }
 
-            var initialGrid = PathfindingConfigurations.InitialGrid6;
+            var initialGrid = PathfindingConfigurations.InitialGridSimple;
             initialGrid.InitialUnitSetup = initialUnitSetup;
             
             var initGridData = new InitialGridData
@@ -196,6 +196,7 @@ namespace SMUBE.BattleState
                 RemoveFromQueue(argUnit);
 
                 var coordinates= argUnit.UnitData.BattleScenePosition.Coordinates;
+                PathfindingAlgorithm.DirtyPositionCache.Add((coordinates, true));
                 BattleSceneState.Grid[coordinates.x, coordinates.y].Clear();
                 
                 return true;

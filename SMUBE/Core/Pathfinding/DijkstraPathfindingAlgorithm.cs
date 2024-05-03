@@ -17,7 +17,7 @@ namespace SMUBE.Pathfinding
             {
                 for (int j = 0; j < battleScene.Height; j++)
                 {
-                    allNodes[i, j] = new PathfindingPathCache(battleScene.Grid[i,j]);
+                    allNodes[i, j] = new PathfindingPathCache(start, battleScene.Grid[i,j]);
                 }
             }
 
@@ -36,7 +36,7 @@ namespace SMUBE.Pathfinding
                             continue;
                         }
 
-                        var targetPos = new SMUBEVector2<int>(currentNode.Position.Coordinates.x + xDelta, currentNode.Position.Coordinates.y + yDelta);
+                        var targetPos = new SMUBEVector2<int>(currentNode.TargetPosition.Coordinates.x + xDelta, currentNode.TargetPosition.Coordinates.y + yDelta);
                         if (!battleScene.IsValid(targetPos) || !battleScene.IsEmpty(targetPos))
                         {
                             continue;
@@ -46,7 +46,7 @@ namespace SMUBE.Pathfinding
                             continue;
                         }
 
-                        var pathSoFar = new List<BattleScenePosition>(currentNode.ShortestKnownPath){ currentNode.Position };
+                        var pathSoFar = new List<BattleScenePosition>(currentNode.ShortestKnownPath){ currentNode.TargetPosition };
 
                         if(allNodes[targetPos.x, targetPos.y].ShortestDistance == int.MaxValue)
                         {

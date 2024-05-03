@@ -6,6 +6,7 @@ using SMUBE.Commands.Args;
 using SMUBE.Commands.Args.ArgsValidators;
 using SMUBE.Commands.Results;
 using SMUBE.DataStructures.Utils;
+using SMUBE.Pathfinding;
 
 namespace SMUBE.Commands.SpecificCommands.Teleport
 {
@@ -34,6 +35,8 @@ namespace SMUBE.Commands.SpecificCommands.Teleport
             var targetPos = commandArgs.BattleStateModel.BattleSceneState.Grid[target.x, target.y];
             activeUnit.UnitData.BattleScenePosition = targetPos;
             activeUnit.UnitData.BattleScenePosition.ApplyUnit(activeUnit.UnitData.UnitIdentifier);
+            PathfindingAlgorithm.DirtyPositionCache.Add((startPos.Coordinates, true));
+            PathfindingAlgorithm.DirtyPositionCache.Add((target, false));
 
             var success = TryUseCommand(commandArgs, activeUnit);
             if (success)

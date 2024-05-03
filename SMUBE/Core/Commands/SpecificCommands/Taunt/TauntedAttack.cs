@@ -141,7 +141,7 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
             var allReachablePos = battleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions;
             var validTargets =
                 allReachablePos.Where(reachablePos =>
-                    targetSurroundingPositions.Any(surroundingPos => surroundingPos.Coordinates.Equals(reachablePos.Position.Coordinates)))
+                    targetSurroundingPositions.Any(surroundingPos => surroundingPos.Coordinates.Equals(reachablePos.TargetPosition.Coordinates)))
                     .ToList();
 
             if (!validTargets.Any())
@@ -155,7 +155,7 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
                 if (validTarget.ShortestDistance < minDistance)
                 {
                     minDistance = validTarget.ShortestDistance;
-                    optimalMovePosition = validTarget.Position;
+                    optimalMovePosition = validTarget.TargetPosition;
                 }
             }
             

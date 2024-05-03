@@ -34,6 +34,9 @@ namespace SMUBE.Commands.SpecificCommands.BaseWalk
             var targetPos = commandArgs.BattleStateModel.BattleSceneState.Grid[target.x, target.y];
             activeUnit.BattleScenePosition = targetPos;
             activeUnit.BattleScenePosition.ApplyUnit(activeUnit.UnitIdentifier);
+            
+            PathfindingAlgorithm.DirtyPositionCache.Add((startPos.Coordinates, true));
+            PathfindingAlgorithm.DirtyPositionCache.Add((activeUnit.BattleScenePosition.Coordinates, false));
 
             activeUnit.UnitStats.TryUseAbility(this);
             var commandResults = GetCommandResults(commandArgs);

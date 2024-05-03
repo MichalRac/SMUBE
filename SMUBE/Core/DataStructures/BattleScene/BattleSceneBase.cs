@@ -8,15 +8,15 @@ namespace SMUBE.DataStructures.BattleScene
     {
         public static List<SMUBEVector2<int>> DefaultTeam0Positions { get; } = new List<SMUBEVector2<int>>()
         {
-            new SMUBEVector2<int>(2, 1),
-            new SMUBEVector2<int>(4, 1),
-            new SMUBEVector2<int>(6, 1),
+            new SMUBEVector2<int>(0, 0),
+            new SMUBEVector2<int>(1, 0),
+            new SMUBEVector2<int>(2, 0),
         };
         public static List<SMUBEVector2<int>> DefaultTeam1Positions { get; } = new List<SMUBEVector2<int>>()
         {
-            new SMUBEVector2<int>(2, 8),
-            new SMUBEVector2<int>(4, 8),
-            new SMUBEVector2<int>(6, 8),
+            new SMUBEVector2<int>(0, 2),
+            new SMUBEVector2<int>(1, 2),
+            new SMUBEVector2<int>(2, 2),
         };
         
         public PathfindingHandler PathfindingHandler { get; } = new PathfindingHandler();

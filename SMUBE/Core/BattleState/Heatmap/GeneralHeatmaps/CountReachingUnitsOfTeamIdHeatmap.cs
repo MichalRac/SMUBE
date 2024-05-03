@@ -36,7 +36,7 @@ namespace SMUBE.BattleState.Heatmap.GeneralHeatmaps
                         continue;
                     }
 
-                    var coordinates = pathCache.Position.Coordinates;
+                    var coordinates = pathCache.TargetPosition.Coordinates;
                     Set(coordinates.x, coordinates.y, Heatmap[coordinates.x][coordinates.y] + 1);
                 }
             }

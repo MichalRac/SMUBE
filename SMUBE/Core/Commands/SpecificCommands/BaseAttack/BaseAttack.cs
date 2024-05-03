@@ -6,6 +6,7 @@ using SMUBE.Commands.Args;
 using SMUBE.Commands.Args.ArgsValidators;
 using SMUBE.Commands.Effects;
 using SMUBE.Commands.Results;
+using SMUBE.Pathfinding;
 
 namespace SMUBE.Commands.SpecificCommands.BaseAttack
 {
@@ -44,6 +45,9 @@ namespace SMUBE.Commands.SpecificCommands.BaseAttack
             activeUnit.UnitData.BattleScenePosition = targetPos;
             activeUnit.UnitData.BattleScenePosition.ApplyUnit(activeUnit.UnitData.UnitIdentifier);
             targetUnit.UnitData.UnitStats.AffectByAbility(GetCommandResults(commandArgs));
+            
+            PathfindingAlgorithm.DirtyPositionCache.Add((startPos.Coordinates, true));
+            PathfindingAlgorithm.DirtyPositionCache.Add((targetCoords, false));
 
             UseCounter++;
             return true;

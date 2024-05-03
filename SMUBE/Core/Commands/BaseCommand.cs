@@ -56,6 +56,8 @@ namespace SMUBE.Commands
             var targetPos = commandArgs.BattleStateModel.BattleSceneState.Grid[target.x, target.y];
             activeUnit.UnitData.BattleScenePosition = targetPos;
             activeUnit.UnitData.BattleScenePosition.ApplyUnit(activeUnit.UnitData.UnitIdentifier);
+            PathfindingAlgorithm.DirtyPositionCache.Add((startPos.Coordinates, true));
+            PathfindingAlgorithm.DirtyPositionCache.Add((target, false));
         }
 
         internal virtual CommandArgs GetSuggestedPseudoRandomArgs(BattleStateModel battleStateModel)

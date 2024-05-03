@@ -20,7 +20,7 @@ namespace SMUBE.BattleState.Heatmap.GeneralHeatmaps
 
             foreach (var reachablePosition in reachablePositions)
             {
-                var coordinates = reachablePosition.Position.Coordinates;
+                var coordinates = reachablePosition.TargetPosition.Coordinates;
                 Set(coordinates.x, coordinates.y, 1);
             }
         }

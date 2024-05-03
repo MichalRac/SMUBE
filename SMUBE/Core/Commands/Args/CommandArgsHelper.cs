@@ -251,7 +251,7 @@ namespace SMUBE.Commands.Args
                         return null;
                     
                     var target = reachablePositions.GetRandom();
-                    var positionDelta = new PositionDelta(unit.UnitData.UnitIdentifier, unit.UnitData.BattleScenePosition.Coordinates, target.Position.Coordinates);
+                    var positionDelta = new PositionDelta(unit.UnitData.UnitIdentifier, unit.UnitData.BattleScenePosition.Coordinates, target.TargetPosition.Coordinates);
                     return new CommonArgs(unit.UnitData, null, battleStateModel, positionDelta);
                 }
                 return null;

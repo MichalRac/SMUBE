@@ -2,6 +2,7 @@
 using SMUBE.Commands.Args;
 using SMUBE.Commands.Args.ArgsValidators;
 using SMUBE.Commands.Results;
+using SMUBE.Pathfinding;
 
 namespace SMUBE.Commands.SpecificCommands.RaiseObstacle
 {
@@ -28,6 +29,9 @@ namespace SMUBE.Commands.SpecificCommands.RaiseObstacle
             
             var target = commandArgs.TargetPositions[0];
             battleStateModel.BattleSceneState.Grid[target.x, target.y].ApplyObstacleTimed(9);
+            
+            PathfindingAlgorithm.DirtyPositionCache.Add((commandArgs.TargetPositions[0], false));
+            
             UseCounter++;
             return true;
         }

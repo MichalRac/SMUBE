@@ -152,7 +152,9 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.Pathfinding
                             Console.Clear();
                             var predefinedPath = PathfindingConfigurations.PredefinedPaths[chosenPathId];
                             var start = GridBattleScene.Grid[predefinedPath.start.x, predefinedPath.start.y];
-                            var reachable = pathfindingModel.GetAllReachablePositions(GridBattleScene, start, amount);
+                            var allPaths = pathfindingModel.ProcessAllPaths(GridBattleScene, start);
+                            var reachable = pathfindingModel.TrimByMaxSteps(allPaths, amount)
+                                .Select(reachableNode => reachableNode.TargetPosition);
                             DisplayGridReachablePositions(start.Coordinates, reachable.Select(n => n.Coordinates).ToList());
                             Console.WriteLine($"Range: {amount}");
                             Console.WriteLine("Left arrow: shorter, right arrow: longer, Q: exit");

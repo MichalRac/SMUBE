@@ -10,7 +10,7 @@ namespace SMUBE.Pathfinding
         {
             public int EstimatedPathDistance { get; set; } = int.MaxValue;
 
-            public AStarPathCache(BattleScenePosition position) : base(position){ }
+            public AStarPathCache(BattleScenePosition startPosition, BattleScenePosition targetPosition) : base(startPosition, targetPosition){ }
         }
 
         public override bool TryFindPathFromTo(GridBattleScene battleScene, BattleScenePosition start,
@@ -24,7 +24,7 @@ namespace SMUBE.Pathfinding
             {
                 for (int j = 0; j < battleScene.Height; j++)
                 {
-                    allNodes[i, j] = new AStarPathCache(battleScene.Grid[i, j]);
+                    allNodes[i, j] = new AStarPathCache(start, battleScene.Grid[i, j]);
                 }
             }
 
@@ -43,7 +43,7 @@ namespace SMUBE.Pathfinding
                             continue;
                         }
 
-                        var moveTargetPos = new SMUBEVector2<int>(currentNode.Position.Coordinates.x + xDelta, currentNode.Position.Coordinates.y + yDelta);
+                        var moveTargetPos = new SMUBEVector2<int>(currentNode.TargetPosition.Coordinates.x + xDelta, currentNode.TargetPosition.Coordinates.y + yDelta);
                         if (!battleScene.IsValid(moveTargetPos) || !battleScene.IsEmpty(moveTargetPos))
                         {
                             continue;
@@ -53,7 +53,7 @@ namespace SMUBE.Pathfinding
                             continue;
                         }
 
-                        var pathSoFar = new List<BattleScenePosition>(currentNode.ShortestKnownPath) { currentNode.Position };
+                        var pathSoFar = new List<BattleScenePosition>(currentNode.ShortestKnownPath) { currentNode.TargetPosition };
 
                         // set distance from start
                         if (allNodes[moveTargetPos.x, moveTargetPos.y].ShortestDistance == int.MaxValue)
@@ -69,12 +69,12 @@ namespace SMUBE.Pathfinding
                         // set estimated remaining distance
                         if (allNodes[moveTargetPos.x, moveTargetPos.y].EstimatedPathDistance == int.MaxValue)
                         {
-                            var estimatedCostRemaining = GetEstimatedCostRemaining(allNodes[moveTargetPos.x, moveTargetPos.y].Position, targetNode.Position);
+                            var estimatedCostRemaining = GetEstimatedCostRemaining(allNodes[moveTargetPos.x, moveTargetPos.y].TargetPosition, targetNode.TargetPosition);
                             allNodes[moveTargetPos.x, moveTargetPos.y].EstimatedPathDistance = estimatedCostRemaining;
                         }
                         else if (pathSoFar.Count <= allNodes[moveTargetPos.x, moveTargetPos.y].ShortestDistance)
                         {
-                            var estimatedCostRemaining = GetEstimatedCostRemaining(allNodes[moveTargetPos.x, moveTargetPos.y].Position, targetNode.Position);
+                            var estimatedCostRemaining = GetEstimatedCostRemaining(allNodes[moveTargetPos.x, moveTargetPos.y].TargetPosition, targetNode.TargetPosition);
 
                             if(estimatedCostRemaining < allNodes[moveTargetPos.x, moveTargetPos.y].EstimatedPathDistance)
                             {

@@ -92,6 +92,11 @@ namespace SMUBE.BattleState.Heatmap.GeneralHeatmaps
                         continue;
                     }
 
+                    if (!emptyPos.IsWalkable() || emptyPos.IsOccupied())
+                    {
+                        continue;
+                    }
+
                     var coord1 = emptyPos.Coordinates;
                     var coord2 = unitOfTeamId.UnitData.BattleScenePosition.Coordinates;
 

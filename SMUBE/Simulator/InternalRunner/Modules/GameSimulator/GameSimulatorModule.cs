@@ -51,7 +51,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 }
                 */
 
-                if (simulationsRun % 100 == 0)
+                if (simulationsRun % 10 == 0)
                 {
                     Console.WriteLine($"simulation progress: {simulationsRun}/{simulationNumber}");
                 }

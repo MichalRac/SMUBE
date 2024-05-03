@@ -8,6 +8,9 @@ namespace SMUBE.Pathfinding
     {
         private readonly static int WIDTH = 10;
         private readonly static int HEIGHT = 10;
+        
+        private readonly static int GAME_WIDTH = 7;
+        private readonly static int GAME_HEIGHT = 12;
 
         public static List<(SMUBEVector2<int> start, SMUBEVector2<int> target)> PredefinedPaths = new List<(SMUBEVector2<int>, SMUBEVector2<int>)>()
         {
@@ -66,6 +69,35 @@ namespace SMUBE.Pathfinding
             return result;
         }
 
+        private static InitialGridData gameGrid;
+        public static InitialGridData GameGrid
+        {
+            get
+            {
+                if (gameGrid == null)
+                {
+                    var ObstaclePos = new List<SMUBEVector2<int>>();
+                    ObstaclePos.AddRange(MakeHorizontalLine(2, 0, 1));
+                    ObstaclePos.AddRange(MakeHorizontalLine(2, 5, 6));
+                    ObstaclePos.AddRange(MakeHorizontalLine(9, 0, 1));
+                    ObstaclePos.AddRange(MakeHorizontalLine(9, 5, 6));
+                    
+                    ObstaclePos.AddRange(MakeVerticalLine(2, 5, 6));
+                    ObstaclePos.AddRange(MakeVerticalLine(4, 5, 6));
+                    
+                    
+
+                    gameGrid = new InitialGridData()
+                    {
+                        width = GAME_WIDTH,
+                        height = GAME_HEIGHT,
+                        InitialObstacleCells = ObstaclePos,
+                    };
+                }
+                return gameGrid;
+            }
+        }
+        
         private static InitialGridData initialGrid0;
         public static InitialGridData InitialGrid0
         {

@@ -103,6 +103,7 @@
     <Compile Include="Commands\Args\ArgsPicker\OneToPositionArgsPicker.cs" />
     <Compile Include="Commands\Args\ArgsPicker\OneToSelfArgsPicker.cs" />
     <Compile Include="Commands\Args\ArgsPicker\TauntedArgsPicker.cs" />
+    <Compile Include="Commands\Args\ArgsPreferences.cs" />
     <Compile Include="Commands\Args\ArgsValidators\OneMoveToOneArgsValidator.cs" />
     <Compile Include="Commands\Args\ArgsValidators\OneToEveryArgsValidator.cs" />
     <Compile Include="Commands\Args\ArgsValidators\OneToOneArgsValidator.cs" />

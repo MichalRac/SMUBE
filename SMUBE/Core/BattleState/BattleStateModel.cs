@@ -70,7 +70,7 @@ namespace SMUBE.BattleState
                 initialUnitSetup.Add((initCoordinates, u.UnitData.UnitIdentifier));
             }
 
-            var initialGrid = PathfindingConfigurations.InitialGridSimple;
+            var initialGrid = PathfindingConfigurations.GameGrid;
             initialGrid.InitialUnitSetup = initialUnitSetup;
             
             var initGridData = new InitialGridData
@@ -79,6 +79,7 @@ namespace SMUBE.BattleState
                 height = 9,
                 InitialUnitSetup = initialUnitSetup,
             };
+            
             return initialGrid;
         }
         

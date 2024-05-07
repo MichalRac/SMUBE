@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using SMUBE.DataStructures.Units;
-using SMUBE.DataStructures.Utils;
 
 namespace SMUBE.BattleState.Heatmap.GeneralHeatmaps
 {

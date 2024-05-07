@@ -8,6 +8,7 @@ namespace SMUBE.Commands.Args
 {
     public abstract class CommandArgs
     {
+        internal string DebugSource { get; set; }
         public UnitData ActiveUnit { get; }
         public List<UnitData> TargetUnits { get; }
         public List<SMUBEVector2<int>> TargetPositions { get; }

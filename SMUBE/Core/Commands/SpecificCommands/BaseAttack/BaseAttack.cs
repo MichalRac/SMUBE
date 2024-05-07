@@ -20,7 +20,7 @@ namespace SMUBE.Commands.SpecificCommands.BaseAttack
         public override int ManaCost => SpecificCommandCostConfiguration.Mana_BaseAttack;
 
         public override BaseCommandArgsValidator CommandArgsValidator => new OneMoveToOneArgsValidator(ArgsConstraint.Enemy);
-        
+
         public override bool TryExecute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
             if (!CommandArgsValidator.Validate(commandArgs, battleStateModel))

@@ -15,6 +15,30 @@ namespace SMUBE.Commands
         public abstract CommandId CommandId { get; }
         public abstract BaseCommandArgsValidator CommandArgsValidator { get; }
 
+        public virtual ArgsPreferences ArgsPreferences { get; private set; } = Args.ArgsPreferences.Default();
+
+        public BaseCommand WithPreferences(ArgsPreferences argsPreferences)
+        {
+            ArgsPreferences = argsPreferences;
+            return this;
+        }
+        
+        public BaseCommand WithPreferences(ArgsEnemyTargetingPreference enemyTargetingPreference)
+        {
+            ArgsPreferences = new ArgsPreferences(enemyTargetingPreference);
+            return this;
+        }
+        public BaseCommand WithPreferences(ArgsMovementTargetingPreference movementPreference)
+        {
+            ArgsPreferences = new ArgsPreferences(movementPreference);
+            return this;
+        }
+        public BaseCommand WithPreferences(ArgsPositionTargetingPreference positionPreference)
+        {
+            ArgsPreferences = new ArgsPreferences(positionPreference);
+            return this;
+        }
+
         public virtual bool TryExecute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
             if (!CommandArgsValidator.Validate(commandArgs, battleStateModel))
@@ -62,7 +86,7 @@ namespace SMUBE.Commands
 
         internal virtual CommandArgs GetSuggestedPseudoRandomArgs(BattleStateModel battleStateModel)
         {
-            return CommandArgsValidator.GetArgsPicker(this, battleStateModel).GetPseudoRandom();
+            return CommandArgsValidator.GetArgsPicker(this, battleStateModel).GetSuggestedArgs(ArgsPreferences);
         }
     }
 }

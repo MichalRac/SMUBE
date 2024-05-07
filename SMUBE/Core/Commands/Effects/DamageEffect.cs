@@ -1,4 +1,7 @@
-﻿using SMUBE.DataStructures.Units;
+﻿using System.Dynamic;
+using System.Linq;
+using SMUBE.Commands.Args;
+using SMUBE.DataStructures.Units;
 using SMUBE.Commands.Results;
 
 namespace SMUBE.Commands.Effects
@@ -20,6 +23,11 @@ namespace SMUBE.Commands.Effects
         public override void Apply(UnitStats unitStats, CommandResults commandResults)
         {            
             unitStats.DeltaHealth((int)(Value * -1 * GetEffectTypeEffectivness(unitStats, commandResults)));
+        }
+
+        public int GetFinalValue(CommandArgs args, CommandResults commandResults)
+        {
+            return (int)(Value * -1 * GetEffectTypeEffectivness(args.TargetUnits.First().UnitStats, commandResults));
         }
     }
 }

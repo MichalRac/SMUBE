@@ -2,6 +2,7 @@
 using SMUBE.AI.DecisionTree.DecisionNodes;
 using SMUBE.AI.DecisionTree.EndNodes;
 using SMUBE.Commands;
+using SMUBE.Commands.Args;
 using SMUBE.Commands.SpecificCommands.BaseAttack;
 using SMUBE.Commands.SpecificCommands.BaseBlock;
 using SMUBE.Commands.SpecificCommands.BaseWalk;
@@ -89,7 +90,7 @@ namespace SMUBE.AI.DecisionTree
             
             return GetSafeAction<TauntedAttack>(
                 new DecisionTreeTestAnySpecialActionViable(
-                    new DecisionTreeTestRandom(0.4D,  // chance of using special if it's possible, todo parametrize 
+                    new DecisionTreeTestRandom(0.6D,  // chance of using special if it's possible, todo parametrize 
                         extension,
                         baseTree),
                     baseTree));
@@ -97,20 +98,41 @@ namespace SMUBE.AI.DecisionTree
         
         private static DecisionTreeNode GetBaseDecisionTree()
         {
-            var enemyInReachDecisionTree = GetRandomAction(0.8D, // chance of attack  todo parametrize
-                new DecisionTreeActionSimple<BaseAttack>(),
+            var enemyInReachDecisionTree = GetRandomAction(0.95D, // chance of attack  todo parametrize
                 new DecisionTreeWeightedActionSelection(new List<DecisionTreeWeightedSet>
                 {
                     // todo parametrize weights
-                    new DecisionTreeWeightedSet(new BaseWalk(), 10),
-                    new DecisionTreeWeightedSet(new BaseBlock(), 10),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.None), 5),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.Closest), 5),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints), 50),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage), 5),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MostDmgDealt), 50),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange), 5),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MinimizeReachableEnemiesAfterTurn), 50),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MaximiseReachableEnemiesAfterTurn), 5),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MinimisePositionBuffAfterTurn), 5),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MaximisePositionBuffAfterTurn), 50),
+                }),
+                new DecisionTreeWeightedActionSelection(new List<DecisionTreeWeightedSet>
+                {
+                    // todo parametrize weights
+                    new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)0), 1),
+                    new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)1), 10),
+                    new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)2), 5),
+                    new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)3), 5),
+                    new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)4), 15),
+                    new DecisionTreeWeightedSet(new BaseBlock(), 50),
                 }));
             
             var enemyOutOfReachDecisionTree = new DecisionTreeWeightedActionSelection(new List<DecisionTreeWeightedSet>
             {
                 // todo parametrize weights
-                new DecisionTreeWeightedSet(new BaseWalk(), 20),
-                new DecisionTreeWeightedSet(new BaseBlock(), 20),
+                new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)0), 1),
+                new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)1), 5),
+                new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)2), 30),
+                new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)3), 15),
+                new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)4), 5),
+                new DecisionTreeWeightedSet(new BaseBlock(), 25),
             });
             
             return new DecisionTreeTestCanPerform<BaseAttack>(
@@ -125,9 +147,30 @@ namespace SMUBE.AI.DecisionTree
             return new DecisionTreeWeightedActionSelection(new List<DecisionTreeWeightedSet>
             {
                 // todo parametrize weights
-                new DecisionTreeWeightedSet(new HeavyAttack(), 10),
-                new DecisionTreeWeightedSet(new Teleport(), 10),
-                new DecisionTreeWeightedSet(new RaiseObstacle(), 10),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.None), 5),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.Closest), 5),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints), 50),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage), 5),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MostDmgDealt), 50),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange), 5),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MinimizeReachableEnemiesAfterTurn), 50),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MaximiseReachableEnemiesAfterTurn), 5),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MinimisePositionBuffAfterTurn), 5),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MaximisePositionBuffAfterTurn), 50),
+
+                new DecisionTreeWeightedSet(new Teleport().WithPreferences(ArgsMovementTargetingPreference.None), 1),
+                new DecisionTreeWeightedSet(new Teleport().WithPreferences(ArgsMovementTargetingPreference.GetOutOfReach), 5),
+                new DecisionTreeWeightedSet(new Teleport().WithPreferences(ArgsMovementTargetingPreference.GetCloserCarefully), 30),
+                new DecisionTreeWeightedSet(new Teleport().WithPreferences(ArgsMovementTargetingPreference.GetCloserAggressively), 15),
+                new DecisionTreeWeightedSet(new Teleport().WithPreferences(ArgsMovementTargetingPreference.OptimizeFortifiedPosition), 5),
+
+                new DecisionTreeWeightedSet(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.None), 1),
+                //new DecisionTreeWeightedSet(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.OnLeastHpPercentageAlly), 15),
+                //new DecisionTreeWeightedSet(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.OnMostHpPercentageAlly), 15),
+                new DecisionTreeWeightedSet(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.NextToClosestEnemy), 15),
+                new DecisionTreeWeightedSet(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.NextToClosestEnemy), 15),
+                //new DecisionTreeWeightedSet(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.OnAllyWithMostEnemiesInReach), 5),
+                new DecisionTreeWeightedSet(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.InBetweenTeams), 5),
             });
         }
         
@@ -138,9 +181,27 @@ namespace SMUBE.AI.DecisionTree
             return new DecisionTreeWeightedActionSelection(new List<DecisionTreeWeightedSet>
             {
                 // todo parametrize weights
-                new DecisionTreeWeightedSet(new HealAll(), 10),
-                new DecisionTreeWeightedSet(new ShieldPosition(), 10),
-                new DecisionTreeWeightedSet(new LowerEnemyDefense(), 10),
+                new DecisionTreeWeightedSet(new HealAll(), 500),
+
+                new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.None), 20),
+                new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.Closest), 100),
+                new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints), 100),
+                new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage), 100),
+                //new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.MostDmgDealt), 50),
+                new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange), 100),
+                //new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.MinimizeReachableEnemiesAfterTurn), 50),
+                //new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.MaximiseReachableEnemiesAfterTurn), 5),
+                //new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.MinimisePositionBuffAfterTurn), 5),
+                //new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.MaximisePositionBuffAfterTurn), 50),
+
+                new DecisionTreeWeightedSet(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.None), 20),
+                new DecisionTreeWeightedSet(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.OnLeastHpPercentageAlly), 100),
+                new DecisionTreeWeightedSet(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.OnMostHpPercentageAlly), 100),
+                new DecisionTreeWeightedSet(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.NextToClosestEnemy), 100),
+                new DecisionTreeWeightedSet(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.NextToClosestEnemy), 100),
+                new DecisionTreeWeightedSet(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.OnAllyWithMostEnemiesInReach), 100),
+                new DecisionTreeWeightedSet(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.InBetweenTeams), 100),
+
             });
         }
         
@@ -151,9 +212,30 @@ namespace SMUBE.AI.DecisionTree
             return new DecisionTreeWeightedActionSelection(new List<DecisionTreeWeightedSet>
             {
                 // todo parametrize weights
-                new DecisionTreeWeightedSet(new DefendAll(), 10),
-                new DecisionTreeWeightedSet(new Taunt(), 10),
-                new DecisionTreeWeightedSet(new Tackle(), 10),
+                new DecisionTreeWeightedSet(new DefendAll(), 500),
+                
+                new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.None), 20),
+                new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.Closest), 100),
+                new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints), 100),
+                new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage), 100),
+                //new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.MostDmgDealt), 50),
+                new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange), 100),
+                //new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.MinimizeReachableEnemiesAfterTurn), 50),
+                //new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.MaximiseReachableEnemiesAfterTurn), 5),
+                //new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.MinimisePositionBuffAfterTurn), 5),
+                //new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.MaximisePositionBuffAfterTurn), 50),
+
+                new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.None), 20),
+                new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.Closest), 100),
+                new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints), 100),
+                new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage), 100),
+                //new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.MostDmgDealt), 50),
+                new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange), 100),
+                //new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.MinimizeReachableEnemiesAfterTurn), 50),
+                //new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.MaximiseReachableEnemiesAfterTurn), 5),
+                //new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.MinimisePositionBuffAfterTurn), 5),
+                //new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.MaximisePositionBuffAfterTurn), 50),
+
             });
         }       
     }

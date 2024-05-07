@@ -9,6 +9,15 @@ namespace SMUBE.Pathfinding
     public abstract class PathfindingAlgorithm
     {
         public static List<(SMUBEVector2<int> pos, bool emptyAfter)> DirtyPositionCache = new List<(SMUBEVector2<int>, bool)>();
+
+        public class PathfindingPathCacheSet
+        {
+            public PathfindingPathCache[,] Data;
+            public PathfindingPathCacheSet(int width, int height)
+            {
+                Data = new PathfindingPathCache[width, height];
+            }
+        }
         
         public class PathfindingPathCache
         {
@@ -159,6 +168,12 @@ namespace SMUBE.Pathfinding
             var maxDistance = (maxSteps * SINGLE_STEP_RANGE);
             return allPaths.Where(n => n.ShortestDistance <= maxDistance).ToList();
         }
+
+        public int GetRequiredMovementTurns(PathfindingPathCache target, int maxSteps)
+        {
+            var maxDistancePerTurn = (maxSteps * SINGLE_STEP_RANGE);
+            return (int)(Math.Ceiling(target.ShortestDistance / maxDistancePerTurn));
+        }
         
         public List<PathfindingPathCache> ProcessAllPaths(GridBattleScene battleScene, BattleScenePosition startPosition)
         {
@@ -303,7 +318,14 @@ namespace SMUBE.Pathfinding
 
                     var moveTarget = allNodes[moveTargetPos.x, moveTargetPos.y];
                     var pathSoFar = new List<BattleScenePosition>(currentNode.ShortestKnownPath) { moveTarget.TargetPosition };
-                    var newDistance = GetPathCost(pathSoFar);
+                    
+                    var movingHorizontally = Math.Abs(currentNode.TargetPosition.Coordinates.x - moveTarget.TargetPosition.Coordinates.x) != 0;
+                    var movingVertically = Math.Abs(currentNode.TargetPosition.Coordinates.y - moveTarget.TargetPosition.Coordinates.y) != 0;
+                    var nextStepCost = movingHorizontally && movingVertically
+                        ? DIAGONAL_COST_APPROXIMATION
+                        : STRAIGHT_COST_APPROXIMATION;
+
+                    var newDistance = currentNode.ShortestDistance + nextStepCost; //GetPathCost(pathSoFar);
 
                     if (moveTarget.ShortestDistance == int.MaxValue)
                     {

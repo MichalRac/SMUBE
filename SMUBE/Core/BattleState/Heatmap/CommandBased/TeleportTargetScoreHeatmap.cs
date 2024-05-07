@@ -23,7 +23,7 @@ namespace SMUBE.BattleState.Heatmap.CommandBased
             var distanceToUnitOfTeamIdHeatmap = 
                 new DistanceToUnitOfTeamIdHeatmap(opponentTeamId, false, battleStateModel);
             var countReachingUnitsOfTeamIdHeatmap =
-                new CountReachingUnitsOfTeamIdHeatmap(opponentTeamId, battleStateModel);
+                new CountReachingUnitsOfTeamIdHeatmap(opponentTeamId, battleStateModel, true);
 
             reachablePositionsHeatmap.ProcessHeatmap(battleStateModel);
             distanceToUnitOfTeamIdHeatmap.ProcessHeatmap(battleStateModel);

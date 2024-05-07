@@ -20,7 +20,25 @@ namespace SMUBE.DataStructures.Utils
 
         public bool Equals(SMUBEVector2<T> other)
         {
-            return x.Equals(other.x) && y.Equals(other.y);
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return EqualityComparer<T>.Default.Equals(x, other.x) && EqualityComparer<T>.Default.Equals(y, other.y);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((SMUBEVector2<T>)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (EqualityComparer<T>.Default.GetHashCode(x) * 397) ^ EqualityComparer<T>.Default.GetHashCode(y);
+            }
         }
     }
 }

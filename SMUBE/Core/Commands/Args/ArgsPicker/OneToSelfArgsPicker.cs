@@ -62,7 +62,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
             return "Confirm or cancel command on self";
         }
 
-        public override CommandArgs GetPseudoRandom()
+        public override CommandArgs GetSuggestedArgs(ArgsPreferences argsPreferences)
         {
             return new CommonArgs(BattleStateModel.ActiveUnit.UnitData, null, BattleStateModel);
         }

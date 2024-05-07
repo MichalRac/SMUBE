@@ -4,6 +4,7 @@ using SMUBE.Units;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using SMUBE.AI;
 using SMUBE.BattleState;
 using SMUBE.Commands;
@@ -117,7 +118,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
         }
 
-        public void OnFinishedLog(AIModel team1AI, AIModel team2AI)
+        public void OnFinishedLog(AIModel team1AI, AIModel team2AI, bool logToFile = false)
         {
             Console.WriteLine($"-- -- -- -- -- --");
             Console.WriteLine($"-- END OF GAME --");
@@ -137,6 +138,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                     throw new NotSupportedException();
                 }
             }
+            
             Console.WriteLine($"team 1 ai ({team1AIName}) runtime: command {teamOneAICommandTime}ticks / args {teamOneAIArgsTime}ticks / total {teamOneAICommandTime + teamOneAIArgsTime}");
             Console.WriteLine($"team 2 ai ({team2AIName}) runtime: command {teamTwoAICommandTime}ticks / args {teamTwoAIArgsTime}ticks / total {teamTwoAICommandTime + teamTwoAIArgsTime}");
             Console.WriteLine($"team 1 actions: {teamOneActions}");
@@ -192,6 +194,65 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
                 Console.WriteLine($"ai ({team1AIName}) runtime: command {teamOneAICommandTime}ticks / args {teamOneAIArgsTime}ticks / total {teamOneAICommandTime + teamOneAIArgsTime}");
                 Console.WriteLine($"ai ticks per action: {(float)(aiTotalRuntime + aiTotalArgsRuntime) / (teamOneActions + teamTwoActions)}");
+            }
+
+            if (logToFile)
+            {
+                var date = DateTime.UtcNow;
+                var dateSuffix = $"{date.Year}_{date.Month}_{date.Day}_{date.Hour}_{date.Minute}_{date.Second}";
+                var newFile = File.CreateText($"E:\\_RepositoryE\\SMUBE\\Output\\logs\\log_{dateSuffix}_{totalSimulationCount}sim.txt");
+                
+                newFile.WriteLine($"Simulation results");
+                newFile.WriteLine($"simulations: {totalSimulationCount}");
+                newFile.WriteLine($"date: {dateSuffix}");
+                newFile.WriteLine($"\n");
+                
+                newFile.WriteLine($"team 1 ai ({team1AIName}) runtime: command {teamOneAICommandTime}ticks / args {teamOneAIArgsTime}ticks / total {teamOneAICommandTime + teamOneAIArgsTime}");
+                newFile.WriteLine($"team 2 ai ({team2AIName}) runtime: command {teamTwoAICommandTime}ticks / args {teamTwoAIArgsTime}ticks / total {teamTwoAICommandTime + teamTwoAIArgsTime}");
+                newFile.WriteLine($"team 1 actions: {teamOneActions}");
+                newFile.WriteLine($"team 2 actions: {teamTwoActions}");
+                newFile.WriteLine($"total actions: {teamOneActions + teamTwoActions}");
+                newFile.WriteLine($"\n");
+
+                newFile.WriteLine($"team 1 ticks per action: {(float)(teamOneAICommandTime + teamOneAIArgsTime) / teamOneActions}");
+                newFile.WriteLine($"team 2 ticks per action: {(float)(teamTwoAICommandTime + teamTwoAIArgsTime) / teamTwoActions}");
+                newFile.WriteLine($"\n");
+
+                if (totalSimulationCount > 1)
+                {
+                    newFile.WriteLine($"team 1 win rate: {(float)team1WinCount/totalSimulationCount * 100}%");
+                    newFile.WriteLine($"team 2 win rate: {(float)team2WinCount/totalSimulationCount * 100}%");
+                    newFile.WriteLine($"\n");
+
+                    newFile.WriteLine($"total support character type count: {UnitHelper.ScholarCount}");
+                    newFile.WriteLine($"total offensive character type count: {UnitHelper.HunterCount}");
+                    newFile.WriteLine($"total defensive character type count: {UnitHelper.SquireCount}");
+                }
+                
+                newFile.WriteLine($"{nameof(BaseAttack)} uses:\t{BaseAttack.UseCounter}");
+                newFile.WriteLine($"{nameof(BaseBlock)} uses:\t{BaseBlock.UseCounter}");
+                newFile.WriteLine($"{nameof(BaseWalk)} uses:\t{BaseWalk.UseCounter}");
+                
+                newFile.WriteLine($"{nameof(HealAll)} uses:\t{HealAll.UseCounter}");
+                newFile.WriteLine($"{nameof(LowerEnemyDefense)} uses:\t{LowerEnemyDefense.UseCounter}");
+                newFile.WriteLine($"{nameof(ShieldPosition)} uses:\t{ShieldPosition.UseCounter}");
+
+                newFile.WriteLine($"{nameof(HeavyAttack)} uses:\t{HeavyAttack.UseCounter}");
+                newFile.WriteLine($"{nameof(RaiseObstacle)} uses:\t{RaiseObstacle.UseCounter}");
+                newFile.WriteLine($"{nameof(Teleport)} uses:\t{Teleport.UseCounter}");
+
+                newFile.WriteLine($"{nameof(Tackle)} uses:\t{Tackle.UseCounter}");
+                newFile.WriteLine($"{nameof(Taunt)} uses:\t{Taunt.UseCounter}");
+                newFile.WriteLine($"{nameof(DefendAll)} uses:\t{DefendAll.UseCounter}");
+
+                newFile.WriteLine($"{nameof(TauntedAttack)} uses:\t{TauntedAttack.UseCounter}");
+                newFile.WriteLine($"{nameof(Wait)} uses:\t{Wait.UseCounter}");
+                
+                newFile.WriteLine($"Total uses:\t{totalCommandUses}");
+                newFile.WriteLine($"Failed turns: {BattleStateModel.FailedCommandExecutions}");
+                newFile.WriteLine($"(Total actions - total command use count) diff: {teamOneActions + teamTwoActions - totalCommandUses}");
+                
+                newFile.Close();
             }
         }
 

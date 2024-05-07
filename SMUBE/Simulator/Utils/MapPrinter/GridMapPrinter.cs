@@ -300,6 +300,7 @@ namespace SMUBE_Utils.Simulator.Utils.MapPrinter
             ConsoleRenderer.RenderDocument(doc);
             return;
 
+            /*
             for (int y = width - 1; y >= 0; y--)
             {
                 for (int x = 0; x < height; x++)
@@ -343,6 +344,7 @@ namespace SMUBE_Utils.Simulator.Utils.MapPrinter
 
                 Console.Write("\n\n\n");
             }
+            */
             
         }
         

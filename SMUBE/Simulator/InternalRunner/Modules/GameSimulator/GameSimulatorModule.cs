@@ -32,32 +32,36 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 ? GenericChoiceUtils.GetInt("Number of simulations to be run:") 
                 : 1;
 
-            int simulationsRun = 0;
-            while (simulationsRun++ < simulationNumber)
+            for (int repeats = 0; repeats < 10; repeats++)
             {
-                /*
-                try
+                int simulationsRun = 0;
+                while (simulationsRun++ < simulationNumber)
                 {
+                    /*
+                    try
+                    {
+                        */
+                        RunSingleSimulation(gameConfigurator, useSimpleBehavior, simulationSeries);
+                    /*
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"Simulation {simulationsRun} corrupted, press anything to continue;");
+                        new InternalRunnerDisplayMap(_coreSimulator, true).OnPicked();
+                        new InternalRunnerDisplayHeatmap(_coreSimulator).OnPicked();
+                        Console.ReadKey();
+                    }
                     */
-                    RunSingleSimulation(gameConfigurator, useSimpleBehavior, simulationSeries);
-                /*
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($"Simulation {simulationsRun} corrupted, press anything to continue;");
-                    new InternalRunnerDisplayMap(_coreSimulator, true).OnPicked();
-                    new InternalRunnerDisplayHeatmap(_coreSimulator).OnPicked();
-                    Console.ReadKey();
-                }
-                */
 
-                if (simulationsRun % 10 == 0)
-                {
-                    Console.WriteLine($"simulation progress: {simulationsRun}/{simulationNumber}");
+                    if (simulationsRun % 10 == 0)
+                    {
+                        Console.WriteLine($"simulation progress: {simulationsRun}/{simulationNumber}");
+                    }
                 }
+                
+                _coreSimulator.OnFinishedLog(ai1, ai2, true);
+                _coreSimulator.RestartDebugCounters();
             }
-            
-            _coreSimulator.OnFinishedLog(ai1, ai2);
             Finish();
         }
 

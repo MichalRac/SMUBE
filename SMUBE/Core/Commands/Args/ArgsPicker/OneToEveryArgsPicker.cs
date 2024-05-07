@@ -101,7 +101,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
             return "Confirm or cancel command on all targets";
         }
 
-        public override CommandArgs GetPseudoRandom()
+        public override CommandArgs GetSuggestedArgs(ArgsPreferences argsPreferences)
         {
             var unit = BattleStateModel.ActiveUnit;
             var activeUnitIdentifier = unit.UnitData.UnitIdentifier;

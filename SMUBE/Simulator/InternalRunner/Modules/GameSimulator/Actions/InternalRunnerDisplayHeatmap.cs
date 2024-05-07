@@ -31,10 +31,9 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Actions
             var activeUnitTeamId = stateModel.ActiveUnit.UnitData.UnitIdentifier.TeamId;
             var enemyTeamId = activeUnitTeamId == 0 ? 1 : 0;
             
-            //var heatmap = new CountReachingUnitsOfTeamIdHeatmap(activeUnitTeamId, stateModel);
-            var heatmap = new DistanceToUnitOfTeamIdHeatmap(enemyTeamId, false, stateModel, stateModel.ActiveUnit.UnitData.UnitIdentifier);
+            var heatmap = new CountReachingUnitsOfTeamIdHeatmap(activeUnitTeamId, stateModel, true);
+            //var heatmap = new DistanceToUnitOfTeamIdHeatmap(enemyTeamId, false, stateModel, stateModel.ActiveUnit.UnitData.UnitIdentifier);
             //var heatmap = new TeleportTargetScoreHeatmap(stateModel);
-            
             heatmap.ProcessHeatmap(stateModel);
 
             for (int x = 0; x < heatmap.Heatmap.Count; x++)
@@ -53,6 +52,41 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Actions
                 }
             }
             GridMapPrinter.DefaultGridPrinter(CoreWrapper.Core.currentStateModel.BattleSceneState, gridMapGenericDisplayData).PrintMap();
+
+            var gridMapGenericDisplayData2 = new List<GridMapGenericDisplayData>()
+            {
+                new GridMapGenericDisplayData()
+                {
+                    Coordinates = activeUnitCoords,
+                    Label = "(active)",
+                    Color = ConsoleColor.Yellow
+                }
+            };
+            var h0 = new DistanceToUnitOfTeamIdHeatmap(activeUnitTeamId, false, stateModel);
+            var h1 = new DistanceToUnitOfTeamIdHeatmap(enemyTeamId, false, stateModel);
+            var debugHeatmap = new InBetweenTeamsHeatmap(stateModel, h0, h1);
+            h0.ProcessHeatmap(stateModel);
+            h1.ProcessHeatmap(stateModel);
+            debugHeatmap.ProcessHeatmap(stateModel);
+
+            for (int x = 0; x < heatmap.Heatmap.Count; x++)
+            {
+                for (int y = 0; y < heatmap.Heatmap[x].Count; y++)
+                {
+                    var color = heatmap.GetDebugConsoleColor(debugHeatmap.Heatmap[x][y]);
+                    var label = heatmap.GetDebugMessage(debugHeatmap.Heatmap[x][y]);
+                    
+                    gridMapGenericDisplayData2.Add(new GridMapGenericDisplayData()
+                    {
+                        Coordinates = new SMUBEVector2<int>(x, y),
+                        Label = label,
+                        Color = color
+                    });
+                }
+            }
+
+            GridMapPrinter.DefaultGridPrinter(CoreWrapper.Core.currentStateModel.BattleSceneState, gridMapGenericDisplayData2).PrintMap();
+
         }
     }
 }

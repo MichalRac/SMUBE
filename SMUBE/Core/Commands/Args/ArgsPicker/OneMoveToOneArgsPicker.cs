@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using SMUBE.BattleState;
+using SMUBE.BattleState.Heatmap.GeneralHeatmaps;
 using SMUBE.Commands._Common;
+using SMUBE.Commands.Effects;
 using SMUBE.DataStructures.BattleScene;
 using SMUBE.DataStructures.Units;
 using SMUBE.DataStructures.Utils;
@@ -308,7 +310,66 @@ namespace SMUBE.Commands.Args.ArgsPicker
             }
         }
 
-        public override CommandArgs GetPseudoRandom()
+        public override CommandArgs GetSuggestedArgs(ArgsPreferences argsPreferences)
+        {
+            if (argsPreferences.MovementTargetingPreference != ArgsMovementTargetingPreference.None
+                || argsPreferences.PositionTargetingPreference != ArgsPositionTargetingPreference.None)
+            {
+                return null;
+            }
+            
+            switch (argsPreferences.TargetingPreference)
+            {
+                case ArgsEnemyTargetingPreference.None:
+                    return GetAnyStrategy();
+                case ArgsEnemyTargetingPreference.Closest:
+                    return GetClosestStrategy();
+                case ArgsEnemyTargetingPreference.LeastHpPoints:
+                    return GetLeastHpStrategy(false);
+                case ArgsEnemyTargetingPreference.LeastHpPercentage:
+                    return GetLeastHpStrategy(true);
+                case ArgsEnemyTargetingPreference.MostDmgDealt:
+                    return GetMaxDmgDealtStrategy();
+                case ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange:
+                    return GetByEnemyWithTeamIdInRangeCountStrategy(BattleStateModel.ActiveUnit.UnitData.UnitIdentifier.TeamId, false);
+                case ArgsEnemyTargetingPreference.MinimizeReachableEnemiesAfterTurn:
+                    return GetByReachableEnemiesAfterTurnStrategy(true);
+                case ArgsEnemyTargetingPreference.MaximiseReachableEnemiesAfterTurn:
+                    return GetByReachableEnemiesAfterTurnStrategy(false);
+                case ArgsEnemyTargetingPreference.MinimisePositionBuffAfterTurn:
+                    return GetByPositionBuffStrategy(true);
+                case ArgsEnemyTargetingPreference.MaximisePositionBuffAfterTurn:
+                    return GetByPositionBuffStrategy(false);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            // unused
+            /*
+            else if (argsPreferences.MovementTargetingPreference != ArgsMovementTargetingPreference.None)
+            {
+                switch (argsPreferences.MovementTargetingPreference)
+                {
+                    case ArgsMovementTargetingPreference.None:
+                        return GetAnyStrategy();
+                    case ArgsMovementTargetingPreference.GetOutOfReach:
+                        return GetAnyStrategy();
+                    case ArgsMovementTargetingPreference.GetCloserCarefully:
+                        return GetByEnemyWithTeamIdInRangeCountStrategy(BattleStateModel.ActiveUnit.UnitData.UnitIdentifier.TeamId == 0 ? 1 : 0, true);
+                    case ArgsMovementTargetingPreference.GetCloserAggressively:
+                        return GetAnyStrategy();
+                    case ArgsMovementTargetingPreference.OptimizeFortifiedPosition:
+                        return GetByPositionBuffStrategy(true);
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            */
+        }
+
+        #region AIArgStrategies
+        
+        private CommandArgs GetAnyStrategy()
         {
             var activeUnit = BattleStateModel.ActiveUnit;
             
@@ -341,5 +402,365 @@ namespace SMUBE.Commands.Args.ArgsPicker
 
             return null;
         }
+        
+        private CommandArgs GetClosestStrategy()
+        {
+            var activeUnit = BattleStateModel.ActiveUnit;
+            
+            var validTargets
+                = BattleStateModel.GetTeamUnits(activeUnit.UnitData.UnitIdentifier.TeamId == 0 ? 1 : 0)
+                    .Where(u => u.UnitData.UnitStats.IsAlive()).ToList();
+
+            if (validTargets.Count == 0)
+            {
+                return null;
+            }
+
+            validTargets.Shuffle();
+            
+            var minDistance = int.MaxValue;
+            CommonArgs minDistanceArgs = null;
+
+            foreach (var validTarget in validTargets)
+            {
+                var reachableSurroundingCache = BattleStateModel.BattleSceneState.PathfindingHandler
+                    .GetSurroundingPathCache(BattleStateModel, validTarget.UnitData.BattleScenePosition);
+
+                if (reachableSurroundingCache.Count == 0)
+                    continue;
+
+                foreach (var potentialTargetNode in reachableSurroundingCache)
+                {
+                    if (potentialTargetNode.ShortestDistance < minDistance)
+                    {
+                        minDistance = potentialTargetNode.ShortestDistance;
+                        var posDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, activeUnit.UnitData.BattleScenePosition.Coordinates, potentialTargetNode.TargetPosition.Coordinates);
+                        var args = new CommonArgs(activeUnit.UnitData, new List<UnitData>() { validTarget.UnitData }, BattleStateModel, posDelta);
+                        minDistanceArgs = args;
+                    }
+                }
+            }
+
+            return minDistanceArgs;
+        }
+        
+        private CommandArgs GetLeastHpStrategy(bool usePercentage)
+        {
+            var activeUnit = BattleStateModel.ActiveUnit;
+            
+            var validTargets
+                = BattleStateModel.GetTeamUnits(activeUnit.UnitData.UnitIdentifier.TeamId == 0 ? 1 : 0)
+                    .Where(u => u.UnitData.UnitStats.IsAlive()).ToList();
+
+            if (validTargets.Count == 0)
+            {
+                return null;
+            }
+
+            var minHp = int.MaxValue;
+            var minHpPercentage = float.MaxValue;
+            CommonArgs minHpArgs = null;
+
+            foreach (var validTarget in validTargets)
+            {
+                var reachableSurroundingCache = BattleStateModel.BattleSceneState.PathfindingHandler
+                    .GetSurroundingPathCache(BattleStateModel, validTarget.UnitData.BattleScenePosition);
+
+                if (reachableSurroundingCache.Count == 0)
+                    continue;
+
+                if (!usePercentage && validTarget.UnitData.UnitStats.CurrentHealth < minHp)
+                {
+                    var closestSurroundingNode = reachableSurroundingCache.OrderBy(pathCache => pathCache.ShortestDistance).First();
+                    minHp = validTarget.UnitData.UnitStats.CurrentHealth;
+                    var posDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, activeUnit.UnitData.BattleScenePosition.Coordinates, closestSurroundingNode.TargetPosition.Coordinates);
+                    var args = new CommonArgs(activeUnit.UnitData, new List<UnitData>() { validTarget.UnitData }, BattleStateModel, posDelta);
+                    minHpArgs = args;
+                    continue;
+                }
+
+                if (usePercentage)
+                {
+                    var healthPercentage = validTarget.UnitData.UnitStats.CurrentHealth / validTarget.UnitData.UnitStats.MaxHealth;
+                    if (healthPercentage < minHpPercentage)
+                    {
+                        minHpPercentage = healthPercentage;
+                        var closestSurroundingNode = reachableSurroundingCache.OrderBy(pathCache => pathCache.ShortestDistance).First();
+                        var posDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, activeUnit.UnitData.BattleScenePosition.Coordinates, closestSurroundingNode.TargetPosition.Coordinates);
+                        var args = new CommonArgs(activeUnit.UnitData, new List<UnitData>() { validTarget.UnitData }, BattleStateModel, posDelta);
+                        minHpArgs = args;
+                        continue;
+                    }
+                }
+            }
+
+            return minHpArgs;
+        }
+        
+        private CommandArgs GetMaxDmgDealtStrategy()
+        {
+            var activeUnit = BattleStateModel.ActiveUnit;
+            
+            var validTargets
+                = BattleStateModel.GetTeamUnits(activeUnit.UnitData.UnitIdentifier.TeamId == 0 ? 1 : 0)
+                    .Where(u => u.UnitData.UnitStats.IsAlive()).ToList();
+
+            if (validTargets.Count == 0)
+            {
+                return null;
+            }
+
+            var maxDmg = int.MinValue;
+            CommonArgs maxDmgArgs = null;
+
+            foreach (var validTarget in validTargets)
+            {
+                var reachableSurroundingCache = BattleStateModel.BattleSceneState.PathfindingHandler
+                    .GetSurroundingPathCache(BattleStateModel, validTarget.UnitData.BattleScenePosition);
+
+                if (reachableSurroundingCache.Count == 0)
+                    continue;
+
+                var closestSurroundingNode = reachableSurroundingCache.OrderBy(pathCache => pathCache.ShortestDistance).First();
+                var posDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, activeUnit.UnitData.BattleScenePosition.Coordinates, closestSurroundingNode.TargetPosition.Coordinates);
+                var potentialArgs = new CommonArgs(activeUnit.UnitData, new List<UnitData> { validTarget.UnitData }, BattleStateModel, posDelta);
+                var commandResults = Command.GetCommandResults(potentialArgs);
+
+                foreach (var effect in commandResults.effects)
+                {
+                    if (!(effect is DamageEffect damageEffect))
+                    {
+                        continue;
+                    }
+
+                    var finalValue = damageEffect.GetFinalValue(potentialArgs, commandResults);
+                    if (finalValue > maxDmg)
+                    {
+                        maxDmg = finalValue;
+                        maxDmgArgs = potentialArgs;
+                    }
+                }
+            }
+
+            return maxDmgArgs;
+        }
+        
+        private CommandArgs GetByEnemyWithTeamIdInRangeCountStrategy(int teamIdInRange, bool minimize)
+        {
+            var activeUnit = BattleStateModel.ActiveUnit;
+            
+            var validTargets
+                = BattleStateModel.GetTeamUnits(activeUnit.UnitData.UnitIdentifier.TeamId == 0 ? 1 : 0)
+                    .Where(u => u.UnitData.UnitStats.IsAlive()).ToList();
+
+            if (validTargets.Count == 0)
+            {
+                return null;
+            }
+
+            var maxReachedUnits = int.MinValue;
+            var minReachedUnits = int.MaxValue;
+            var minDistance = int.MaxValue;
+            CommonArgs optimalReachedUnitsArgs = null;
+
+            var unitsOfTeamIdInRangeHeatmap = new CountReachingUnitsOfTeamIdHeatmap(teamIdInRange, BattleStateModel, true);
+            unitsOfTeamIdInRangeHeatmap.ProcessHeatmap(BattleStateModel);
+
+            foreach (var validTarget in validTargets)
+            {
+                var reachableSurroundingCache = BattleStateModel.BattleSceneState.PathfindingHandler
+                    .GetSurroundingPathCache(BattleStateModel, validTarget.UnitData.BattleScenePosition);
+
+                if (reachableSurroundingCache.Count == 0)
+                    continue;
+                
+                var closestSurroundingNode = reachableSurroundingCache.OrderBy(pathCache => pathCache.ShortestDistance).First();
+                var coordinates = closestSurroundingNode.TargetPosition.Coordinates;
+                var posDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, activeUnit.UnitData.BattleScenePosition.Coordinates, closestSurroundingNode.TargetPosition.Coordinates);
+                var potentialArgs = new CommonArgs(activeUnit.UnitData, new List<UnitData> { validTarget.UnitData }, BattleStateModel, posDelta);
+
+                if (minimize)
+                {
+                    if (unitsOfTeamIdInRangeHeatmap.Heatmap[coordinates.x][coordinates.y] < minReachedUnits)
+                    {
+                        minReachedUnits = unitsOfTeamIdInRangeHeatmap.Heatmap[coordinates.x][coordinates.y];
+                        minDistance = closestSurroundingNode.ShortestDistance;
+                        optimalReachedUnitsArgs = potentialArgs;
+                    }
+                    else if (unitsOfTeamIdInRangeHeatmap.Heatmap[coordinates.x][coordinates.y] == minReachedUnits)
+                    {
+                        if (closestSurroundingNode.ShortestDistance < minDistance)
+                        {
+                            minDistance = closestSurroundingNode.ShortestDistance;
+                            optimalReachedUnitsArgs = potentialArgs;
+                        }
+                    }
+
+                }
+                else
+                {
+                    if (unitsOfTeamIdInRangeHeatmap.Heatmap[coordinates.x][coordinates.y] < maxReachedUnits)
+                    {
+                        maxReachedUnits = unitsOfTeamIdInRangeHeatmap.Heatmap[coordinates.x][coordinates.y];
+                        minDistance = closestSurroundingNode.ShortestDistance;
+                        optimalReachedUnitsArgs = potentialArgs;
+                    }
+                    else if (unitsOfTeamIdInRangeHeatmap.Heatmap[coordinates.x][coordinates.y] == maxReachedUnits)
+                    {
+                        if (closestSurroundingNode.ShortestDistance < minDistance)
+                        {
+                            minDistance = closestSurroundingNode.ShortestDistance;
+                            optimalReachedUnitsArgs = potentialArgs;
+                        }
+                    }
+                }
+            }
+
+            return optimalReachedUnitsArgs;
+        }
+        
+        private CommandArgs GetByReachableEnemiesAfterTurnStrategy(bool minimize)
+        {
+            var activeUnit = BattleStateModel.ActiveUnit;
+            var enemyTeamId = activeUnit.UnitData.UnitIdentifier.TeamId == 0 ? 1 : 0;
+
+            var validTargets
+                = BattleStateModel.GetTeamUnits(enemyTeamId)
+                    .Where(u => u.UnitData.UnitStats.IsAlive()).ToList();
+
+            if (validTargets.Count == 0)
+            {
+                return null;
+            }
+            
+            validTargets.Shuffle();
+            
+            var minReachableEnemies = int.MinValue;
+            var maxReachableEnemies = int.MaxValue;
+            CommonArgs optimalReachedUnitsArgs = null;
+            
+            var inEnemyRangeCountHeatmap = new CountReachingUnitsOfTeamIdHeatmap(enemyTeamId, BattleStateModel, true);
+            inEnemyRangeCountHeatmap.ProcessHeatmap(BattleStateModel);
+
+            foreach (var validTarget in validTargets)
+            {
+                var reachableSurroundingCache = BattleStateModel.BattleSceneState.PathfindingHandler
+                    .GetSurroundingPathCache(BattleStateModel, validTarget.UnitData.BattleScenePosition);
+
+                if (reachableSurroundingCache.Count == 0)
+                    continue;
+                
+                reachableSurroundingCache.Shuffle();
+
+                foreach (var potentialTargetPosition in reachableSurroundingCache)
+                {
+                    var coordinates = potentialTargetPosition.TargetPosition.Coordinates;
+                    var enemyRangeCount = inEnemyRangeCountHeatmap.Heatmap[coordinates.x][coordinates.y];
+                    if (minimize)
+                    {
+                        if (enemyRangeCount < minReachableEnemies)
+                        {
+                            minReachableEnemies = enemyRangeCount;
+                            var posDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, activeUnit.UnitData.BattleScenePosition.Coordinates, coordinates);
+                            optimalReachedUnitsArgs = new CommonArgs(activeUnit.UnitData, new List<UnitData> { validTarget.UnitData }, BattleStateModel, posDelta);
+                        }
+                    }
+                    else
+                    {
+                        if (enemyRangeCount > maxReachableEnemies)
+                        {
+                            maxReachableEnemies = enemyRangeCount;
+                            var posDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, activeUnit.UnitData.BattleScenePosition.Coordinates, coordinates);
+                            optimalReachedUnitsArgs = new CommonArgs(activeUnit.UnitData, new List<UnitData> { validTarget.UnitData }, BattleStateModel, posDelta);
+                        }
+                    }
+                }
+            }
+
+            return optimalReachedUnitsArgs;
+        }
+        
+        private CommandArgs GetByPositionBuffStrategy(bool minimize)
+        {
+            var activeUnit = BattleStateModel.ActiveUnit;
+            var enemyTeamId = activeUnit.UnitData.UnitIdentifier.TeamId == 0 ? 1 : 0;
+
+            var validTargets
+                = BattleStateModel.GetTeamUnits(enemyTeamId)
+                    .Where(u => u.UnitData.UnitStats.IsAlive()).ToList();
+
+            if (validTargets.Count == 0)
+            {
+                return null;
+            }
+            
+            validTargets.Shuffle();
+
+            int bestScore = int.MinValue;
+            int worstScore = int.MaxValue;
+            CommonArgs optimalArgs = null;
+            
+            var inEnemyRangeCountHeatmap = new CountReachingUnitsOfTeamIdHeatmap(enemyTeamId, BattleStateModel, true);
+            inEnemyRangeCountHeatmap.ProcessHeatmap(BattleStateModel);
+
+            foreach (var validTarget in validTargets)
+            {
+                var reachableSurroundingCache = BattleStateModel.BattleSceneState.PathfindingHandler
+                    .GetSurroundingPathCache(BattleStateModel, validTarget.UnitData.BattleScenePosition);
+
+                if (reachableSurroundingCache.Count == 0)
+                    continue;
+                
+                reachableSurroundingCache.Shuffle();
+
+                foreach (var potentialTargetPosition in reachableSurroundingCache)
+                {
+                    var positionScore = GetPositionContentTypeScore(potentialTargetPosition.TargetPosition.ContentType);
+
+                    if (minimize)
+                    {
+                        if (positionScore < worstScore)
+                        {
+                            worstScore = positionScore;
+                            var posDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, activeUnit.UnitData.BattleScenePosition.Coordinates, potentialTargetPosition.TargetPosition.Coordinates);
+                            optimalArgs = new CommonArgs(activeUnit.UnitData, new List<UnitData> { validTarget.UnitData }, BattleStateModel, posDelta);
+                        }
+                    }
+                    else
+                    {
+                        if (positionScore > bestScore)
+                        {
+                            bestScore = positionScore;
+                            var posDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, activeUnit.UnitData.BattleScenePosition.Coordinates, potentialTargetPosition.TargetPosition.Coordinates);
+                            optimalArgs = new CommonArgs(activeUnit.UnitData, new List<UnitData> { validTarget.UnitData }, BattleStateModel, posDelta);
+                        }
+                    }
+                }
+            }
+
+            return optimalArgs;
+        }
+
+        private int GetPositionContentTypeScore(BattleScenePositionContentType type)
+        {
+            switch (type)
+            {
+                case BattleScenePositionContentType.Obstacle:
+                case BattleScenePositionContentType.ObstacleTimed:
+                    return -1;
+                case BattleScenePositionContentType.Unstable:
+                    return 0;
+                case BattleScenePositionContentType.None:
+                    return 1;
+                case BattleScenePositionContentType.DefensiveTimed:
+                    return 2;
+                case BattleScenePositionContentType.Defensive:
+                    return 3;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+        
+        #endregion
     }
 }

@@ -91,6 +91,7 @@
     <Compile Include="BattleState\Heatmap\BaseHeatmap.cs" />
     <Compile Include="BattleState\Heatmap\CommandBased\TeleportTargetScoreHeatmap.cs" />
     <Compile Include="BattleState\Heatmap\GeneralHeatmaps\CountReachingUnitsOfTeamIdHeatmap.cs" />
+    <Compile Include="BattleState\Heatmap\GeneralHeatmaps\InBetweenTeamsHeatmap.cs" />
     <Compile Include="BattleState\Heatmap\GeneralHeatmaps\DistanceToUnitOfTeamIdHeatmap.cs" />
     <Compile Include="BattleState\Heatmap\GeneralHeatmaps\GetReachablePositionsHeatmap.cs" />
     <Compile Include="BattleState\Heatmap\HeatmapHelper.cs" />

@@ -41,6 +41,6 @@ namespace SMUBE.Commands.Args.ArgsPicker
 
         public abstract string GetPickerState();
 
-        public abstract CommandArgs GetPseudoRandom();
+        public abstract CommandArgs GetSuggestedArgs(ArgsPreferences argsPreferences);
     }
 }

@@ -169,7 +169,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
         }
         
         
-        public override CommandArgs GetPseudoRandom()
+        public override CommandArgs GetSuggestedArgs(ArgsPreferences _)
         {
             var unit = BattleStateModel.ActiveUnit;
             var viableTargets = unit.UnitCommandProvider.ViableTargets;

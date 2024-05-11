@@ -51,7 +51,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
         protected override void SetDefaultTarget()
         {
             var validTargets = BattleStateModel.BattleSceneState.PathfindingHandler
-                .ActiveUnitReachablePositions.Where(target => !target.TargetPosition.Coordinates.Equals(BattleStateModel.ActiveUnit.UnitData.BattleScenePosition.Coordinates)).ToList();
+                .GetAllReachablePathsForActiveUnit(BattleStateModel).Where(target => !target.TargetPosition.Coordinates.Equals(BattleStateModel.ActiveUnit.UnitData.BattleScenePosition.Coordinates)).ToList();
 
             if (validTargets.Any())
             {
@@ -62,7 +62,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
         public override bool IsAnyValid()
         {
             var activeUnitPosition = BattleStateModel.ActiveUnit.UnitData.BattleScenePosition.Coordinates;
-            return BattleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions
+            return BattleStateModel.BattleSceneState.PathfindingHandler.GetAllReachablePathsForActiveUnit(BattleStateModel)
                 .Count(target => !target.TargetPosition.Coordinates.Equals(activeUnitPosition)) 
                    > 0;
         }

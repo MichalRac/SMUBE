@@ -13,7 +13,6 @@ namespace SMUBE.Commands.SpecificCommands.Tackle
 {
     public class Tackle : BaseCommand
     {
-        public static int UseCounter = 0;
         public const float TACKLE_ATTACK_POWER_MULTIPLIER = 1.5f;
         public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_Tackle;
         public override int ManaCost => SpecificCommandCostConfiguration.Mana_Tackle;
@@ -47,22 +46,21 @@ namespace SMUBE.Commands.SpecificCommands.Tackle
             var targetPos = commandArgs.BattleStateModel.BattleSceneState.Grid[targetCoords.x, targetCoords.y];
             activeUnit.UnitData.BattleScenePosition = targetPos;
             activeUnit.UnitData.BattleScenePosition.ApplyUnit(activeUnit.UnitData.UnitIdentifier);
-            PathfindingAlgorithm.DirtyPositionCache.Add((startPos.Coordinates, true));
-            PathfindingAlgorithm.DirtyPositionCache.Add((targetCoords, false));
+            battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((startPos.Coordinates, true));
+            battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((targetCoords, false));
             
             if (commandResults.PositionDeltas.Count == 2)
             {
-                PathfindingAlgorithm.DirtyPositionCache.Add((targetUnit.UnitData.BattleScenePosition.Coordinates, true));
+                battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((targetUnit.UnitData.BattleScenePosition.Coordinates, true));
                 targetUnit.UnitData.BattleScenePosition.Clear();
                 var targetMoveCoords = commandResults.PositionDeltas[1].Target;
                 var targetMovePosition = commandArgs.BattleStateModel.BattleSceneState.Grid[targetMoveCoords.x, targetMoveCoords.y];
                 targetUnit.UnitData.BattleScenePosition = targetMovePosition;
                 targetUnit.UnitData.BattleScenePosition.ApplyUnit(targetUnit.UnitData.UnitIdentifier);;
-                PathfindingAlgorithm.DirtyPositionCache.Add((targetMoveCoords, false));
+                battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((targetMoveCoords, false));
             }
             targetUnit.UnitData.UnitStats.AffectByAbility(GetCommandResults(commandArgs));
             
-            UseCounter++;
             return true;
         }
 

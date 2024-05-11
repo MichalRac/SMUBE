@@ -241,7 +241,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
 
                 foreach (var surroundingPosition in surroundingPositions)
                 {
-                    var activeUnitPaths = BattleStateModel.BattleSceneState.PathfindingHandler.PathCacheSets[activeUnit.UnitData.UnitIdentifier].Data;
+                    var activeUnitPaths = BattleStateModel.BattleSceneState.PathfindingHandler.GetAllPathCacheSetsForUnit(BattleStateModel, activeUnit.UnitData.UnitIdentifier).Data;
                     var coordinates = surroundingPosition.Coordinates;
                     var pathCache = activeUnitPaths[coordinates.x, coordinates.y];
                     if (pathCache != null && pathCache.ShortestDistance != 0 && pathCache.ShortestDistance != int.MaxValue)

@@ -5,6 +5,7 @@ using SMUBE.AI.GoalOrientedBehavior;
 using SMUBE.AI.StateMachine;
 using SMUBE.Units;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurator
@@ -14,12 +15,12 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
         private Func<AIModel> team1AIModelProvider = null;
         private Func<AIModel> team2AIModelProvider = null;
 
-        public List<Unit> GetUnits(bool useSimpleBehaviour)
+        public ConcurrentBag<Unit> GetUnits(bool useSimpleBehaviour)
         {
             team1AIModelProvider = team1AIModelProvider ?? GetTeamAiProvider(1, useSimpleBehaviour);
             team2AIModelProvider = team2AIModelProvider ?? GetTeamAiProvider(2, useSimpleBehaviour);
 
-            return new List<Unit>
+            return new ConcurrentBag<Unit>
             {
                 UnitHelper.CreateRandomUnit(0, team1AIModelProvider?.Invoke(), useSimpleBehaviour),
                 UnitHelper.CreateRandomUnit(0, team1AIModelProvider?.Invoke(), useSimpleBehaviour),

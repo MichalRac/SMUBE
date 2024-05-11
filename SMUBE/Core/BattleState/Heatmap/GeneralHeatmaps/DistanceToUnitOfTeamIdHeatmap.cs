@@ -41,7 +41,11 @@ namespace SMUBE.BattleState.Heatmap.GeneralHeatmaps
                 }
                 
                 var unitPaths = battleStateModel.BattleSceneState
+                    .PathfindingHandler.GetAllPathsForUnit(battleStateModel, unitOfTeamId.UnitData.UnitIdentifier);
+                /*
+                var unitPaths = battleStateModel.BattleSceneState
                     .PathfindingHandler.AllUnitPaths[unitOfTeamId.UnitData.UnitIdentifier];
+                    */
 
                 foreach (var pathCache in unitPaths)
                 {

@@ -310,7 +310,7 @@ namespace SMUBE_Utils.Simulator
             }
             return;
         }
-
+        
         private static void FinishSimulationSeries(int simulationAmount)
         {
             Console.WriteLine($"-- -- -- -- -- -- -- --");
@@ -325,9 +325,9 @@ namespace SMUBE_Utils.Simulator
             Console.WriteLine($"team 2 win rate: {(float)team2WinCount/simulationAmount * 100}%");
 
 
-            Console.WriteLine($"total support character type count: {UnitHelper.ScholarCount}");
-            Console.WriteLine($"total offensive character type count: {UnitHelper.HunterCount}");
-            Console.WriteLine($"total defensive character type count: {UnitHelper.SquireCount}");
+            Console.WriteLine($"total support character type count: {"missing info! obsolete code?"}");
+            Console.WriteLine($"total offensive character type count: {"missing info! obsolete code?"}");
+            Console.WriteLine($"total defensive character type count: {"missing info! obsolete code?"}");
 
             Console.WriteLine($"team 1 ticks per action: {((float)(teamOneAICommandTime + teamOneAIArgsTime) / teamOneActions)}");
             Console.WriteLine($"team 2 ticks per action: {((float)(teamTwoAICommandTime + teamTwoAIArgsTime) / teamTwoActions)}");

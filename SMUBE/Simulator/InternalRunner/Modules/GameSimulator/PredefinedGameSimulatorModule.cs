@@ -17,7 +17,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
             var gameConfigurator = GetGameSimulatorConfigurator();
             var initUnits = gameConfigurator.GetUnits(false);
-            RunSingleSimulation(gameConfigurator, false, false);
+            RunSingleSimulation(_coreSimulator, gameConfigurator, false, false);
             
             _coreSimulator.OnFinishedLog(AiModel, AiModel);
             Finish();

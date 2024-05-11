@@ -42,19 +42,19 @@ namespace SMUBE.Commands.Args.ArgsPicker
 
         protected override void SetDefaultTarget()
         {
-            var viablePositions = BattleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions;
+            var viablePositions = BattleStateModel.BattleSceneState.PathfindingHandler.GetAllReachablePathsForActiveUnit(BattleStateModel);
 
             if (viablePositions == null || viablePositions.Count == 0)
             {
                 return;
             }
             
-            _currentTargetCoordinates = BattleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions.First().TargetPosition.Coordinates;
+            _currentTargetCoordinates = BattleStateModel.BattleSceneState.PathfindingHandler.GetAllReachablePathsForActiveUnit(BattleStateModel).First().TargetPosition.Coordinates;
         }
 
         public override bool IsAnyValid()
         {
-            return BattleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions
+            return BattleStateModel.BattleSceneState.PathfindingHandler.GetAllReachablePathsForActiveUnit(BattleStateModel)
                 .Any(pos => !pos.TargetPosition.IsOccupied() && pos.TargetPosition.IsWalkable());
         }
 
@@ -126,7 +126,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
             }
             else
             {
-                foreach (var reachablePosition in BattleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions)
+                foreach (var reachablePosition in BattleStateModel.BattleSceneState.PathfindingHandler.GetAllReachablePathsForActiveUnit(BattleStateModel))
                 {
                     if (reachablePosition.TargetPosition.Coordinates.Equals(targetPos))
                     {
@@ -173,7 +173,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
         private CommandArgs GetAnyStrategy()
         {
             var unit = BattleStateModel.ActiveUnit;
-            var reachablePositions = BattleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions
+            var reachablePositions = BattleStateModel.BattleSceneState.PathfindingHandler.GetAllReachablePathsForActiveUnit(BattleStateModel)
                 .Where(pos => !pos.TargetPosition.IsOccupied() && pos.TargetPosition.IsWalkable()).ToList();
                     
             if (!reachablePositions.Any())
@@ -191,7 +191,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
         {
             var unit = BattleStateModel.ActiveUnit;
             var allValidPaths = BattleStateModel.BattleSceneState.PathfindingHandler
-                .AllUnitPaths[unit.UnitData.UnitIdentifier].Where(p => p.IsReachable && !p.TargetPosition.IsOccupied() && p.TargetPosition.IsWalkable()).ToList();
+                .GetAllPathsForUnit(BattleStateModel, unit.UnitData.UnitIdentifier).Where(p => p.IsReachable && !p.TargetPosition.IsOccupied() && p.TargetPosition.IsWalkable()).ToList();
 
             if (!allValidPaths.Any())
             {
@@ -250,7 +250,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
         {
             var unit = BattleStateModel.ActiveUnit;
             var allValidPaths = BattleStateModel.BattleSceneState.PathfindingHandler
-                .AllUnitReachablePaths[unit.UnitData.UnitIdentifier]
+                .GetAllReachablePathsForUnit(BattleStateModel, unit.UnitData.UnitIdentifier)
                 .Where(p => p.IsReachable && !p.TargetPosition.IsOccupied() && p.TargetPosition.IsWalkable()).ToList();
 
             if (!allValidPaths.Any())
@@ -297,8 +297,10 @@ namespace SMUBE.Commands.Args.ArgsPicker
             {
                 return GetAnyStrategy();
             }
-
-            return new CommonArgs(unit.UnitData, null, BattleStateModel, optimalPositionDelta);
+            
+            var result = new CommonArgs(unit.UnitData, null, BattleStateModel, optimalPositionDelta);
+            result.DebugSource = $"{nameof(OneMoveToPositionArgsPicker)}:{nameof(GetCloserCarefullyStrategy)}";
+            return result;
         }
 
         
@@ -322,7 +324,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
             {
                 var reachableSurroundingCache = BattleStateModel.BattleSceneState.PathfindingHandler
                     .GetSurroundingPathCache(BattleStateModel, validTarget.UnitData.BattleScenePosition, true)
-                    .Where(p => !p.TargetPosition.Coordinates.Equals(activeUnit.UnitData.BattleScenePosition.Coordinates)).ToList();
+                    .Where(p => !p.TargetPosition.IsOccupied() && p.TargetPosition.IsWalkable()).ToList();
 
                 if (reachableSurroundingCache.Count == 0)
                     continue;
@@ -442,7 +444,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
             int worstScore = int.MaxValue;
             CommonArgs optimalArgs = null;
 
-            var validPaths = BattleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions
+            var validPaths = BattleStateModel.BattleSceneState.PathfindingHandler.GetAllReachablePathsForActiveUnit(BattleStateModel)
                 .Where(p => !p.TargetPosition.IsOccupied() && p.TargetPosition.IsWalkable()).ToList();
 
             if (validPaths.Count == 0)

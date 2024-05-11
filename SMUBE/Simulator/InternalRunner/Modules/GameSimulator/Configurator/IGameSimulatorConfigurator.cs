@@ -1,10 +1,10 @@
-﻿using SMUBE.Units;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using SMUBE.Units;
 
 namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurator
 {
     internal interface IGameSimulatorConfigurator
     {
-        List<Unit> GetUnits(bool useSimpleBehaviour);
+        ConcurrentBag<Unit> GetUnits(bool useSimpleBehaviour);
     }
 }

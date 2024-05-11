@@ -71,7 +71,7 @@ namespace SMUBE.Commands
             return false;
         }
         
-        protected static void MoveUnitToDelta(CommandArgs commandArgs, Unit activeUnit)
+        protected static void MoveUnitToDelta(BattleStateModel battleStateModel, CommandArgs commandArgs, Unit activeUnit)
         {
             var startPos = commandArgs.BattleStateModel.BattleSceneState
                 .Grid[activeUnit.UnitData.BattleScenePosition.Coordinates.x, activeUnit.UnitData.BattleScenePosition.Coordinates.y];
@@ -80,8 +80,8 @@ namespace SMUBE.Commands
             var targetPos = commandArgs.BattleStateModel.BattleSceneState.Grid[target.x, target.y];
             activeUnit.UnitData.BattleScenePosition = targetPos;
             activeUnit.UnitData.BattleScenePosition.ApplyUnit(activeUnit.UnitData.UnitIdentifier);
-            PathfindingAlgorithm.DirtyPositionCache.Add((startPos.Coordinates, true));
-            PathfindingAlgorithm.DirtyPositionCache.Add((target, false));
+            battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((startPos.Coordinates, true));
+            battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((target, false));
         }
 
         internal virtual CommandArgs GetSuggestedPseudoRandomArgs(BattleStateModel battleStateModel)

@@ -1,4 +1,5 @@
-﻿using SMUBE.AI;
+﻿using System.Collections.Concurrent;
+using SMUBE.AI;
 using SMUBE.Units;
 using System.Collections.Generic;
 using SMUBE.Units.CharacterTypes;
@@ -16,9 +17,9 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
             this.team2AiModel = team2AiModel;
         }
 
-        public List<Unit> GetUnits(bool useSimpleBehaviour)
+        public ConcurrentBag<Unit> GetUnits(bool useSimpleBehaviour)
         {
-            return new List<Unit>
+            return new ConcurrentBag<Unit>
                 {
                     UnitHelper.CreateUnit<Squire>(0, team1AiModel, useSimpleBehaviour),
                     //UnitHelper.CreateUnit<Hunter>(0, team1AiModel, useSimpleBehaviour),

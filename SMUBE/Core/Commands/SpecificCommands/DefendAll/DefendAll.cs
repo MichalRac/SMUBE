@@ -8,7 +8,6 @@ namespace SMUBE.Commands.SpecificCommands.DefendAll
 {
     public class DefendAll : BaseCommand
     {
-        public static int UseCounter = 0;
         private const int DEFEND_ALL_PERSISTANCE = 2;
 
         public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_DefendAll;
@@ -49,7 +48,6 @@ namespace SMUBE.Commands.SpecificCommands.DefendAll
                 targetUnit.UnitData.UnitStats.AddEffects(GetCommandResults(commandArgs));
             }
 
-            UseCounter++;
             return true;
         }
 

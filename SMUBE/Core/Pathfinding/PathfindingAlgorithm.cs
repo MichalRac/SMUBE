@@ -8,8 +8,6 @@ namespace SMUBE.Pathfinding
 {
     public abstract class PathfindingAlgorithm
     {
-        public static List<(SMUBEVector2<int> pos, bool emptyAfter)> DirtyPositionCache = new List<(SMUBEVector2<int>, bool)>();
-
         public class PathfindingPathCacheSet
         {
             public PathfindingPathCache[,] Data;
@@ -43,7 +41,7 @@ namespace SMUBE.Pathfinding
                 TargetPosition = targetPosition;
             }
 
-            public bool IsDirty => ShortestKnownPath.Any(pathNode => DirtyPositionCache.Any(pos => pos.pos.Equals(pathNode.Coordinates)));
+            //public bool IsDirty => ShortestKnownPath.Any(pathNode => DirtyPositionCache.Any(pos => pos.pos.Equals(pathNode.Coordinates)));
         }
 
         protected readonly static float SINGLE_STEP_RANGE = 1f;
@@ -208,7 +206,7 @@ namespace SMUBE.Pathfinding
             return reachableNodes;
         }
         
-        public List<PathfindingPathCache> UpdatePaths(List<PathfindingPathCache> knownPaths, GridBattleScene battleScene, BattleScenePosition startPosition)
+        public List<PathfindingPathCache> UpdatePaths(List<PathfindingPathCache> knownPaths, GridBattleScene battleScene, BattleScenePosition startPosition, List<(SMUBEVector2<int> pos, bool emptyAfter)> unitDirtyPositionCache = null)
         {
             if (knownPaths == null || knownPaths.Count == 0 || !knownPaths.First().StartPosition.Coordinates.Equals(startPosition.Coordinates))
             {
@@ -218,54 +216,65 @@ namespace SMUBE.Pathfinding
             var allNodes = new PathfindingPathCache[battleScene.Width, battleScene.Height];
             var reachableNodes = new List<PathfindingPathCache>();
             var reopenedNodes = new HashSet<SMUBEVector2<int>>();
-            
-            foreach (var knownPath in knownPaths)
+
+            if (unitDirtyPositionCache != null)
             {
-                var isValid = true;
-                foreach (var dirtyCacheElement in DirtyPositionCache)
+                foreach (var knownPath in knownPaths)
                 {
-                    // if any node on path was closed, ignore path
-                    if (!dirtyCacheElement.emptyAfter 
-                        && knownPath.ShortestKnownPath.Any(pathElement => pathElement.Coordinates.Equals(dirtyCacheElement.pos)))
-                    {
-                        isValid = false;
-                        break;
-                    }
+                    var isValid = true;
 
-                    // for opened nodes, check their neighbours, if part of known path, tag neighbour node for revisiting
-                    if (dirtyCacheElement.emptyAfter)
+                    foreach (var dirtyCacheElement in unitDirtyPositionCache)
                     {
-                        var pos = battleScene.Grid[dirtyCacheElement.pos.x, dirtyCacheElement.pos.y];
-                        var neighbours = GetSurroundingPositions(battleScene, pos, false, onlyWalkable: true);
-
-                        foreach (var pathElement in knownPath.ShortestKnownPath)
+                        // if any node on path was closed, ignore path and target neighbours to be reopened
+                        if (!dirtyCacheElement.emptyAfter
+                            && knownPath.ShortestKnownPath.Any(pathElement => pathElement.Coordinates.Equals(dirtyCacheElement.pos)))
                         {
-                            foreach (var dirtyElementNeighbour in neighbours)
+                            isValid = false;
+                            var pos = battleScene.Grid[dirtyCacheElement.pos.x, dirtyCacheElement.pos.y];
+                            var neighbours = GetSurroundingPositions(battleScene, pos, false, onlyWalkable: true);
+                            foreach (var neighbour in neighbours)
                             {
-                                if (pathElement.Coordinates.Equals(dirtyElementNeighbour.Coordinates))
+                                reopenedNodes.Add(neighbour.Coordinates);
+                            }
+
+                            break;
+                        }
+
+                        // for opened nodes, check their neighbours, if part of known path, tag neighbour node for revisiting
+                        if (dirtyCacheElement.emptyAfter)
+                        {
+                            var pos = battleScene.Grid[dirtyCacheElement.pos.x, dirtyCacheElement.pos.y];
+                            var neighbours = GetSurroundingPositions(battleScene, pos, false, onlyWalkable: true);
+
+                            foreach (var pathElement in knownPath.ShortestKnownPath)
+                            {
+                                foreach (var dirtyElementNeighbour in neighbours)
                                 {
-                                    reopenedNodes.Add(pathElement.Coordinates);
+                                    if (pathElement.Coordinates.Equals(dirtyElementNeighbour.Coordinates))
+                                    {
+                                        reopenedNodes.Add(pathElement.Coordinates);
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                // assign node path cache to known paths
-                if (isValid)
+                    // assign node path cache to known paths
+                    if (isValid)
+                    {
+                        allNodes[knownPath.TargetPosition.Coordinates.x, knownPath.TargetPosition.Coordinates.y] = knownPath;
+                    }
+                }
+                
+                foreach (var reopenedNode in reopenedNodes)
                 {
-                    allNodes[knownPath.TargetPosition.Coordinates.x, knownPath.TargetPosition.Coordinates.y] = knownPath;
+                    if (allNodes[reopenedNode.x, reopenedNode.y] != null)
+                    {
+                        allNodes[reopenedNode.x, reopenedNode.y].WasVisited = false;
+                    }
                 }
             }
-
-            foreach (var reopenedNode in reopenedNodes)
-            {
-                if (allNodes[reopenedNode.x, reopenedNode.y] != null)
-                {
-                    allNodes[reopenedNode.x, reopenedNode.y].WasVisited = false;
-                }
-            }
-
+            
             for (int i = 0; i < battleScene.Width; i++)
             {
                 for (int j = 0; j < battleScene.Height; j++)
@@ -373,6 +382,7 @@ namespace SMUBE.Pathfinding
             return nextEvaluatedNode;
         }
 
+        /*
         private void GreedyPathfindingLoop(GridBattleScene battleScene, BattleScenePosition position, PathfindingPathCache[,] allNodes, List<PathfindingPathCache> reachableNodes, float maxDistance)
         {
             var currentNode = allNodes[position.Coordinates.x, position.Coordinates.y];
@@ -464,7 +474,9 @@ namespace SMUBE.Pathfinding
                 }
             }
         }
+        */
 
+        /*
         public List<PathfindingPathCache> UpdateAllReachablePaths(List<PathfindingPathCache> knownPaths, GridBattleScene battleScene, BattleScenePosition startPosition, int maxSteps = int.MaxValue)
         {
             var maxDistance = (maxSteps * SINGLE_STEP_RANGE);
@@ -482,7 +494,7 @@ namespace SMUBE.Pathfinding
             foreach (var knownPathNode in knownPaths)
             {
                 // if a node or it's any neighbour has changed, recalculate any paths going through them
-                if (knownPathNode.IsDirty)
+                if (knownPathNode.ShortestKnownPath.Any(pathNode => DirtyPositionCache.Any(dirtyPos => dirtyPos.pos.Equals(pathNode.Coordinates))))
                 {
                     continue;
                 }                
@@ -500,6 +512,7 @@ namespace SMUBE.Pathfinding
             
             return reachableNodes.Where(n => n.ShortestDistance <= maxDistance).ToList();
         }
+        */
 
         protected List<BattleScenePosition> GetShorterPath(List<BattleScenePosition> pathA, List<BattleScenePosition> pathB)
         {

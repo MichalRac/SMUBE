@@ -32,7 +32,7 @@ namespace SMUBE.BattleState.Heatmap.GeneralHeatmaps
                 }
                 
                 var unitPaths = battleStateModel.BattleSceneState
-                    .PathfindingHandler.ReachablePathCacheSets[unitOfTeamId.UnitData.UnitIdentifier];
+                    .PathfindingHandler.GetAllReachablePathCacheSetsForUnit(battleStateModel, unitOfTeamId.UnitData.UnitIdentifier);
                 
                 foreach (var pathCache in unitPaths.Data)
                 {

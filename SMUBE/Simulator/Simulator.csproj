@@ -65,6 +65,7 @@
     <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerAction.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\ActionContexts\InternalRunnerActionContext.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\PredefinedGameSimulatorModule.cs" />
+    <Compile Include="InternalRunner\Modules\GameSimulator\SimulatorDebugData.cs" />
     <Compile Include="InternalRunner\Modules\IInternalRunnerModule.cs" />
     <Compile Include="InternalRunner\Modules\InternalRunnerModulePicker.cs" />
     <Compile Include="InternalRunner\Modules\Pathfinding\PathfindingConfigurations.cs" />

@@ -2,6 +2,7 @@
 using SMUBE.Core;
 using SMUBE.Units;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -22,6 +23,7 @@ using SMUBE.Commands.SpecificCommands.Tackle;
 using SMUBE.Commands.SpecificCommands.Taunt;
 using SMUBE.Commands.SpecificCommands.Teleport;
 using SMUBE.Commands.SpecificCommands.Wait;
+using SMUBE.Units.CharacterTypes;
 
 namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 {
@@ -29,73 +31,87 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
     {
         private BattleCore _core;
         public BattleCore Core => _core;
-
-        private int turnCounter = 0;
-
-        private static long teamOneAICommandTime = 0;
-        private static long teamTwoAICommandTime = 0;
-
-        private static long teamOneAIArgsTime = 0;
-        private static long teamTwoAIArgsTime = 0;
-
-        private static long teamOneActions = 0;
-        private static long teamTwoActions = 0;
-
-        private static int totalSimulationCount = 0;
-        private static int team1WinCount = 0;
-        private static int team2WinCount = 0;
         
         private static bool prewarm = false;
 
+        public SimulatorDebugData _simulatorDebugData = new SimulatorDebugData();
+
         private List<(ICommand, CommandArgs)> CurrentListOfActions = new List<(ICommand, CommandArgs)>();
         
-        public void SetupSimulation(List<Unit> initialUnits)
+        public void SetupSimulation(ConcurrentBag<Unit> initialUnits)
         {
-            totalSimulationCount++;
-            turnCounter = 0;
-            _core = new BattleCore(initialUnits);
+            _simulatorDebugData.totalSimulationCount++;
+            _simulatorDebugData.turnCount = 0;
+
+            foreach (var unit in initialUnits)
+            {
+                switch (unit.UnitData.UnitStats.BaseCharacter.BaseCharacterType)
+                {
+                    case BaseCharacterType.None:
+                        break;
+                    case BaseCharacterType.Scholar:
+                        _simulatorDebugData.ScholarCount++;
+                        break;
+                    case BaseCharacterType.Squire:
+                        _simulatorDebugData.SquireCount++;
+                        break;
+                    case BaseCharacterType.Hunter:
+                        _simulatorDebugData.HunterCount++;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            List<Unit> units = new List<Unit>();
+            foreach (var initialUnit in initialUnits)
+            {
+                units.Add(initialUnit);
+            }
+            
+            _core = new BattleCore(units);
         }
 
         public void RestartDebugCounters()
         {
-            teamOneAICommandTime = 0;
-            teamTwoAICommandTime = 0;
+            _simulatorDebugData.teamOneAICommandTime = 0;
+            _simulatorDebugData.teamTwoAICommandTime = 0;
 
-            teamOneAIArgsTime = 0;
-            teamTwoAIArgsTime = 0;
+            _simulatorDebugData.teamOneAIArgsTime = 0;
+            _simulatorDebugData.teamTwoAIArgsTime = 0;
 
-            teamOneActions = 0;
-            teamTwoActions = 0;
-            turnCounter = 0;
+            _simulatorDebugData.teamOneActions = 0;
+            _simulatorDebugData.teamTwoActions = 0;
+            _simulatorDebugData.turnCount = 0;
 
-            totalSimulationCount = 0;
-            team1WinCount = 0;
-            team2WinCount = 0;
+            _simulatorDebugData.totalSimulationCount = 0;
+            _simulatorDebugData.team1WinCount = 0;
+            _simulatorDebugData.team2WinCount = 0;
 
-            UnitHelper.ScholarCount = 0;
-            UnitHelper.HunterCount = 0;
-            UnitHelper.SquireCount = 0;
+            _simulatorDebugData.ScholarCount = 0;
+            _simulatorDebugData.HunterCount = 0;
+            _simulatorDebugData.SquireCount = 0;
 
-            BattleStateModel.FailedCommandExecutions = 0;
+            _simulatorDebugData.FailedCommandExecutions = 0;
             
-            BaseAttack.UseCounter = 0;
-            BaseBlock.UseCounter = 0;
-            BaseWalk.UseCounter = 0;
+            _simulatorDebugData.BaseAttack_UseCounter = 0;
+            _simulatorDebugData.BaseBlock_UseCounter = 0;
+            _simulatorDebugData.BaseWalk_UseCounter = 0;
             
-            HealAll.UseCounter = 0;
-            LowerEnemyDefense.UseCounter = 0;
-            ShieldPosition.UseCounter = 0;
+            _simulatorDebugData.HealAll_UseCounter = 0;
+            _simulatorDebugData.LowerEnemyDefense_UseCounter = 0;
+            _simulatorDebugData.ShieldPosition_UseCounter = 0;
 
-            HeavyAttack.UseCounter = 0;
-            RaiseObstacle.UseCounter = 0;
-            Teleport.UseCounter = 0;
+            _simulatorDebugData.HeavyAttack_UseCounter = 0;
+            _simulatorDebugData.RaiseObstacle_UseCounter = 0;
+            _simulatorDebugData.Teleport_UseCounter = 0;
 
-            Tackle.UseCounter = 0;
-            Taunt.UseCounter = 0;
-            DefendAll.UseCounter = 0;
+            _simulatorDebugData.Tackle_UseCounter = 0;
+            _simulatorDebugData.Taunt_UseCounter = 0;
+            _simulatorDebugData.DefendAll_UseCounter = 0;
             
-            TauntedAttack.UseCounter = 0;
-            Wait.UseCounter = 0;
+            _simulatorDebugData.TauntedAttack_UseCounter = 0;
+            _simulatorDebugData.Wait_UseCounter = 0;
         }
         
         public bool IsFinished(out int winningTeamId)
@@ -112,9 +128,9 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             }
             
             if (winningTeamId == 0)
-                team1WinCount++;
+                _simulatorDebugData.team1WinCount++;
             else
-                team2WinCount++;
+                _simulatorDebugData.team2WinCount++;
 
         }
 
@@ -127,7 +143,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             var team1AIName = team1AI.GetType().Name;
             var team2AIName = team2AI.GetType().Name;
 
-            if (totalSimulationCount == 1)
+            if (_simulatorDebugData.totalSimulationCount == 1)
             {
                 if (_core.currentStateModel.IsFinished(out var winningTeamId))
                 {
@@ -139,118 +155,118 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 }
             }
             
-            Console.WriteLine($"team 1 ai ({team1AIName}) runtime: command {teamOneAICommandTime}ticks / args {teamOneAIArgsTime}ticks / total {teamOneAICommandTime + teamOneAIArgsTime}");
-            Console.WriteLine($"team 2 ai ({team2AIName}) runtime: command {teamTwoAICommandTime}ticks / args {teamTwoAIArgsTime}ticks / total {teamTwoAICommandTime + teamTwoAIArgsTime}");
-            Console.WriteLine($"team 1 actions: {teamOneActions}");
-            Console.WriteLine($"team 2 actions: {teamTwoActions}");
-            Console.WriteLine($"total actions: {teamOneActions + teamTwoActions}");
+            Console.WriteLine($"team 1 ai ({team1AIName}) runtime: command {_simulatorDebugData.teamOneAICommandTime}ticks / args {_simulatorDebugData.teamOneAIArgsTime}ticks / total {_simulatorDebugData.teamOneAICommandTime + _simulatorDebugData.teamOneAIArgsTime}");
+            Console.WriteLine($"team 2 ai ({team2AIName}) runtime: command {_simulatorDebugData.teamTwoAICommandTime}ticks / args {_simulatorDebugData.teamTwoAIArgsTime}ticks / total {_simulatorDebugData.teamTwoAICommandTime + _simulatorDebugData.teamTwoAIArgsTime}");
+            Console.WriteLine($"team 1 actions: {_simulatorDebugData.teamOneActions}");
+            Console.WriteLine($"team 2 actions: {_simulatorDebugData.teamTwoActions}");
+            Console.WriteLine($"total actions: {_simulatorDebugData.teamOneActions + _simulatorDebugData.teamTwoActions}");
 
-            Console.WriteLine($"team 1 ticks per action: {(float)(teamOneAICommandTime + teamOneAIArgsTime) / teamOneActions}");
-            Console.WriteLine($"team 2 ticks per action: {(float)(teamTwoAICommandTime + teamTwoAIArgsTime) / teamTwoActions}");
+            Console.WriteLine($"team 1 ticks per action: {(float)(_simulatorDebugData.teamOneAICommandTime + _simulatorDebugData.teamOneAIArgsTime) / _simulatorDebugData.teamOneActions}");
+            Console.WriteLine($"team 2 ticks per action: {(float)(_simulatorDebugData.teamTwoAICommandTime + _simulatorDebugData.teamTwoAIArgsTime) / _simulatorDebugData.teamTwoActions}");
 
-            if (totalSimulationCount > 1)
+            if (_simulatorDebugData.totalSimulationCount > 1)
             {
-                Console.WriteLine($"team 1 win rate: {(float)team1WinCount/totalSimulationCount * 100}%");
-                Console.WriteLine($"team 2 win rate: {(float)team2WinCount/totalSimulationCount * 100}%");
+                Console.WriteLine($"team 1 win rate: {(float)_simulatorDebugData.team1WinCount/_simulatorDebugData.totalSimulationCount * 100}%");
+                Console.WriteLine($"team 2 win rate: {(float)_simulatorDebugData.team2WinCount/_simulatorDebugData.totalSimulationCount * 100}%");
                 
-                Console.WriteLine($"total support character type count: {UnitHelper.ScholarCount}");
-                Console.WriteLine($"total offensive character type count: {UnitHelper.HunterCount}");
-                Console.WriteLine($"total defensive character type count: {UnitHelper.SquireCount}");
+                Console.WriteLine($"total support character type count: {_simulatorDebugData.ScholarCount}");
+                Console.WriteLine($"total offensive character type count: {_simulatorDebugData.HunterCount}");
+                Console.WriteLine($"total defensive character type count: {_simulatorDebugData.SquireCount}");
             }
             
-            Console.WriteLine($"{nameof(BaseAttack)} uses:\t{BaseAttack.UseCounter}");
-            Console.WriteLine($"{nameof(BaseBlock)} uses:\t{BaseBlock.UseCounter}");
-            Console.WriteLine($"{nameof(BaseWalk)} uses:\t{BaseWalk.UseCounter}");
+            Console.WriteLine($"{nameof(BaseAttack)} uses:\t{_simulatorDebugData.BaseAttack_UseCounter}");
+            Console.WriteLine($"{nameof(BaseBlock)} uses:\t{_simulatorDebugData.BaseBlock_UseCounter}");
+            Console.WriteLine($"{nameof(BaseWalk)} uses:\t{_simulatorDebugData.BaseWalk_UseCounter}");
             
-            Console.WriteLine($"{nameof(HealAll)} uses:\t{HealAll.UseCounter}");
-            Console.WriteLine($"{nameof(LowerEnemyDefense)} uses:\t{LowerEnemyDefense.UseCounter}");
-            Console.WriteLine($"{nameof(ShieldPosition)} uses:\t{ShieldPosition.UseCounter}");
+            Console.WriteLine($"{nameof(HealAll)} uses:\t{_simulatorDebugData.HealAll_UseCounter}");
+            Console.WriteLine($"{nameof(LowerEnemyDefense)} uses:\t{_simulatorDebugData.LowerEnemyDefense_UseCounter}");
+            Console.WriteLine($"{nameof(ShieldPosition)} uses:\t{_simulatorDebugData.ShieldPosition_UseCounter}");
 
-            Console.WriteLine($"{nameof(HeavyAttack)} uses:\t{HeavyAttack.UseCounter}");
-            Console.WriteLine($"{nameof(RaiseObstacle)} uses:\t{RaiseObstacle.UseCounter}");
-            Console.WriteLine($"{nameof(Teleport)} uses:\t{Teleport.UseCounter}");
+            Console.WriteLine($"{nameof(HeavyAttack)} uses:\t{_simulatorDebugData.HeavyAttack_UseCounter}");
+            Console.WriteLine($"{nameof(RaiseObstacle)} uses:\t{_simulatorDebugData.RaiseObstacle_UseCounter}");
+            Console.WriteLine($"{nameof(Teleport)} uses:\t{_simulatorDebugData.Teleport_UseCounter}");
 
-            Console.WriteLine($"{nameof(Tackle)} uses:\t{Tackle.UseCounter}");
-            Console.WriteLine($"{nameof(Taunt)} uses:\t{Taunt.UseCounter}");
-            Console.WriteLine($"{nameof(DefendAll)} uses:\t{DefendAll.UseCounter}");
+            Console.WriteLine($"{nameof(Tackle)} uses:\t{_simulatorDebugData.Tackle_UseCounter}");
+            Console.WriteLine($"{nameof(Taunt)} uses:\t{_simulatorDebugData.Taunt_UseCounter}");
+            Console.WriteLine($"{nameof(DefendAll)} uses:\t{_simulatorDebugData.DefendAll_UseCounter}");
 
-            Console.WriteLine($"{nameof(TauntedAttack)} uses:\t{TauntedAttack.UseCounter}");
-            Console.WriteLine($"{nameof(Wait)} uses:\t{Wait.UseCounter}");
+            Console.WriteLine($"{nameof(TauntedAttack)} uses:\t{_simulatorDebugData.TauntedAttack_UseCounter}");
+            Console.WriteLine($"{nameof(Wait)} uses:\t{_simulatorDebugData.Wait_UseCounter}");
 
-            var totalCommandUses = BaseAttack.UseCounter + BaseBlock.UseCounter + BaseWalk.UseCounter 
-                                   + DefendAll.UseCounter + HealAll.UseCounter + HeavyAttack.UseCounter 
-                                   + LowerEnemyDefense.UseCounter + RaiseObstacle.UseCounter + ShieldPosition.UseCounter 
-                                   + Tackle.UseCounter + Taunt.UseCounter + Teleport.UseCounter 
-                                   + TauntedAttack.UseCounter + Wait.UseCounter;
+            var totalCommandUses = _simulatorDebugData.BaseAttack_UseCounter + _simulatorDebugData.BaseBlock_UseCounter + _simulatorDebugData.BaseWalk_UseCounter 
+                                   + _simulatorDebugData.DefendAll_UseCounter + _simulatorDebugData.HealAll_UseCounter + _simulatorDebugData.HeavyAttack_UseCounter 
+                                   + _simulatorDebugData.LowerEnemyDefense_UseCounter + _simulatorDebugData.RaiseObstacle_UseCounter + _simulatorDebugData.ShieldPosition_UseCounter 
+                                   + _simulatorDebugData.Tackle_UseCounter + _simulatorDebugData.Taunt_UseCounter + _simulatorDebugData.Teleport_UseCounter 
+                                   + _simulatorDebugData.TauntedAttack_UseCounter + _simulatorDebugData.Wait_UseCounter;
             
             Console.WriteLine($"Total uses:\t{totalCommandUses}");
             Console.WriteLine($"Failed turns: {BattleStateModel.FailedCommandExecutions}");
-            Console.WriteLine($"(Total actions - total command use count) diff: {teamOneActions + teamTwoActions - totalCommandUses}");
+            Console.WriteLine($"(Total actions - total command use count) diff: {_simulatorDebugData.teamOneActions + _simulatorDebugData.teamTwoActions - totalCommandUses}");
 
             if(team1AIName == team2AIName)
             {
-                var aiTotalRuntime = teamOneAICommandTime + teamTwoAICommandTime;
-                var aiTotalArgsRuntime = teamOneAIArgsTime + teamTwoAIArgsTime;
+                var aiTotalRuntime = _simulatorDebugData.teamOneAICommandTime + _simulatorDebugData.teamTwoAICommandTime;
+                var aiTotalArgsRuntime = _simulatorDebugData.teamOneAIArgsTime + _simulatorDebugData.teamTwoAIArgsTime;
 
-                Console.WriteLine($"ai ({team1AIName}) runtime: command {teamOneAICommandTime}ticks / args {teamOneAIArgsTime}ticks / total {teamOneAICommandTime + teamOneAIArgsTime}");
-                Console.WriteLine($"ai ticks per action: {(float)(aiTotalRuntime + aiTotalArgsRuntime) / (teamOneActions + teamTwoActions)}");
+                Console.WriteLine($"ai ({team1AIName}) runtime: command {_simulatorDebugData.teamOneAICommandTime}ticks / args {_simulatorDebugData.teamOneAIArgsTime}ticks / total {_simulatorDebugData.teamOneAICommandTime + _simulatorDebugData.teamTwoAIArgsTime}");
+                Console.WriteLine($"ai ticks per action: {(float)(aiTotalRuntime + aiTotalArgsRuntime) / (_simulatorDebugData.teamOneActions + _simulatorDebugData.teamTwoActions)}");
             }
 
             if (logToFile)
             {
                 var date = DateTime.UtcNow;
                 var dateSuffix = $"{date.Year}_{date.Month}_{date.Day}_{date.Hour}_{date.Minute}_{date.Second}";
-                var newFile = File.CreateText($"E:\\_RepositoryE\\SMUBE\\Output\\logs\\log_{dateSuffix}_{totalSimulationCount}sim.txt");
+                var newFile = File.CreateText($"E:\\_RepositoryE\\SMUBE\\Output\\logs\\log_{dateSuffix}_{_simulatorDebugData.totalSimulationCount}sim.txt");
                 
                 newFile.WriteLine($"Simulation results");
-                newFile.WriteLine($"simulations: {totalSimulationCount}");
+                newFile.WriteLine($"simulations: {_simulatorDebugData.totalSimulationCount}");
                 newFile.WriteLine($"date: {dateSuffix}");
                 newFile.WriteLine($"\n");
                 
-                newFile.WriteLine($"team 1 ai ({team1AIName}) runtime: command {teamOneAICommandTime}ticks / args {teamOneAIArgsTime}ticks / total {teamOneAICommandTime + teamOneAIArgsTime}");
-                newFile.WriteLine($"team 2 ai ({team2AIName}) runtime: command {teamTwoAICommandTime}ticks / args {teamTwoAIArgsTime}ticks / total {teamTwoAICommandTime + teamTwoAIArgsTime}");
-                newFile.WriteLine($"team 1 actions: {teamOneActions}");
-                newFile.WriteLine($"team 2 actions: {teamTwoActions}");
-                newFile.WriteLine($"total actions: {teamOneActions + teamTwoActions}");
+                newFile.WriteLine($"team 1 ai ({team1AIName}) runtime: command {_simulatorDebugData.teamOneAICommandTime}ticks / args {_simulatorDebugData.teamOneAIArgsTime}ticks / total {_simulatorDebugData.teamOneAICommandTime + _simulatorDebugData.teamOneAIArgsTime}");
+                newFile.WriteLine($"team 2 ai ({team2AIName}) runtime: command {_simulatorDebugData.teamTwoAICommandTime}ticks / args {_simulatorDebugData.teamTwoAIArgsTime}ticks / total {_simulatorDebugData.teamTwoAICommandTime + _simulatorDebugData.teamTwoAIArgsTime}");
+                newFile.WriteLine($"team 1 actions: {_simulatorDebugData.teamOneActions}");
+                newFile.WriteLine($"team 2 actions: {_simulatorDebugData.teamTwoActions}");
+                newFile.WriteLine($"total actions: {_simulatorDebugData.teamOneActions + _simulatorDebugData.teamTwoActions}");
                 newFile.WriteLine($"\n");
 
-                newFile.WriteLine($"team 1 ticks per action: {(float)(teamOneAICommandTime + teamOneAIArgsTime) / teamOneActions}");
-                newFile.WriteLine($"team 2 ticks per action: {(float)(teamTwoAICommandTime + teamTwoAIArgsTime) / teamTwoActions}");
+                newFile.WriteLine($"team 1 ticks per action: {(float)(_simulatorDebugData.teamOneAICommandTime + _simulatorDebugData.teamOneAIArgsTime) / _simulatorDebugData.teamOneActions}");
+                newFile.WriteLine($"team 2 ticks per action: {(float)(_simulatorDebugData.teamTwoAICommandTime + _simulatorDebugData.teamTwoAIArgsTime) / _simulatorDebugData.teamTwoActions}");
                 newFile.WriteLine($"\n");
 
-                if (totalSimulationCount > 1)
+                if (_simulatorDebugData.totalSimulationCount > 1)
                 {
-                    newFile.WriteLine($"team 1 win rate: {(float)team1WinCount/totalSimulationCount * 100}%");
-                    newFile.WriteLine($"team 2 win rate: {(float)team2WinCount/totalSimulationCount * 100}%");
+                    newFile.WriteLine($"team 1 win rate: {(float)_simulatorDebugData.team1WinCount/_simulatorDebugData.totalSimulationCount * 100}%");
+                    newFile.WriteLine($"team 2 win rate: {(float)_simulatorDebugData.team2WinCount/_simulatorDebugData.totalSimulationCount * 100}%");
                     newFile.WriteLine($"\n");
 
-                    newFile.WriteLine($"total support character type count: {UnitHelper.ScholarCount}");
-                    newFile.WriteLine($"total offensive character type count: {UnitHelper.HunterCount}");
-                    newFile.WriteLine($"total defensive character type count: {UnitHelper.SquireCount}");
+                    newFile.WriteLine($"total support character type count: {_simulatorDebugData.ScholarCount}");
+                    newFile.WriteLine($"total offensive character type count: {_simulatorDebugData.HunterCount}");
+                    newFile.WriteLine($"total defensive character type count: {_simulatorDebugData.SquireCount}");
                 }
                 
-                newFile.WriteLine($"{nameof(BaseAttack)} uses:\t{BaseAttack.UseCounter}");
-                newFile.WriteLine($"{nameof(BaseBlock)} uses:\t{BaseBlock.UseCounter}");
-                newFile.WriteLine($"{nameof(BaseWalk)} uses:\t{BaseWalk.UseCounter}");
+                newFile.WriteLine($"{nameof(BaseAttack)} uses:\t{_simulatorDebugData.BaseAttack_UseCounter}");
+                newFile.WriteLine($"{nameof(BaseBlock)} uses:\t{_simulatorDebugData.BaseBlock_UseCounter}");
+                newFile.WriteLine($"{nameof(BaseWalk)} uses:\t{_simulatorDebugData.BaseWalk_UseCounter}");
                 
-                newFile.WriteLine($"{nameof(HealAll)} uses:\t{HealAll.UseCounter}");
-                newFile.WriteLine($"{nameof(LowerEnemyDefense)} uses:\t{LowerEnemyDefense.UseCounter}");
-                newFile.WriteLine($"{nameof(ShieldPosition)} uses:\t{ShieldPosition.UseCounter}");
+                newFile.WriteLine($"{nameof(HealAll)} uses:\t{_simulatorDebugData.HealAll_UseCounter}");
+                newFile.WriteLine($"{nameof(LowerEnemyDefense)} uses:\t{_simulatorDebugData.LowerEnemyDefense_UseCounter}");
+                newFile.WriteLine($"{nameof(ShieldPosition)} uses:\t{_simulatorDebugData.ShieldPosition_UseCounter}");
 
-                newFile.WriteLine($"{nameof(HeavyAttack)} uses:\t{HeavyAttack.UseCounter}");
-                newFile.WriteLine($"{nameof(RaiseObstacle)} uses:\t{RaiseObstacle.UseCounter}");
-                newFile.WriteLine($"{nameof(Teleport)} uses:\t{Teleport.UseCounter}");
+                newFile.WriteLine($"{nameof(HeavyAttack)} uses:\t{_simulatorDebugData.HeavyAttack_UseCounter}");
+                newFile.WriteLine($"{nameof(RaiseObstacle)} uses:\t{_simulatorDebugData.RaiseObstacle_UseCounter}");
+                newFile.WriteLine($"{nameof(Teleport)} uses:\t{_simulatorDebugData.Teleport_UseCounter}");
 
-                newFile.WriteLine($"{nameof(Tackle)} uses:\t{Tackle.UseCounter}");
-                newFile.WriteLine($"{nameof(Taunt)} uses:\t{Taunt.UseCounter}");
-                newFile.WriteLine($"{nameof(DefendAll)} uses:\t{DefendAll.UseCounter}");
+                newFile.WriteLine($"{nameof(Tackle)} uses:\t{_simulatorDebugData.Tackle_UseCounter}");
+                newFile.WriteLine($"{nameof(Taunt)} uses:\t{_simulatorDebugData.Taunt_UseCounter}");
+                newFile.WriteLine($"{nameof(DefendAll)} uses:\t{_simulatorDebugData.DefendAll_UseCounter}");
 
-                newFile.WriteLine($"{nameof(TauntedAttack)} uses:\t{TauntedAttack.UseCounter}");
-                newFile.WriteLine($"{nameof(Wait)} uses:\t{Wait.UseCounter}");
+                newFile.WriteLine($"{nameof(TauntedAttack)} uses:\t{_simulatorDebugData.TauntedAttack_UseCounter}");
+                newFile.WriteLine($"{nameof(Wait)} uses:\t{_simulatorDebugData.Wait_UseCounter}");
                 
                 newFile.WriteLine($"Total uses:\t{totalCommandUses}");
                 newFile.WriteLine($"Failed turns: {BattleStateModel.FailedCommandExecutions}");
-                newFile.WriteLine($"(Total actions - total command use count) diff: {teamOneActions + teamTwoActions - totalCommandUses}");
+                newFile.WriteLine($"(Total actions - total command use count) diff: {_simulatorDebugData.teamOneActions + _simulatorDebugData.teamTwoActions - totalCommandUses}");
                 
                 newFile.Close();
             }
@@ -259,7 +275,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
         public void LogTurnInfo()
         {
             Console.WriteLine($"\n-- -- -- -- -- --");
-            Console.WriteLine($"-- TURN {turnCounter} --");
+            Console.WriteLine($"-- TURN {_simulatorDebugData.turnCount} --");
             Console.WriteLine($"-- -- -- -- -- --");
         }
 
@@ -323,29 +339,31 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             {
                 if (unit.UnitData.UnitIdentifier.TeamId == 0)
                 {
-                    teamOneAICommandTime += commandStopwatch.ElapsedTicks;
-                    teamOneAIArgsTime += argsStopwatch.ElapsedTicks;
+                    _simulatorDebugData.teamOneAICommandTime += commandStopwatch.ElapsedTicks;
+                    _simulatorDebugData.teamOneAIArgsTime += argsStopwatch.ElapsedTicks;
                 }
                 else
                 {
-                    teamTwoAICommandTime += commandStopwatch.ElapsedTicks;
-                    teamTwoAIArgsTime += argsStopwatch.ElapsedTicks;
+                    _simulatorDebugData.teamTwoAICommandTime += commandStopwatch.ElapsedTicks;
+                    _simulatorDebugData.teamTwoAIArgsTime += argsStopwatch.ElapsedTicks;
                 }
             }
             
             if (unit.UnitData.UnitIdentifier.TeamId == 0)
             {
-                teamOneActions++;
+                _simulatorDebugData.teamOneActions++;
             }
             else
             {
-                teamTwoActions++;
+                _simulatorDebugData.teamTwoActions++;
             }
 
             if (!(unit.AiModel is BehaviorTreeAIModel))
             {
                 _core.currentStateModel.ExecuteCommand(nextCommand, nextArgs);
             }
+            
+            _simulatorDebugData.UpdateCommandUse(nextCommand.CommandId);
             
             CurrentListOfActions.Add((nextCommand, nextArgs));
 
@@ -358,7 +376,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
         public void OnTurnEnded()
         {
-            turnCounter++;
+            _simulatorDebugData.turnCount++;
         }
 
         public void LogUnitSummary()

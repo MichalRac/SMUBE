@@ -8,7 +8,6 @@ namespace SMUBE.Commands.SpecificCommands.HealAll
 {
     public class HealAll : BaseCommand
     {
-        public static int UseCounter = 0;
         public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_HealAll;
         public override int ManaCost => SpecificCommandCostConfiguration.Mana_HealAll;
         public override CommandId CommandId => CommandId.HealAll;
@@ -49,7 +48,6 @@ namespace SMUBE.Commands.SpecificCommands.HealAll
             }
 
             activeUnit.UnitData.UnitStats.TryUseAbility(this);
-            UseCounter++;
             return true;
         }
 

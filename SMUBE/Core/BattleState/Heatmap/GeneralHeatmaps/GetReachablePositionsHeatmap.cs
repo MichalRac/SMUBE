@@ -16,7 +16,8 @@ namespace SMUBE.BattleState.Heatmap.GeneralHeatmaps
         {
             base.ProcessHeatmap(battleStateModel);
 
-            var reachablePositions = battleStateModel.BattleSceneState.PathfindingHandler.AllUnitReachablePaths[_unitIdentifier];
+            var reachablePositions = battleStateModel.BattleSceneState.PathfindingHandler
+                .GetAllReachablePathsForUnit(battleStateModel, _unitIdentifier);
 
             foreach (var reachablePosition in reachablePositions)
             {

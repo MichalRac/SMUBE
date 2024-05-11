@@ -1,43 +1,76 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using SMUBE.BattleState;
 using SMUBE.DataStructures.BattleScene;
 using SMUBE.DataStructures.Units;
+using SMUBE.DataStructures.Utils;
 
 namespace SMUBE.Pathfinding
 {
     public class PathfindingHandler
     {
-        private PathfindingAlgorithm Pathfinding { get; } = new AStarPathfindingAlgorithm();
+        public List<(SMUBEVector2<int> pos, bool emptyAfter)> AggregatedDirtyPositionCache = new List<(SMUBEVector2<int>, bool)>();
+        public Dictionary<UnitIdentifier, List<(SMUBEVector2<int> pos, bool emptyAfter)>> PersonalDirtyPositionCache 
+            = new Dictionary<UnitIdentifier, List<(SMUBEVector2<int> pos, bool emptyAfter)>>();
+        
+        private List<UnitIdentifier> _initializedPaths = new List<UnitIdentifier>();
+        
+        public PathfindingAlgorithm Pathfinding { get; } = new AStarPathfindingAlgorithm();
         private BattleScenePosition _activeUnitPosition;
         
-        private List<PathfindingAlgorithm.PathfindingPathCache> _activeUnitReachablePositions = new List<PathfindingAlgorithm.PathfindingPathCache>();
-        public IReadOnlyList<PathfindingAlgorithm.PathfindingPathCache> ActiveUnitReachablePositions => _activeUnitReachablePositions;
+        private Dictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>> _allUnitPaths 
+            = new Dictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>>();
         
+        public List<PathfindingAlgorithm.PathfindingPathCache> GetAllPathsForUnit(BattleStateModel battleStateModel, UnitIdentifier unitIdentifier)
+        {
+            EnsureUnitPathsUpdated(battleStateModel, unitIdentifier);
+            return _allUnitPaths[unitIdentifier];
+        }
 
-        private Dictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>> _allUnitPaths = new Dictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>>();
-        public IReadOnlyDictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>> AllUnitPaths => _allUnitPaths;
-        
-        
-        private Dictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>> _allUnitReachablePaths = new Dictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>>();
-        public IReadOnlyDictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>> AllUnitReachablePaths => _allUnitReachablePaths;
+        private Dictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>> _allUnitReachablePaths 
+            = new Dictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>>();
 
-        public Dictionary<UnitIdentifier, PathfindingAlgorithm.PathfindingPathCacheSet> PathCacheSets =
+        public List<PathfindingAlgorithm.PathfindingPathCache> GetAllReachablePathsForUnit(BattleStateModel battleStateModel, UnitIdentifier unitIdentifier)
+        {
+            EnsureUnitPathsUpdated(battleStateModel, unitIdentifier);
+            return _allUnitReachablePaths[unitIdentifier];
+        }
+        
+        public List<PathfindingAlgorithm.PathfindingPathCache> GetAllReachablePathsForActiveUnit(BattleStateModel battleStateModel)
+        {
+            return GetAllReachablePathsForUnit(battleStateModel, battleStateModel.ActiveUnit.UnitData.UnitIdentifier);
+        }
+
+        private Dictionary<UnitIdentifier, PathfindingAlgorithm.PathfindingPathCacheSet> PathCacheSets =
             new Dictionary<UnitIdentifier, PathfindingAlgorithm.PathfindingPathCacheSet>();
         
-        public Dictionary<UnitIdentifier, PathfindingAlgorithm.PathfindingPathCacheSet> ReachablePathCacheSets =
-            new Dictionary<UnitIdentifier, PathfindingAlgorithm.PathfindingPathCacheSet>();
+        public PathfindingAlgorithm.PathfindingPathCacheSet GetAllPathCacheSetsForUnit(BattleStateModel battleStateModel, UnitIdentifier unitIdentifier)
+        {
+            EnsureUnitPathsUpdated(battleStateModel, unitIdentifier);
+            return PathCacheSets[unitIdentifier];
+        }
         
+        private Dictionary<UnitIdentifier, PathfindingAlgorithm.PathfindingPathCacheSet> ReachablePathCacheSets =
+            new Dictionary<UnitIdentifier, PathfindingAlgorithm.PathfindingPathCacheSet>();
+        public PathfindingAlgorithm.PathfindingPathCacheSet GetAllReachablePathCacheSetsForUnit(BattleStateModel battleStateModel, UnitIdentifier unitIdentifier)
+        {
+            EnsureUnitPathsUpdated(battleStateModel, unitIdentifier);
+            return ReachablePathCacheSets[unitIdentifier];
+        }
+
         private bool initialized = false;
-        
+
         private void Initialize(BattleStateModel battleState)
         {
             EvaluateAllPaths(battleState);
             EvaluateAllUnitReachablePositions(battleState);
 
+            foreach (var unit in battleState.Units)
+            {
+                _initializedPaths.Add(unit.UnitData.UnitIdentifier);
+            }
+            
             _activeUnitPosition = battleState.ActiveUnit.UnitData.BattleScenePosition;
-            _activeUnitReachablePositions = _allUnitReachablePaths[battleState.ActiveUnit.UnitData.UnitIdentifier];
         }
         
         public void OnNewTurn(BattleStateModel battleState)
@@ -50,17 +83,117 @@ namespace SMUBE.Pathfinding
             }
             
             _activeUnitPosition = battleState.ActiveUnit.UnitData.BattleScenePosition;
-            _activeUnitReachablePositions = _allUnitReachablePaths[battleState.ActiveUnit.UnitData.UnitIdentifier];
 
-            if(!PathfindingAlgorithm.DirtyPositionCache.Any())
+            if(!AggregatedDirtyPositionCache.Any())
                 return;
             
+            _initializedPaths.Clear();
+
+            foreach (var units in battleState.Units)
+            {
+                var unitId = units.UnitData.UnitIdentifier;
+                var didMove = false;
+
+                if (!_allUnitPaths[unitId].Any())
+                {
+                    didMove = true;
+                }
+                else
+                {
+                    SMUBEVector2<int> previousCoordinates = _allUnitPaths[unitId].First().StartPosition.Coordinates;
+                    SMUBEVector2<int> currentCoordinates = units.UnitData.BattleScenePosition.Coordinates;
+                    didMove = !currentCoordinates.Equals(previousCoordinates);
+                }
+
+                if (didMove)
+                {
+                    _allUnitPaths[unitId].Clear();
+                    _allUnitReachablePaths[unitId].Clear();
+    
+                    if(PersonalDirtyPositionCache.ContainsKey(unitId))
+                        PersonalDirtyPositionCache[unitId] = null;
+                }
+                else
+                {
+                    if (!PersonalDirtyPositionCache.ContainsKey(unitId) || PersonalDirtyPositionCache[unitId] == null)
+                    {
+                        PersonalDirtyPositionCache[unitId] = new List<(SMUBEVector2<int> pos, bool emptyAfter)>();
+                    }
+                    
+                    foreach (var newDirtyPositionCache in AggregatedDirtyPositionCache)
+                    {
+                        PersonalDirtyPositionCache[unitId].Add(newDirtyPositionCache);
+                    }
+                }
+            }
+            
+            AggregatedDirtyPositionCache.Clear();
+            
+            EnsureUnitPathsUpdated(battleState, battleState.ActiveUnit.UnitData.UnitIdentifier);
+
+            /*
             UpdateAllPaths(battleState);
             EvaluateAllUnitReachablePositions(battleState);
+            */
 
-            PathfindingAlgorithm.DirtyPositionCache.Clear();
+        }
+        
+        private void EnsureUnitPathsUpdated(BattleStateModel battleStateModel, UnitIdentifier unitIdentifier)
+        {
+            if (!_initializedPaths.Any(ip => ip.Equals(unitIdentifier)))
+            {
+                UpdatePathsForUnit(battleStateModel, unitIdentifier);
+                _initializedPaths.Add(unitIdentifier);
+                if(PersonalDirtyPositionCache.TryGetValue(unitIdentifier, out var cacheList) && cacheList != null)
+                    cacheList.Clear();
+            }
         }
 
+        private void UpdatePathsForUnit(BattleStateModel battleStateModel, UnitIdentifier unitIdentifier)
+        {
+            var unit = battleStateModel.Units.Find(u => u.UnitData.UnitIdentifier.Equals(unitIdentifier));
+            
+            // all paths
+            {
+                var dirtyPositionCache = PersonalDirtyPositionCache.TryGetValue(unitIdentifier, out var value) 
+                    ? value
+                    : null;
+                var knownPaths = _allUnitPaths[unitIdentifier];
+                _allUnitPaths[unitIdentifier] = Pathfinding.UpdatePaths(knownPaths, battleStateModel.BattleSceneState, 
+                    unit.UnitData.BattleScenePosition, dirtyPositionCache);
+            
+                var width = battleStateModel.BattleSceneState.Width;
+                var height = battleStateModel.BattleSceneState.Height;
+                var allPathsSet = new PathfindingAlgorithm.PathfindingPathCacheSet(width, height);
+                foreach (var path in _allUnitPaths[unitIdentifier])
+                {
+                    var coordinates = path.TargetPosition.Coordinates;
+                    allPathsSet.Data[coordinates.x, coordinates.y] = path;
+                }
+                PathCacheSets[unitIdentifier] = allPathsSet;
+            }
+            
+            // reachable paths
+            {
+                var reachablePaths = Pathfinding.TrimByMaxSteps(
+                    _allUnitPaths[unitIdentifier], 
+                    unit.UnitData.UnitStats.Speed);
+                
+                _allUnitReachablePaths[unitIdentifier] = reachablePaths;
+                
+                var width = battleStateModel.BattleSceneState.Width;
+                var height = battleStateModel.BattleSceneState.Height;
+                var allPathsSet = new PathfindingAlgorithm.PathfindingPathCacheSet(width, height);
+
+                foreach (var path in reachablePaths)
+                {
+                    var coordinates = path.TargetPosition.Coordinates;
+                    allPathsSet.Data[coordinates.x, coordinates.y] = path;
+                }
+                ReachablePathCacheSets[unit.UnitData.UnitIdentifier] = allPathsSet;
+            }
+        }
+        
         private void EvaluateAllUnitReachablePositions(BattleStateModel battleState)
         {
             foreach (var currentUnit in battleState.Units)
@@ -104,6 +237,7 @@ namespace SMUBE.Pathfinding
             }
         }
 
+        /*
         private void UpdateAllPaths(BattleStateModel battleStateModel)
         {
             foreach (var unit in battleStateModel.Units)
@@ -123,6 +257,7 @@ namespace SMUBE.Pathfinding
                 PathCacheSets[unit.UnitData.UnitIdentifier] = allPathsSet;
             }
         }
+        */
         
         public List<BattleScenePosition> GetSurroundingPositions(BattleStateModel battleState, BattleScenePosition target, bool onlyEmpty = true)
         {
@@ -136,7 +271,7 @@ namespace SMUBE.Pathfinding
             var surroundingPositions = GetSurroundingPositions(battleState, target);
             foreach (var surroundingPosition in surroundingPositions)
             {
-                if (_activeUnitReachablePositions.Any(reachable => reachable.TargetPosition.Coordinates.Equals(surroundingPosition.Coordinates)))
+                if (GetAllReachablePathsForActiveUnit(battleState).Any(reachable => reachable.TargetPosition.Coordinates.Equals(surroundingPosition.Coordinates)))
                 {
                     result.Add(surroundingPosition);
                 }
@@ -153,8 +288,8 @@ namespace SMUBE.Pathfinding
             foreach (var surroundingPosition in surroundingPositions)
             {
                 var pathCacheToCheck = includeOutOfReach 
-                    ? _allUnitPaths[battleState.ActiveUnit.UnitData.UnitIdentifier] 
-                    : _activeUnitReachablePositions;
+                    ? GetAllPathsForUnit(battleState, battleState.ActiveUnit.UnitData.UnitIdentifier) 
+                    : GetAllReachablePathsForActiveUnit(battleState);
                 
                 foreach (var reachablePosition in pathCacheToCheck)
                 {
@@ -183,7 +318,7 @@ namespace SMUBE.Pathfinding
                 pathCost = PathfindingAlgorithm.GetPathCost(path);
                 for (var i = path.Count - 1; i >= 0; i--)
                 {
-                    if (_activeUnitReachablePositions.Any(activeReachablePos => activeReachablePos.TargetPosition.Coordinates.Equals(path[i].Coordinates)))
+                    if (GetAllReachablePathsForActiveUnit(battleState).Any(activeReachablePos => activeReachablePos.TargetPosition.Coordinates.Equals(path[i].Coordinates)))
                     {
                         lastReachable = path[i];
                         return true;

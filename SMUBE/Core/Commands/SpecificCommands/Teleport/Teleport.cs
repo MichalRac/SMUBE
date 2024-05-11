@@ -12,7 +12,6 @@ namespace SMUBE.Commands.SpecificCommands.Teleport
 {
     public class Teleport : BaseCommand
     {
-        public static int UseCounter = 0;
         public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_Teleport;
         public override int ManaCost => SpecificCommandCostConfiguration.Mana_Teleport;
         public override CommandId CommandId => CommandId.Teleport;
@@ -35,14 +34,10 @@ namespace SMUBE.Commands.SpecificCommands.Teleport
             var targetPos = commandArgs.BattleStateModel.BattleSceneState.Grid[target.x, target.y];
             activeUnit.UnitData.BattleScenePosition = targetPos;
             activeUnit.UnitData.BattleScenePosition.ApplyUnit(activeUnit.UnitData.UnitIdentifier);
-            PathfindingAlgorithm.DirtyPositionCache.Add((startPos.Coordinates, true));
-            PathfindingAlgorithm.DirtyPositionCache.Add((target, false));
+            battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((startPos.Coordinates, true));
+            battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((target, false));
 
             var success = TryUseCommand(commandArgs, activeUnit);
-            if (success)
-            {
-                UseCounter++;
-            }
             return success;
         }
 
@@ -56,6 +51,7 @@ namespace SMUBE.Commands.SpecificCommands.Teleport
             return results;
         }
 
+        /*
         internal override CommandArgs GetSuggestedPseudoRandomArgs(BattleStateModel battleStateModel)
         {
             var activeUnitStats = battleStateModel.ActiveUnit.UnitData.UnitStats;
@@ -88,5 +84,6 @@ namespace SMUBE.Commands.SpecificCommands.Teleport
             return new CommonArgs(battleStateModel.ActiveUnit.UnitData, null, 
                 battleStateModel, positionDelta, new List<SMUBEVector2<int>> {targetPos});
         }
+    */
     }
 }

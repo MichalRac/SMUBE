@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Actions;
 using SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurator;
 using SMUBE_Utils.Simulator.Utils;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using SMUBE.AI;
 
 namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
@@ -16,7 +18,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
         protected virtual IGameSimulatorConfigurator GetGameSimulatorConfigurator() => new DefaultGameSimulatorConfigurator();
         
-        public virtual void Run()
+        public virtual async void Run()
         {
             var useSimpleBehavior = GenericChoiceUtils.GetBooleanChoice("Setting up units AI, use simple behavior?");
             var gameConfigurator = GetGameSimulatorConfigurator();
@@ -24,82 +26,102 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
             ai1 = initUnits.First(u => u.UnitData.UnitIdentifier.TeamId == 0).AiModel;
             ai2 = initUnits.First(u => u.UnitData.UnitIdentifier.TeamId == 1).AiModel;
-
-            _coreSimulator = new BattleCoreSimulationWrapper();
-
+            
             var simulationSeries = GenericChoiceUtils.GetBooleanChoice("Run N Simulation Series?");
             int simulationNumber = simulationSeries 
                 ? GenericChoiceUtils.GetInt("Number of simulations to be run:") 
                 : 1;
 
+            List<Task> tasks = new List<Task>();
+            var results = new ConcurrentBag<SimulatorDebugData>();
+            
             for (int repeats = 0; repeats < 10; repeats++)
             {
-                int simulationsRun = 0;
-                while (simulationsRun++ < simulationNumber)
-                {
-                    /*
-                    try
-                    {
-                        */
-                        RunSingleSimulation(gameConfigurator, useSimpleBehavior, simulationSeries);
-                    /*
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine($"Simulation {simulationsRun} corrupted, press anything to continue;");
-                        new InternalRunnerDisplayMap(_coreSimulator, true).OnPicked();
-                        new InternalRunnerDisplayHeatmap(_coreSimulator).OnPicked();
-                        Console.ReadKey();
-                    }
-                    */
+                int repeat = repeats;
+                tasks.Add(Task.Run(() => SingleSimulationWrapper(repeat, simulationNumber)));
+                continue;
 
-                    if (simulationsRun % 10 == 0)
+                Task SingleSimulationWrapper(int run, int simulationsPerThread)
+                {
+                    var simulationWrapper = new BattleCoreSimulationWrapper();
+                    int simulationsRun = 0;
+                    while (simulationsRun++ < simulationsPerThread)
                     {
-                        Console.WriteLine($"simulation progress: {simulationsRun}/{simulationNumber}");
+                        /*
+                                          try
+                                          {
+                                              */
+                        //RunSingleSimulation(simulationWrapper, gameConfigurator, useSimpleBehavior, simulationSeries);
+                        RunSingleSimulation(simulationWrapper, gameConfigurator, useSimpleBehavior, simulationSeries);
+                        /*
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine($"Simulation {simulationsRun} corrupted, press anything to continue;");
+                            new InternalRunnerDisplayMap(_coreSimulator, true).OnPicked();
+                            new InternalRunnerDisplayHeatmap(_coreSimulator).OnPicked();
+                            Console.ReadKey();
+                        }
+                        */
+
+                        if (simulationsRun % 25 == 0)
+                        {
+                            Console.WriteLine($"simulation {run} progress: {simulationsRun}/{simulationNumber}");
+                        }
                     }
+                    
+                    results.Add(simulationWrapper._simulatorDebugData);
+                    //simulationWrapper.OnFinishedLog(ai1, ai2, true);
+                    //simulationWrapper.RestartDebugCounters();
+                    return Task.CompletedTask;
                 }
-                
-                _coreSimulator.OnFinishedLog(ai1, ai2, true);
-                _coreSimulator.RestartDebugCounters();
             }
+
+            await Task.WhenAll(tasks);
+
+            var aggregatedData = new SimulatorDebugData(results);
+            var debugDataListed = aggregatedData.GetDebugDataListed();
+            aggregatedData.PrintToConsole(debugDataListed);
+            aggregatedData.SaveToFile(debugDataListed);
+            
             Finish();
         }
 
-        protected void RunSingleSimulation(IGameSimulatorConfigurator gameConfigurator, bool useSimpleBehavior, bool simulationSeries)
+        protected void RunSingleSimulation(BattleCoreSimulationWrapper simulationWrapper, IGameSimulatorConfigurator gameConfigurator, bool useSimpleBehavior, bool simulationSeries)
         {
-            _coreSimulator.SetupSimulation(gameConfigurator.GetUnits(useSimpleBehavior));
+            simulationWrapper.SetupSimulation(gameConfigurator.GetUnits(useSimpleBehavior));
                 
             var roundAutoResolved = false;
             while (!roundAutoResolved)
             {
                 if(!simulationSeries)
                 {
-                    ProcessCurrentTurn();
+                    ProcessCurrentTurn(simulationWrapper);
                 }
                 else
                 {
-                    new InternalRunnerSkipForward(_coreSimulator).OnPicked();
+                    new InternalRunnerSkipForward(simulationWrapper).OnPicked();
                 }
                     
-                roundAutoResolved = _coreSimulator.IsFinished(out _);
+                roundAutoResolved = simulationWrapper.IsFinished(out _);
             }
                 
-            _coreSimulator.OnFinished();
+            simulationWrapper.OnFinished();
         }
 
-        private void ProcessCurrentTurn()
+        private void ProcessCurrentTurn(BattleCoreSimulationWrapper simulator)
         {
-            _coreSimulator.LogTurnInfo();
+            simulator.LogTurnInfo();
          
             var result = GenericChoiceUtils.GetListChoice("Options:", true, new List<(string description, InternalRunnerAction result)>
             {
-                ("Continue", new InternalRunnerStepForward(_coreSimulator)),
-                ("Auto-Continue", new InternalRunnerSkipForward(_coreSimulator, true)),
-                ("Pick Action Manually", new InternalRunnerManualAction(_coreSimulator)),
-                ("Display Map", new InternalRunnerDisplayMap(_coreSimulator, false)),
-                ("Display Map With Descriptors", new InternalRunnerDisplayMap(_coreSimulator, true)),
-                ("Display Ally Distance Heatmap", new InternalRunnerDisplayHeatmap(_coreSimulator)),
-                ("Log Unit Summary", new InternalRunnerLogUnitSummary(_coreSimulator)),
+                ("Continue", new InternalRunnerStepForward(simulator)),
+                ("Auto-Continue", new InternalRunnerSkipForward(simulator, true)),
+                ("Pick Action Manually", new InternalRunnerManualAction(simulator)),
+                ("Display Map", new InternalRunnerDisplayMap(simulator, false)),
+                ("Display Map With Descriptors", new InternalRunnerDisplayMap(simulator, true)),
+                ("Display Ally Distance Heatmap", new InternalRunnerDisplayHeatmap(simulator)),
+                ("Log Unit Summary", new InternalRunnerLogUnitSummary(simulator)),
             }, false);
 
             result.OnPicked();

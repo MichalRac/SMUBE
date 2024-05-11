@@ -7,7 +7,6 @@ namespace SMUBE.Commands.SpecificCommands.Wait
 {
     public class Wait : BaseCommand
     {
-        public static int UseCounter = 0;
         public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_Wait;
         public override int ManaCost => SpecificCommandCostConfiguration.Mana_Wait;
         public override CommandId CommandId => CommandId.Wait;
@@ -15,10 +14,6 @@ namespace SMUBE.Commands.SpecificCommands.Wait
         public override bool TryExecute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
             var success = base.TryExecute(battleStateModel, commandArgs);
-            if (success)
-            {
-                UseCounter++;
-            }
             return success;
         }
 

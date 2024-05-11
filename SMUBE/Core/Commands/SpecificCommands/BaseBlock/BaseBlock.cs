@@ -8,7 +8,6 @@ namespace SMUBE.Commands.SpecificCommands.BaseBlock
 {
     public class BaseBlock : BaseCommand
     {
-        public static int UseCounter = 0;
         public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_BaseBlock;
 
         public override int ManaCost => SpecificCommandCostConfiguration.Mana_BaseBlock;
@@ -34,7 +33,6 @@ namespace SMUBE.Commands.SpecificCommands.BaseBlock
             activeUnit.UnitData.UnitStats.TryUseAbility(this);
             activeUnit.UnitData.UnitStats.AddEffects(GetCommandResults(commandArgs));
 
-            UseCounter++;
             return true;
         }
 

@@ -110,7 +110,8 @@ namespace SMUBE_Utils.Simulator.Utils.MapPrinter
                 }
                 else
                 {
-                    foreach (var reachablePosition in battleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions)
+                    var activeUnitId = battleStateModel.ActiveUnit.UnitData.UnitIdentifier;
+                    foreach (var reachablePosition in battleStateModel.BattleSceneState.PathfindingHandler.GetAllReachablePathsForUnit(battleStateModel, activeUnitId))
                     {
                         if (!reachablePosition.TargetPosition.Coordinates.Equals(targetPosition)) continue;
                         var fullPathCoordinates = reachablePosition.ShortestKnownPath

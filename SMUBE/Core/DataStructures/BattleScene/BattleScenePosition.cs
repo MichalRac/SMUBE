@@ -1,7 +1,9 @@
-﻿using SMUBE.Commands._Common;
+﻿using SMUBE.BattleState;
+using SMUBE.Commands._Common;
 using SMUBE.Commands.Effects;
 using SMUBE.DataStructures.Units;
 using SMUBE.DataStructures.Utils;
+using SMUBE.Pathfinding;
 using SMUBE.Units;
 
 namespace SMUBE.DataStructures.BattleScene
@@ -34,9 +36,9 @@ namespace SMUBE.DataStructures.BattleScene
         public BattleScenePositionContentType ContentType { get; private set; }
         public int RemainingDuration { get; private set; } = -1;
 
-        public void OnNewTurn()
+        public void OnNewTurn(BattleStateModel battleStateModel)
         {
-            ProcessTimedObstacle();
+            ProcessTimedObstacle(battleStateModel);
         }
 
         public void ProcessAssignedUnit(Unit assignedUnit)
@@ -54,7 +56,7 @@ namespace SMUBE.DataStructures.BattleScene
             }
         }
 
-        private void ProcessTimedObstacle()
+        private void ProcessTimedObstacle(BattleStateModel battleStateModel)
         {
             if (RemainingDuration > 0)
             {
@@ -66,6 +68,7 @@ namespace SMUBE.DataStructures.BattleScene
             {
                 RemainingDuration = -1;
                 ContentType = BattleScenePositionContentType.None;
+                battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((Coordinates, true));
             }
         }
 

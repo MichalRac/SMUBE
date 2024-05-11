@@ -245,7 +245,7 @@ namespace SMUBE.Commands.Args
             {
                 if (battleStateModel.TryGetUnit(activeUnitIdentifier, out var unit))
                 {
-                    var reachablePositions = battleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions;
+                    var reachablePositions = battleStateModel.BattleSceneState.PathfindingHandler.GetAllReachablePathsForActiveUnit(battleStateModel);
                     
                     if (reachablePositions.Count == 0)
                         return null;

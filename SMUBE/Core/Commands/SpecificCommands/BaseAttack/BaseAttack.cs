@@ -12,7 +12,6 @@ namespace SMUBE.Commands.SpecificCommands.BaseAttack
 {
     public class BaseAttack : BaseCommand
     {
-        public static int UseCounter = 0;
         public override CommandId CommandId => CommandId.BaseAttack;
 
         public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_BaseAttack;
@@ -46,10 +45,9 @@ namespace SMUBE.Commands.SpecificCommands.BaseAttack
             activeUnit.UnitData.BattleScenePosition.ApplyUnit(activeUnit.UnitData.UnitIdentifier);
             targetUnit.UnitData.UnitStats.AffectByAbility(GetCommandResults(commandArgs));
             
-            PathfindingAlgorithm.DirtyPositionCache.Add((startPos.Coordinates, true));
-            PathfindingAlgorithm.DirtyPositionCache.Add((targetCoords, false));
+            battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((startPos.Coordinates, true));
+            battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((targetCoords, false));
 
-            UseCounter++;
             return true;
             
         }

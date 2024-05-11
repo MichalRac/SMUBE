@@ -12,7 +12,6 @@ namespace SMUBE.Commands.SpecificCommands.HeavyAttack
 {
     public class HeavyAttack : BaseCommand
     {
-        public static int UseCounter = 0;
         public const int HEAVY_ATTACK_POWER_MULTIPLIER = 2;
 
         public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_HeavyAttack;
@@ -52,10 +51,9 @@ namespace SMUBE.Commands.SpecificCommands.HeavyAttack
             activeUnit.UnitData.BattleScenePosition.ApplyUnit(activeUnit.UnitData.UnitIdentifier);
             targetUnit.UnitData.UnitStats.AffectByAbility(GetCommandResults(commandArgs));
             
-            PathfindingAlgorithm.DirtyPositionCache.Add((startPos.Coordinates, true));
-            PathfindingAlgorithm.DirtyPositionCache.Add((activeUnit.UnitData.BattleScenePosition.Coordinates, false));
+            battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((startPos.Coordinates, true));
+            battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((activeUnit.UnitData.BattleScenePosition.Coordinates, false));
 
-            UseCounter++;
             return true;
         }
 

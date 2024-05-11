@@ -69,18 +69,18 @@ namespace SMUBE.BattleState
                     : BattleSceneBase.DefaultTeam1Positions[team1PosCount++];
                 initialUnitSetup.Add((initCoordinates, u.UnitData.UnitIdentifier));
             }
-
-            var initialGrid = PathfindingConfigurations.GameGrid;
-            initialGrid.InitialUnitSetup = initialUnitSetup;
             
             var initGridData = new InitialGridData
             {
-                width = 9,
-                height = 9,
+                width = PathfindingConfigurations.GameGrid.width,
+                height = PathfindingConfigurations.GameGrid.height,
                 InitialUnitSetup = initialUnitSetup,
+                InitialObstacleCells = PathfindingConfigurations.GameGrid.InitialObstacleCells,
+                InitialUnstableCells = PathfindingConfigurations.GameGrid.InitialUnstableCells,
+                InitialDefensiveCells = PathfindingConfigurations.GameGrid.InitialDefensiveCells,
             };
             
-            return initialGrid;
+            return initGridData;
         }
         
         private void PreAssignUnitsToPositions(InitialGridData initGridData)
@@ -156,6 +156,11 @@ namespace SMUBE.BattleState
 
         public void OnNewTurn()
         {
+            foreach (var battleScenePosition in BattleSceneState.Grid)
+            {
+                battleScenePosition.OnNewTurn(this);
+            }
+            
             if(GetNextActiveUnit(out var nextUnit))
             {
                 nextUnit.UnitData.UnitStats.OnOwnTurnStartEvaluate(this);
@@ -163,11 +168,6 @@ namespace SMUBE.BattleState
 
                 BattleSceneState.PathfindingHandler.OnNewTurn(this);
                 ActiveUnit.UnitCommandProvider.OnNewTurn(this);
-            }
-
-            foreach (var battleScenePosition in BattleSceneState.Grid)
-            {
-                battleScenePosition.OnNewTurn();
             }
             
             foreach (var unit in Units)
@@ -197,7 +197,7 @@ namespace SMUBE.BattleState
                 RemoveFromQueue(argUnit);
 
                 var coordinates= argUnit.UnitData.BattleScenePosition.Coordinates;
-                PathfindingAlgorithm.DirtyPositionCache.Add((coordinates, true));
+                BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((coordinates, true));
                 BattleSceneState.Grid[coordinates.x, coordinates.y].Clear();
                 
                 return true;

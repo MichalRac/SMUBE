@@ -13,7 +13,6 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
 {
     public class TauntedAttack : BaseCommand
     {
-        public static int UseCounter = 0;
         public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_TauntedAttack;
         public override int ManaCost => SpecificCommandCostConfiguration.Mana_TauntedAttack;
         public override CommandId CommandId => CommandId.TauntedAttack;
@@ -76,7 +75,6 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
                 if(!anyPathFound)
                 {
                     // no valid path to target, do nothing by design
-                    UseCounter++;
                     return true;
                 }
             }
@@ -97,10 +95,9 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
 
             if (commandArgs.PositionDelta != null)
             {
-                MoveUnitToDelta(commandArgs, activeUnit);
+                MoveUnitToDelta(battleStateModel, commandArgs, activeUnit);
             }
 
-            UseCounter++;
             return true;
         }
 
@@ -138,7 +135,7 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
                 return true;
             }
             
-            var allReachablePos = battleStateModel.BattleSceneState.PathfindingHandler.ActiveUnitReachablePositions;
+            var allReachablePos = battleStateModel.BattleSceneState.PathfindingHandler.GetAllReachablePathsForActiveUnit(battleStateModel);
             var validTargets =
                 allReachablePos.Where(reachablePos =>
                     targetSurroundingPositions.Any(surroundingPos => surroundingPos.Coordinates.Equals(reachablePos.TargetPosition.Coordinates)))

@@ -126,7 +126,7 @@ namespace SMUBE_Utils.Simulator.Utils.MapPrinter
 
         public void PrintMap()
         {
-            Console.SetWindowSize(150, 50);
+            Console.SetWindowSize(150, 63);
             
             var height = _battleScene.Height;
             var width = _battleScene.Width;

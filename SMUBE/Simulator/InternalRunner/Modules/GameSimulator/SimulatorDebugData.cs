@@ -18,6 +18,7 @@ using SMUBE.Commands.SpecificCommands.Tackle;
 using SMUBE.Commands.SpecificCommands.Taunt;
 using SMUBE.Commands.SpecificCommands.Teleport;
 using SMUBE.Commands.SpecificCommands.Wait;
+using SMUBE.Units;
 
 namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 {
@@ -49,6 +50,10 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
         public int HunterCount = 0;
         public int SquireCount = 0;
         
+        public int ScholarWinCount = 0;
+        public int HunterWinCount = 0;
+        public int SquireWinCount = 0;
+        
         // commands
         public int FailedCommandExecutions = 0;
             
@@ -77,6 +82,8 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                                                + LowerEnemyDefense_UseCounter + RaiseObstacle_UseCounter + ShieldPosition_UseCounter 
                                                + Tackle_UseCounter + Taunt_UseCounter + Teleport_UseCounter 
                                                + TauntedAttack_UseCounter + Wait_UseCounter;
+
+        public List<Unit> tempUnitList = new List<Unit>();
         
         public SimulatorDebugData(){}
 
@@ -114,6 +121,10 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 ScholarCount += debugData.ScholarCount;
                 HunterCount += debugData.HunterCount;
                 SquireCount += debugData.SquireCount;
+                
+                ScholarWinCount += debugData.ScholarWinCount;
+                HunterWinCount += debugData.HunterWinCount;
+                SquireWinCount += debugData.SquireWinCount;
                 
                 // commands
                 FailedCommandExecutions += debugData.FailedCommandExecutions;
@@ -217,19 +228,26 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             results.Add(team1TicksPerAction);
             var team2TicksPerAction = $"team 2 ticks per action: {(float)(teamTwoAICommandTime + teamTwoAIArgsTime) / teamTwoActions}";
             results.Add(team2TicksPerAction);
-            var team1WinRate = $"team 1 win rate: {(float)team1WinCount/totalSimulationCount * 100}% ({team1WinCount}/{totalSimulationCount}";
+            var team1WinRate = $"team 1 win rate: {(float)team1WinCount/totalSimulationCount * 100}% ({team1WinCount}/{totalSimulationCount})";
             results.Add(team1WinRate);
-            var team2WinRate = $"team 2 win rate: {(float)team2WinCount/totalSimulationCount * 100}% ({team2WinCount}/{totalSimulationCount}";
+            var team2WinRate = $"team 2 win rate: {(float)team2WinCount/totalSimulationCount * 100}% ({team2WinCount}/{totalSimulationCount})";
             results.Add(team2WinRate);
-            var totalSupportCount = $"total support character type count: {ScholarCount}";
-            
-            results.Add("\n");
 
+            results.Add("\n");
+            
+            var totalSupportCount = $"total support character type count: {ScholarCount}";
             results.Add(totalSupportCount);
             var totalOffensiveCount = $"total offensive character type count: {HunterCount}";
             results.Add(totalOffensiveCount);
             var totalDefensiveCount = $"total defensive character type count: {SquireCount}";
             results.Add(totalDefensiveCount);
+            
+            var totalSupportWinCount = $"total support character type win count: {ScholarWinCount} win percentage {(float)ScholarWinCount / ScholarCount * 100}";
+            results.Add(totalSupportWinCount);
+            var totalOffensiveWinCount = $"total offensive character type win count: {HunterWinCount} win percentage {(float)HunterWinCount / HunterCount * 100}";
+            results.Add(totalOffensiveWinCount);
+            var totalDefensiveWinCount = $"total defensive character type win count: {SquireWinCount} win percentage {(float)SquireWinCount / SquireCount * 100}";
+            results.Add(totalDefensiveWinCount);
                       
             results.Add("\n");
             

@@ -32,6 +32,21 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 ? GenericChoiceUtils.GetInt("Number of simulations to be run:") 
                 : 1;
 
+            if (simulationSeries)
+            {
+                await RunSimulationSeries(simulationNumber, gameConfigurator, useSimpleBehavior, simulationSeries);
+            }
+            else
+            {
+                var simulationWrapper = new BattleCoreSimulationWrapper();
+                RunSingleSimulation(simulationWrapper, gameConfigurator, useSimpleBehavior, simulationSeries);
+            }
+
+            Finish();
+        }
+
+        private async Task RunSimulationSeries(int simulationNumber, IGameSimulatorConfigurator gameConfigurator, bool useSimpleBehavior, bool simulationSeries)
+        {
             List<Task> tasks = new List<Task>();
             var results = new ConcurrentBag<SimulatorDebugData>();
             
@@ -66,7 +81,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
                         if (simulationsRun % 25 == 0)
                         {
-                            Console.WriteLine($"simulation {run} progress: {simulationsRun}/{simulationNumber}");
+                            Console.WriteLine($"thread {run} simulation group progress: {simulationsRun}/{simulationNumber}");
                         }
                     }
                     
@@ -83,8 +98,6 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             var debugDataListed = aggregatedData.GetDebugDataListed();
             aggregatedData.PrintToConsole(debugDataListed);
             aggregatedData.SaveToFile(debugDataListed);
-            
-            Finish();
         }
 
         protected void RunSingleSimulation(BattleCoreSimulationWrapper simulationWrapper, IGameSimulatorConfigurator gameConfigurator, bool useSimpleBehavior, bool simulationSeries)

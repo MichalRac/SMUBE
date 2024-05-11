@@ -53,6 +53,8 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Actions
             }
             GridMapPrinter.DefaultGridPrinter(CoreWrapper.Core.currentStateModel.BattleSceneState, gridMapGenericDisplayData).PrintMap();
 
+            /*
+            // InBetweenTeamsHeatmap
             var gridMapGenericDisplayData2 = new List<GridMapGenericDisplayData>()
             {
                 new GridMapGenericDisplayData()
@@ -86,6 +88,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Actions
             }
 
             GridMapPrinter.DefaultGridPrinter(CoreWrapper.Core.currentStateModel.BattleSceneState, gridMapGenericDisplayData2).PrintMap();
+            */
 
         }
     }

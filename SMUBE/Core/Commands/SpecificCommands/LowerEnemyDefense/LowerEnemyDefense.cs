@@ -36,7 +36,7 @@ namespace SMUBE.Commands.SpecificCommands.LowerEnemyDefense
 
             results.performer = commandArgs.ActiveUnit;
             results.targets = commandArgs.TargetUnits;
-            results.effects.Add(new DamageAppliedMultiplier(1.5f, UnitRoundStartTrigger.OnActiveUnitRoundStart));
+            results.effects.Add(new DamageAppliedMultiplier(1.75f, UnitRoundStartTrigger.OnActiveUnitRoundStart));
             
             return results;
         }

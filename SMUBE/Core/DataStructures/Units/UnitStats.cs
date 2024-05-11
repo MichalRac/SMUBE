@@ -1,11 +1,8 @@
 ﻿using SMUBE.Commands.Effects;
-using SMUBE.DataStructures.Utils;
 using SMUBE.Units.CharacterTypes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using SMUBE.BattleState;
 using SMUBE.Commands;
 using SMUBE.Commands.Results;

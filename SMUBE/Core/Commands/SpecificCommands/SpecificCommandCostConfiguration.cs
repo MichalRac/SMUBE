@@ -20,7 +20,7 @@
         public static int Stamina_DefendAll = 40;
         
         public static int Mana_Taunt = 0;
-        public static int Stamina_Taunt = 40;
+        public static int Stamina_Taunt = 60;
         
         public static int Mana_Tackle = 0;
         public static int Stamina_Tackle = 20;

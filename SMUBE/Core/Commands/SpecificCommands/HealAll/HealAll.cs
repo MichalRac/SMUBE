@@ -8,6 +8,7 @@ namespace SMUBE.Commands.SpecificCommands.HealAll
 {
     public class HealAll : BaseCommand
     {
+        public const float HEAL_POWER_MULTIPIER = 1.5f;
         public override int StaminaCost => SpecificCommandCostConfiguration.Stamina_HealAll;
         public override int ManaCost => SpecificCommandCostConfiguration.Mana_HealAll;
         public override CommandId CommandId => CommandId.HealAll;
@@ -56,7 +57,7 @@ namespace SMUBE.Commands.SpecificCommands.HealAll
             var results = new CommandResults();
             results.performer = commandArgs.ActiveUnit;
             results.targets.AddRange(commandArgs.TargetUnits);
-            results.effects.Add(new HealEffect(commandArgs.ActiveUnit.UnitStats.Power));
+            results.effects.Add(new HealEffect((int)(commandArgs.ActiveUnit.UnitStats.Power * HEAL_POWER_MULTIPIER)));
             return results;
         }
     }

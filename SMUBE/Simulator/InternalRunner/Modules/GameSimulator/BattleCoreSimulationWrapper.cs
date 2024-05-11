@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using SMUBE.AI;
 using SMUBE.BattleState;
 using SMUBE.Commands;
@@ -40,8 +41,13 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
         
         public void SetupSimulation(ConcurrentBag<Unit> initialUnits)
         {
+            _simulatorDebugData.tempUnitList.Clear();
+            
             _simulatorDebugData.totalSimulationCount++;
             _simulatorDebugData.turnCount = 0;
+
+            _simulatorDebugData.teamOneAiName = initialUnits.First(u => u.UnitData.UnitIdentifier.TeamId == 0).AiModel.GetType().Name;
+            _simulatorDebugData.teamTwoAiName = initialUnits.First(u => u.UnitData.UnitIdentifier.TeamId == 1).AiModel.GetType().Name;
 
             foreach (var unit in initialUnits)
             {
@@ -67,6 +73,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             foreach (var initialUnit in initialUnits)
             {
                 units.Add(initialUnit);
+                _simulatorDebugData.tempUnitList.Add(initialUnit);
             }
             
             _core = new BattleCore(units);
@@ -132,6 +139,27 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             else
                 _simulatorDebugData.team2WinCount++;
 
+            foreach (var unit in _simulatorDebugData.tempUnitList)
+            {
+                if (unit.UnitData.UnitIdentifier.TeamId == winningTeamId)
+                {
+                    switch (unit.UnitData.UnitStats.BaseCharacter.BaseCharacterType)
+                    {
+                        case BaseCharacterType.Scholar:
+                            _simulatorDebugData.ScholarWinCount++;
+                            break;
+                        case BaseCharacterType.Squire:
+                            _simulatorDebugData.SquireWinCount++;
+                            break;
+                        case BaseCharacterType.Hunter:
+                            _simulatorDebugData.HunterWinCount++;
+                            break;
+                        case BaseCharacterType.None:
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+            }
         }
 
         public void OnFinishedLog(AIModel team1AI, AIModel team2AI, bool logToFile = false)

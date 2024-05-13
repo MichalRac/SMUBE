@@ -59,8 +59,11 @@
     <Compile Include="AI\BehaviorTree\BehaviorTreeSequence.cs" />
     <Compile Include="AI\BehaviorTree\BehaviorTreeTask.cs" />
     <Compile Include="AI\BehaviorTree\IBehaviorTreeCommand.cs" />
+    <Compile Include="AI\DecisionTree\DecisionNodes\DecisionTreeTestActiveUnitHealth.cs" />
     <Compile Include="AI\DecisionTree\DecisionNodes\DecisionTreeTestCanPerform.cs" />
     <Compile Include="AI\DecisionTree\DecisionNodes\DecisionTreeTestAnySpecialActionViable.cs" />
+    <Compile Include="AI\DecisionTree\DecisionTreeDataSet.cs" />
+    <Compile Include="AI\DecisionTree\DecisionTreeDataSetConfigs.cs" />
     <Compile Include="AI\DecisionTree\EndNodes\DecisionTreeAction.cs" />
     <Compile Include="AI\DecisionTree\DecisionTreeAIModel.cs" />
     <Compile Include="AI\DecisionTree\DecisionTreeConfigs.cs" />
@@ -79,6 +82,7 @@
     <Compile Include="AI\GoalOrientedBehavior\LowerEnemyHealthGoal.cs" />
     <Compile Include="AI\GoalOrientedBehavior\SurviveGoal.cs" />
     <Compile Include="AI\GoalOrientedBehavior\WinGoal.cs" />
+    <Compile Include="AI\ParameterOptimization\GeneticAlgorithmDecisionTree.cs" />
     <Compile Include="AI\RandomAIModel.cs" />
     <Compile Include="AI\StateMachine\StateMachineAIModel.cs" />
     <Compile Include="AI\StateMachine\StateMachineCanPerformTransition.cs" />

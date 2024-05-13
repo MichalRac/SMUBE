@@ -134,7 +134,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
         {
             var targetBattleScenePosition = BattleStateModel.BattleSceneState.Grid[targetPos.x, targetPos.y];
             var reachableSurroundingPositions = BattleStateModel.BattleSceneState
-                .PathfindingHandler.GetReachableSurroundingPositions(BattleStateModel, targetBattleScenePosition);
+                .PathfindingHandler.GetReachableSurroundingPositions(BattleStateModel, targetBattleScenePosition, BattleStateModel.ActiveUnit.UnitData.UnitIdentifier);
             return reachableSurroundingPositions;
         }
         

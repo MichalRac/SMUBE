@@ -7,6 +7,8 @@ using SMUBE.Units;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurator
 {
@@ -60,6 +62,10 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
             Console.WriteLine("3. Goal Oriented Behavior AI");
             Console.WriteLine("4. Finite State Machine AI");
             Console.WriteLine("5. Behavior Tree AI");
+            
+            Console.WriteLine("6. Decision Tree - Extended Conditional AI");
+            Console.WriteLine("7. Decision Tree - json config");
+            
             Console.WriteLine("\nChoice:");
         }
 
@@ -77,9 +83,20 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
                     return () => new StateMachineAIModel(null, useSimpleBehavior);
                 case ConsoleKey.D5:
                     return () => new BehaviorTreeAIModel(useSimpleBehavior);
+                case ConsoleKey.D6:
+                    return () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetConditionalDecisionTree(bc));
+                case ConsoleKey.D7:
+                    return () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetConditionalDecisionTree(bc, GetJsonDataSet()));
                 default:
                     return null;
             }
+        }
+
+        private DecisionTreeDataSet GetJsonDataSet()
+        {
+            var fileContent = File.ReadAllText("E:\\_RepositoryE\\SMUBE\\Output\\JsonConfigs\\40gen24x300.json");
+            var config = JsonConvert.DeserializeObject<DecisionTreeDataSet>(fileContent);
+            return config;
         }
     }
 }

@@ -8,6 +8,7 @@ using SMUBE.Commands.Effects;
 using SMUBE.DataStructures.BattleScene;
 using SMUBE.DataStructures.Units;
 using SMUBE.DataStructures.Utils;
+using SMUBE.Units;
 
 namespace SMUBE.Commands.Args.ArgsPicker
 {
@@ -271,7 +272,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
         {
             var targetBattleScenePosition = BattleStateModel.BattleSceneState.Grid[targetPos.x, targetPos.y];
             var reachableSurroundingPositions = BattleStateModel.BattleSceneState
-                .PathfindingHandler.GetReachableSurroundingPositions(BattleStateModel, targetBattleScenePosition);
+                .PathfindingHandler.GetReachableSurroundingPositions(BattleStateModel, targetBattleScenePosition, BattleStateModel.ActiveUnit.UnitData.UnitIdentifier);
             return reachableSurroundingPositions;
         }
         
@@ -369,14 +370,33 @@ namespace SMUBE.Commands.Args.ArgsPicker
 
         #region AIArgStrategies
         
+        private List<Unit> GetValidTargets(Unit activeUnit)
+        {
+            List<Unit> validTargets;
+            if (Command.CommandArgsValidator.ArgsConstraint == ArgsConstraint.Enemy)
+            {
+                validTargets = BattleStateModel.GetTeamUnits(activeUnit.UnitData.UnitIdentifier.TeamId == 0 ? 1 : 0)
+                    .Where(u => u.UnitData.UnitStats.IsAlive()).ToList();
+            }
+            else if(Command.CommandArgsValidator.ArgsConstraint == ArgsConstraint.OtherUnit)
+            {
+                validTargets = BattleStateModel.Units.Where(u => u.UnitData.UnitStats.IsAlive() 
+                                                                 && !u.UnitData.UnitIdentifier.Equals(activeUnit.UnitData.UnitIdentifier)).ToList();
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
+
+            return validTargets;
+        }
+
         private CommandArgs GetAnyStrategy()
         {
             var activeUnit = BattleStateModel.ActiveUnit;
-            
-            var validTargets
-                = BattleStateModel.GetTeamUnits(activeUnit.UnitData.UnitIdentifier.TeamId == 0 ? 1 : 0)
-                    .Where(u => u.UnitData.UnitStats.IsAlive()).ToList();
 
+            var validTargets = GetValidTargets(activeUnit);
+            
             if (validTargets.Count == 0)
             {
                 return null;
@@ -387,7 +407,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
             foreach (var validTarget in validTargets)
             {
                 var reachableSurrounding = BattleStateModel.BattleSceneState.PathfindingHandler
-                    .GetReachableSurroundingPositions(BattleStateModel, validTarget.UnitData.BattleScenePosition);
+                    .GetReachableSurroundingPositions(BattleStateModel, validTarget.UnitData.BattleScenePosition, activeUnit.UnitData.UnitIdentifier);
 
                 if (reachableSurrounding.Count == 0)
                     continue;
@@ -407,9 +427,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
         {
             var activeUnit = BattleStateModel.ActiveUnit;
             
-            var validTargets
-                = BattleStateModel.GetTeamUnits(activeUnit.UnitData.UnitIdentifier.TeamId == 0 ? 1 : 0)
-                    .Where(u => u.UnitData.UnitStats.IsAlive()).ToList();
+            var validTargets = GetValidTargets(activeUnit);
 
             if (validTargets.Count == 0)
             {
@@ -424,7 +442,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
             foreach (var validTarget in validTargets)
             {
                 var reachableSurroundingCache = BattleStateModel.BattleSceneState.PathfindingHandler
-                    .GetSurroundingPathCache(BattleStateModel, validTarget.UnitData.BattleScenePosition);
+                    .GetSurroundingPathCache(BattleStateModel, validTarget.UnitData.BattleScenePosition, ignoredOccupant: activeUnit.UnitData.UnitIdentifier);
 
                 if (reachableSurroundingCache.Count == 0)
                     continue;
@@ -448,9 +466,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
         {
             var activeUnit = BattleStateModel.ActiveUnit;
             
-            var validTargets
-                = BattleStateModel.GetTeamUnits(activeUnit.UnitData.UnitIdentifier.TeamId == 0 ? 1 : 0)
-                    .Where(u => u.UnitData.UnitStats.IsAlive()).ToList();
+            var validTargets = GetValidTargets(activeUnit);
 
             if (validTargets.Count == 0)
             {
@@ -464,7 +480,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
             foreach (var validTarget in validTargets)
             {
                 var reachableSurroundingCache = BattleStateModel.BattleSceneState.PathfindingHandler
-                    .GetSurroundingPathCache(BattleStateModel, validTarget.UnitData.BattleScenePosition);
+                    .GetSurroundingPathCache(BattleStateModel, validTarget.UnitData.BattleScenePosition, ignoredOccupant: activeUnit.UnitData.UnitIdentifier);
 
                 if (reachableSurroundingCache.Count == 0)
                     continue;
@@ -501,9 +517,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
         {
             var activeUnit = BattleStateModel.ActiveUnit;
             
-            var validTargets
-                = BattleStateModel.GetTeamUnits(activeUnit.UnitData.UnitIdentifier.TeamId == 0 ? 1 : 0)
-                    .Where(u => u.UnitData.UnitStats.IsAlive()).ToList();
+            var validTargets = GetValidTargets(activeUnit);
 
             if (validTargets.Count == 0)
             {
@@ -516,7 +530,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
             foreach (var validTarget in validTargets)
             {
                 var reachableSurroundingCache = BattleStateModel.BattleSceneState.PathfindingHandler
-                    .GetSurroundingPathCache(BattleStateModel, validTarget.UnitData.BattleScenePosition);
+                    .GetSurroundingPathCache(BattleStateModel, validTarget.UnitData.BattleScenePosition, ignoredOccupant: activeUnit.UnitData.UnitIdentifier);
 
                 if (reachableSurroundingCache.Count == 0)
                     continue;
@@ -549,9 +563,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
         {
             var activeUnit = BattleStateModel.ActiveUnit;
             
-            var validTargets
-                = BattleStateModel.GetTeamUnits(activeUnit.UnitData.UnitIdentifier.TeamId == 0 ? 1 : 0)
-                    .Where(u => u.UnitData.UnitStats.IsAlive()).ToList();
+            var validTargets = GetValidTargets(activeUnit);
 
             if (validTargets.Count == 0)
             {
@@ -569,7 +581,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
             foreach (var validTarget in validTargets)
             {
                 var reachableSurroundingCache = BattleStateModel.BattleSceneState.PathfindingHandler
-                    .GetSurroundingPathCache(BattleStateModel, validTarget.UnitData.BattleScenePosition);
+                    .GetSurroundingPathCache(BattleStateModel, validTarget.UnitData.BattleScenePosition, ignoredOccupant: activeUnit.UnitData.UnitIdentifier);
 
                 if (reachableSurroundingCache.Count == 0)
                     continue;
@@ -624,9 +636,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
             var activeUnit = BattleStateModel.ActiveUnit;
             var enemyTeamId = activeUnit.UnitData.UnitIdentifier.TeamId == 0 ? 1 : 0;
 
-            var validTargets
-                = BattleStateModel.GetTeamUnits(enemyTeamId)
-                    .Where(u => u.UnitData.UnitStats.IsAlive()).ToList();
+            var validTargets = GetValidTargets(activeUnit);
 
             if (validTargets.Count == 0)
             {
@@ -645,7 +655,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
             foreach (var validTarget in validTargets)
             {
                 var reachableSurroundingCache = BattleStateModel.BattleSceneState.PathfindingHandler
-                    .GetSurroundingPathCache(BattleStateModel, validTarget.UnitData.BattleScenePosition);
+                    .GetSurroundingPathCache(BattleStateModel, validTarget.UnitData.BattleScenePosition, ignoredOccupant: activeUnit.UnitData.UnitIdentifier);
 
                 if (reachableSurroundingCache.Count == 0)
                     continue;
@@ -685,9 +695,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
             var activeUnit = BattleStateModel.ActiveUnit;
             var enemyTeamId = activeUnit.UnitData.UnitIdentifier.TeamId == 0 ? 1 : 0;
 
-            var validTargets
-                = BattleStateModel.GetTeamUnits(enemyTeamId)
-                    .Where(u => u.UnitData.UnitStats.IsAlive()).ToList();
+            var validTargets = GetValidTargets(activeUnit);
 
             if (validTargets.Count == 0)
             {
@@ -706,7 +714,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
             foreach (var validTarget in validTargets)
             {
                 var reachableSurroundingCache = BattleStateModel.BattleSceneState.PathfindingHandler
-                    .GetSurroundingPathCache(BattleStateModel, validTarget.UnitData.BattleScenePosition);
+                    .GetSurroundingPathCache(BattleStateModel, validTarget.UnitData.BattleScenePosition, ignoredOccupant: activeUnit.UnitData.UnitIdentifier);
 
                 if (reachableSurroundingCache.Count == 0)
                     continue;

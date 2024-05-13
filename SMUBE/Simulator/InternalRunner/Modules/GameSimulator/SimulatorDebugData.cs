@@ -207,6 +207,11 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             }
         }
 
+        public float GetAverageWinRateTeam1()
+        {
+            return (float)team1WinCount / totalSimulationCount * 100;
+        }
+        
         public List<string> GetDebugDataListed()
         {
             var results = new List<string>();
@@ -301,13 +306,25 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             }
         }
 
-        public void SaveToFile(List<string> results)
+        public void SaveToFile(List<string> results, string nameSuffix, string group)
         {
             var date = DateTime.UtcNow;
             var dateSuffix = $"{date.Year}_{date.Month}_{date.Day}_{date.Hour}_{date.Minute}_{date.Second}";
-            var newFile = File.CreateText($"E:\\_RepositoryE\\SMUBE\\Output\\logs\\log_{dateSuffix}_{totalSimulationCount}sim.txt");
+            var path = $"E:\\_RepositoryE\\SMUBE\\Output\\logs\\";
+
+            if (!Directory.Exists(path + group))
+            {
+                path = $"{path}\\{group}";
+                Directory.CreateDirectory(path);
+            }
+            else
+            {
+                path = $"{path}\\{group}";
+            }
+            
+            var newFile = File.CreateText($"{path}\\log_{dateSuffix}_{totalSimulationCount}sim{nameSuffix}.txt");
                 
-            newFile.WriteLine($"Simulation results");
+            newFile.WriteLine($"Simulation results \"{group}\"");
             newFile.WriteLine($"simulations: {totalSimulationCount}");
             newFile.WriteLine($"date: {dateSuffix}");
             newFile.WriteLine($"\n");
@@ -318,7 +335,36 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             }
             
             newFile.Close();
+        }
+        
+        public static void SaveToFileSummary(List<string> results, string name, string group)
+        {
+            var date = DateTime.UtcNow;
+            var dateSuffix = $"{date.Year}_{date.Month}_{date.Day}_{date.Hour}_{date.Minute}_{date.Second}";
+            var path = $"E:\\_RepositoryE\\SMUBE\\Output\\logs\\";
 
+            if (!Directory.Exists(path + group))
+            {
+                path = $"{path}\\{group}";
+                Directory.CreateDirectory(path);
+            }
+            else
+            {
+                path = $"{path}\\{group}";
+            }
+            
+            var newFile = File.CreateText($"{path}\\log_{dateSuffix}_{name}.txt");
+                
+            newFile.WriteLine($"Simulation results \"{group}\"");
+            newFile.WriteLine($"date: {dateSuffix}");
+            newFile.WriteLine($"\n");
+
+            foreach (var result in results)
+            {
+                newFile.WriteLine($"{result}");
+            }
+            
+            newFile.Close();
         }
     }
 }

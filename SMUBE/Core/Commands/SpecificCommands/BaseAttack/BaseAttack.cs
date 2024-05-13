@@ -44,9 +44,12 @@ namespace SMUBE.Commands.SpecificCommands.BaseAttack
             activeUnit.UnitData.BattleScenePosition = targetPos;
             activeUnit.UnitData.BattleScenePosition.ApplyUnit(activeUnit.UnitData.UnitIdentifier);
             targetUnit.UnitData.UnitStats.AffectByAbility(GetCommandResults(commandArgs));
-            
-            battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((startPos.Coordinates, true));
-            battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((targetCoords, false));
+
+            if (!startPos.Coordinates.Equals(targetPos.Coordinates))
+            {
+                battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((startPos.Coordinates, true));
+                battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((targetCoords, false));
+            }
 
             return true;
             

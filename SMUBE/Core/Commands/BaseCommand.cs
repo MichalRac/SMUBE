@@ -80,8 +80,11 @@ namespace SMUBE.Commands
             var targetPos = commandArgs.BattleStateModel.BattleSceneState.Grid[target.x, target.y];
             activeUnit.UnitData.BattleScenePosition = targetPos;
             activeUnit.UnitData.BattleScenePosition.ApplyUnit(activeUnit.UnitData.UnitIdentifier);
-            battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((startPos.Coordinates, true));
-            battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((target, false));
+            if (!startPos.Coordinates.Equals(targetPos.Coordinates))
+            {
+                battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((startPos.Coordinates, true));
+                battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((target, false));
+            }
         }
 
         internal virtual CommandArgs GetSuggestedPseudoRandomArgs(BattleStateModel battleStateModel)

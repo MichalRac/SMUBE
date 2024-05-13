@@ -97,7 +97,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             var aggregatedData = new SimulatorDebugData(results);
             var debugDataListed = aggregatedData.GetDebugDataListed();
             aggregatedData.PrintToConsole(debugDataListed);
-            aggregatedData.SaveToFile(debugDataListed);
+            aggregatedData.SaveToFile(debugDataListed, string.Empty, "RegularSimulations");
         }
 
         protected void RunSingleSimulation(BattleCoreSimulationWrapper simulationWrapper, IGameSimulatorConfigurator gameConfigurator, bool useSimpleBehavior, bool simulationSeries)

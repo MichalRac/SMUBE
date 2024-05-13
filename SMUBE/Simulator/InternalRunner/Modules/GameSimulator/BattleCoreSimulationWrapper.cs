@@ -30,6 +30,8 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 {
     internal class BattleCoreSimulationWrapper
     {
+        public const int TURN_TIMEOUT_COUNT = 2500; 
+
         private BattleCore _core;
         public BattleCore Core => _core;
         
@@ -309,6 +311,11 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
         public void AutoResolveTurn(bool log = true)
         {
+            if (_simulatorDebugData.turnCount > TURN_TIMEOUT_COUNT)
+            {
+                throw new ApplicationException();
+            }
+
             if (!_core.currentStateModel.GetNextActiveUnit(out var unit))
             {
                 Console.WriteLine("ERROR - no units in the queue");
@@ -334,14 +341,27 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             }
             else
             {
+                int attempts = 0;
                 while (nextArgs == null)
                 {
+                    attempts++;
                     commandStopwatch.Start();
                     nextCommand = unit.AiModel.ResolveNextCommand(_core.currentStateModel, unit.UnitData.UnitIdentifier);
                     commandStopwatch.Stop();
                     argsStopwatch.Start();
                     nextArgs = unit.AiModel.GetCommandArgs(nextCommand, _core.currentStateModel, unit.UnitData.UnitIdentifier);
                     argsStopwatch.Stop();
+
+                    var check = false;
+                    if (check)
+                    {
+                        _core.currentStateModel.DebugReevaluateCommands();
+                    }
+                    if (attempts > TURN_TIMEOUT_COUNT)
+                    {
+                        _simulatorDebugData.FailedCommandExecutions++;
+                        throw new ApplicationException();
+                    }
                 }
 
                 if (log)

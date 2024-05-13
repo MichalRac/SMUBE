@@ -10,12 +10,26 @@ namespace SMUBE.AI.DecisionTree
 {
     public class DecisionTreeAIModel : AIModel
     {
+        private Func<BaseCharacter, DecisionTreeNode> _decisionTreeProvider;
         public DecisionTreeAIModel(bool useSimpleBehavior) : base(useSimpleBehavior) { }
+        
+        public DecisionTreeAIModel(Func<BaseCharacter, DecisionTreeNode> decisionTreeProvider) 
+            : base(false)
+        {
+            _decisionTreeProvider = decisionTreeProvider;
+        }
+
         private DecisionTreeNode _decisionTree;
         private DecisionTreeNode GetDecisionTree(BaseCharacter baseCharacter)
         {
             if (_decisionTree != null)
                 return _decisionTree;
+
+            if (_decisionTreeProvider != null)
+            {
+                _decisionTree = _decisionTreeProvider?.Invoke(baseCharacter);
+                return _decisionTree;
+            }
 
             _decisionTree = DecisionTreeConfigs.GetDecisionTreeForArchetype(baseCharacter, UseSimpleBehavior);
             return _decisionTree;

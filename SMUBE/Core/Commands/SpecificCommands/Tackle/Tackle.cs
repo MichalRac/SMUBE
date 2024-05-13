@@ -46,8 +46,11 @@ namespace SMUBE.Commands.SpecificCommands.Tackle
             var targetPos = commandArgs.BattleStateModel.BattleSceneState.Grid[targetCoords.x, targetCoords.y];
             activeUnit.UnitData.BattleScenePosition = targetPos;
             activeUnit.UnitData.BattleScenePosition.ApplyUnit(activeUnit.UnitData.UnitIdentifier);
-            battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((startPos.Coordinates, true));
-            battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((targetCoords, false));
+            if (!startPos.Coordinates.Equals(targetCoords))
+            {
+                battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((startPos.Coordinates, true));
+                battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((targetCoords, false));
+            }
             
             if (commandResults.PositionDeltas.Count == 2)
             {

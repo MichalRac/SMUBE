@@ -154,6 +154,11 @@ namespace SMUBE.BattleState
             return true;
         }
 
+        public void DebugReevaluateCommands()
+        {
+            ActiveUnit.UnitCommandProvider.OnNewTurn(this);
+        }
+
         public void OnNewTurn()
         {
             foreach (var battleScenePosition in BattleSceneState.Grid)

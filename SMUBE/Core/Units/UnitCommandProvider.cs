@@ -37,7 +37,8 @@ namespace SMUBE.Units
         {
             foreach (var command in AllCommands)
             {
-                if (_unitData.UnitStats.CanUseAbility(command) && command.CommandArgsValidator.GetArgsPicker(command, battleStateModel).IsAnyValid())
+                if (_unitData.UnitStats.CanUseAbility(command) 
+                    && command.CommandArgsValidator.GetArgsPicker(command, battleStateModel).IsAnyValid())
                 {
                     ViableCommands.Add(command);
                 }

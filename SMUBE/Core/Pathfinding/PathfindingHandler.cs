@@ -264,11 +264,43 @@ namespace SMUBE.Pathfinding
             return Pathfinding.GetSurroundingPositions(battleState.BattleSceneState, target, onlyEmpty);
         }
 
-        public List<BattleScenePosition> GetReachableSurroundingPositions(BattleStateModel battleState, BattleScenePosition target)
+        public List<BattleScenePosition> GetReachableSurroundingPositions(BattleStateModel battleState, BattleScenePosition target, UnitIdentifier ignoredOccupant = null)
         {
             var result = new List<BattleScenePosition>();
+
+            var allReachablePaths = GetAllReachablePathCacheSetsForUnit(battleState, battleState.ActiveUnit.UnitData.UnitIdentifier);
+            var surroundingPositions = GetSurroundingPositions(battleState, target, false);
+
+            foreach (var surroundingPosition in surroundingPositions)
+            {
+                var coordinate = surroundingPosition.Coordinates;
+                var position = allReachablePaths.Data[coordinate.x, coordinate.y];
+                
+                if(position == null || position.TargetPosition == null)
+                    continue;
+                if (position.TargetPosition.UnitIdentifier != null)
+                {
+                    if (ignoredOccupant != null && !position.TargetPosition.UnitIdentifier.Equals(ignoredOccupant))
+                    {
+                        continue;
+                    }
+                    
+                    if(ignoredOccupant != null)
+                    {
+                        continue;
+                    }
+                }
+                if(!position.TargetPosition.IsWalkable())
+                    continue;
+                
+                result.Add(position.TargetPosition);
+            }
+
+            return result;
             
-            var surroundingPositions = GetSurroundingPositions(battleState, target);
+            surroundingPositions = surroundingPositions
+                .Where(pos => pos.IsWalkable() && (pos.UnitIdentifier == null 
+                                                   || (ignoredOccupant != null && pos.UnitIdentifier.Equals(ignoredOccupant)))).ToList();
             foreach (var surroundingPosition in surroundingPositions)
             {
                 if (GetAllReachablePathsForActiveUnit(battleState).Any(reachable => reachable.TargetPosition.Coordinates.Equals(surroundingPosition.Coordinates)))
@@ -280,17 +312,52 @@ namespace SMUBE.Pathfinding
             return result;
         }
         
-        public List<PathfindingAlgorithm.PathfindingPathCache> GetSurroundingPathCache(BattleStateModel battleState, BattleScenePosition target, bool includeOutOfReach = false)
+        public List<PathfindingAlgorithm.PathfindingPathCache> GetSurroundingPathCache(BattleStateModel battleState, BattleScenePosition target, bool includeOutOfReach = false, UnitIdentifier ignoredOccupant = null)
         {
             var result = new List<PathfindingAlgorithm.PathfindingPathCache>();
             
-            var surroundingPositions = GetSurroundingPositions(battleState, target);
+            var pathCacheToCheck = includeOutOfReach 
+                ? GetAllPathCacheSetsForUnit(battleState, battleState.ActiveUnit.UnitData.UnitIdentifier) 
+                : GetAllReachablePathCacheSetsForUnit(battleState, battleState.ActiveUnit.UnitData.UnitIdentifier);
+            var surroundingPositions = GetSurroundingPositions(battleState, target, false);
+
             foreach (var surroundingPosition in surroundingPositions)
             {
-                var pathCacheToCheck = includeOutOfReach 
-                    ? GetAllPathsForUnit(battleState, battleState.ActiveUnit.UnitData.UnitIdentifier) 
-                    : GetAllReachablePathsForActiveUnit(battleState);
+                var coordinate = surroundingPosition.Coordinates;
+                var position = pathCacheToCheck.Data[coordinate.x, coordinate.y];
                 
+                if(position == null || position.TargetPosition == null)
+                    continue;
+                if (position.TargetPosition.UnitIdentifier != null)
+                {
+                    if (ignoredOccupant != null && !position.TargetPosition.UnitIdentifier.Equals(ignoredOccupant))
+                    {
+                        continue;
+                    }
+                    
+                    if(ignoredOccupant != null)
+                    {
+                        continue;
+                    }
+                }
+                if(!position.TargetPosition.IsWalkable())
+                    continue;
+                
+                result.Add(position);
+            }
+
+            return result;
+
+            
+            /*
+            var surroundingPositions = GetSurroundingPositions(battleState, target, false);
+            surroundingPositions = surroundingPositions
+                .Where(pos => battleState.BattleSceneState.IsValid(pos.Coordinates) 
+                              && pos.IsWalkable() 
+                              && (pos.UnitIdentifier == null 
+                                  || (ignoredOccupant != null && pos.UnitIdentifier.Equals(ignoredOccupant)))).ToList();
+            foreach (var surroundingPosition in surroundingPositions)
+            {
                 foreach (var reachablePosition in pathCacheToCheck)
                 {
                     if (reachablePosition.TargetPosition.Coordinates.Equals(surroundingPosition.Coordinates))
@@ -301,6 +368,7 @@ namespace SMUBE.Pathfinding
             }
 
             return result;
+        */
         }
         
         public bool GetLastReachableOnPath(BattleStateModel battleState, BattleScenePosition target, out BattleScenePosition lastReachable, out int pathCost)

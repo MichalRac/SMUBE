@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using SMUBE.AI;
 using SMUBE.Units;
-using System.Collections.Generic;
 using SMUBE.Units.CharacterTypes;
 
 namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurator

@@ -13,6 +13,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules
             {
                 ("Game Simulator", new GameSimulatorModule()),
                 ("Predefined Game Simulator", new PredefinedGameSimulatorModule()),
+                ("Decision Tree Learning", new DecisionTreeLearningModule()),
                 ("Pathfinding Simulator", new PathfindingSimulatorModule()),
             });
 

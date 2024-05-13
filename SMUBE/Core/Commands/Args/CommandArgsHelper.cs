@@ -225,7 +225,7 @@ namespace SMUBE.Commands.Args
                     foreach (var validTarget in validTargets)
                     {
                         var reachableSurrounding = battleStateModel.BattleSceneState.PathfindingHandler
-                            .GetReachableSurroundingPositions(battleStateModel, validTarget.UnitData.BattleScenePosition);
+                            .GetReachableSurroundingPositions(battleStateModel, validTarget.UnitData.BattleScenePosition, validTarget.UnitData.UnitIdentifier);
 
                         if (reachableSurrounding.Count == 0)
                             continue;

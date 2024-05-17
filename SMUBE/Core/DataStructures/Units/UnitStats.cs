@@ -12,6 +12,9 @@ namespace SMUBE.DataStructures.Units
     [Serializable]
     public class UnitStats
     {
+        public const int PER_TURN_HP_REPLENISH = 20;
+        public const int PER_TURN_MANA_REPLENISH = 5;
+        public const int PER_TURN_STAMINA_REPLENISH = 5;
         public BaseCharacter BaseCharacter { get; }
         public int CurrentHealth { get; set; }
         public int MaxHealth { get; private set; }
@@ -154,6 +157,8 @@ namespace SMUBE.DataStructures.Units
 
         internal void OnOwnTurnStartEvaluate(BattleStateModel battleStateModel)
         {
+            PerOwnTurnReplenish();
+
             for (int i = PersistentEffects.Count - 1; i >= 0; i--)
             {
                 Effect effect = PersistentEffects[i];
@@ -163,6 +168,16 @@ namespace SMUBE.DataStructures.Units
                     PersistentEffects.RemoveAt(i);
                 }
             }
+        }
+
+        private void PerOwnTurnReplenish()
+        {
+            CurrentHealth += PER_TURN_HP_REPLENISH;
+            CurrentMana += PER_TURN_MANA_REPLENISH;
+            CurrentStamina += PER_TURN_STAMINA_REPLENISH;
+            CurrentHealth = Math.Min(CurrentHealth, MaxHealth);
+            CurrentMana = Math.Min(CurrentMana, MaxMana);
+            CurrentStamina = Math.Min(CurrentStamina, MaxStamina);
         }
 
         public override string ToString()

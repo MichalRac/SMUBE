@@ -85,6 +85,14 @@ namespace SMUBE.Pathfinding
                     ObstaclePos.AddRange(MakeVerticalLine(2, 5, 6));
                     ObstaclePos.AddRange(MakeVerticalLine(4, 5, 6));
                     
+                    var DefensivePos = new List<SMUBEVector2<int>>();
+                    DefensivePos.AddRange(MakeHorizontalLine(0, 0, 6));
+                    DefensivePos.AddRange(MakeHorizontalLine(1, 0, 6));
+                    DefensivePos.AddRange(MakeHorizontalLine(10, 0, 6));
+                    DefensivePos.AddRange(MakeHorizontalLine(11, 0, 6));
+                    
+                    DefensivePos.AddRange(MakeVerticalLine(0, 3, 8));
+                    DefensivePos.AddRange(MakeVerticalLine(6, 3, 8));
                     
 
                     gameGrid = new InitialGridData()
@@ -92,6 +100,7 @@ namespace SMUBE.Pathfinding
                         width = GAME_WIDTH,
                         height = GAME_HEIGHT,
                         InitialObstacleCells = ObstaclePos,
+                        InitialDefensiveCells = DefensivePos,
                     };
                 }
                 return gameGrid;

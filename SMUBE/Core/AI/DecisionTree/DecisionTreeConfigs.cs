@@ -167,36 +167,36 @@ namespace SMUBE.AI.DecisionTree
             var enemyInReachDecisionTree = GetRandomAction(dataSet.Probabilities["BaseTree_EnemyInReach_BaseAttackChance" + weightGroupSuffix], // chance of attack if enemy in reach
                 new DecisionTreeWeightedActionSelection(new List<DecisionTreeWeightedSet>
                 {
-                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.None), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_None" + weightGroupSuffix]),
-                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.Closest), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_Closest" + weightGroupSuffix]),
-                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPoints" + weightGroupSuffix]),
-                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPercentage" + weightGroupSuffix]),
-                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MostDmgDealt), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_MostDmgDealt" + weightGroupSuffix]),
-                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_EnemyWithMostAlliesInRange" + weightGroupSuffix]),
-                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MinimizeReachableEnemiesAfterTurn), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_MinimizeReachableEnemiesAfterTurn" + weightGroupSuffix]),
-                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MaximiseReachableEnemiesAfterTurn), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_MaximiseReachableEnemiesAfterTurn" + weightGroupSuffix]),
-                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MinimisePositionBuffAfterTurn), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_MinimisePositionBuffAfterTurn" + weightGroupSuffix]),
-                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MaximisePositionBuffAfterTurn), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_MaximisePositionBuffAfterTurn" + weightGroupSuffix]),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.None), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_None" + weightGroupSuffix].GetValue()),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.Closest), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_Closest" + weightGroupSuffix].GetValue()),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPoints" + weightGroupSuffix].GetValue()),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPercentage" + weightGroupSuffix].GetValue()),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MostDmgDealt), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_MostDmgDealt" + weightGroupSuffix].GetValue()),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_EnemyWithMostAlliesInRange" + weightGroupSuffix].GetValue()),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MinimizeReachableEnemiesAfterTurn), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_MinimizeReachableEnemiesAfterTurn" + weightGroupSuffix].GetValue()),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MaximiseReachableEnemiesAfterTurn), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_MaximiseReachableEnemiesAfterTurn" + weightGroupSuffix].GetValue()),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MinimisePositionBuffAfterTurn), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_MinimisePositionBuffAfterTurn" + weightGroupSuffix].GetValue()),
+                    new DecisionTreeWeightedSet(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MaximisePositionBuffAfterTurn), dataSet.Weights["BaseTree_EnemyInReach_AttackWeight-Pref_MaximisePositionBuffAfterTurn" + weightGroupSuffix].GetValue()),
                 }),
                 new DecisionTreeWeightedActionSelection(new List<DecisionTreeWeightedSet>
                 {
-                    new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)0), dataSet.Weights["BaseTree_EnemyInReach_BaseWalk-Pref_None" + weightGroupSuffix]),
-                    new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)1), dataSet.Weights["BaseTree_EnemyInReach_BaseWalk-Pref_GetOutOfReach" + weightGroupSuffix]),
-                    new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)2), dataSet.Weights["BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserCarefully" + weightGroupSuffix]),
-                    new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)3), dataSet.Weights["BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserAggressively" + weightGroupSuffix]),
-                    new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)4), dataSet.Weights["BaseTree_EnemyInReach_BaseWalk-Pref_OptimizeFortifiedPosition" + weightGroupSuffix]),
-                    new DecisionTreeWeightedSet(new BaseBlock(), dataSet.Weights["BaseTree_EnemyInReach_BaseBlock" + weightGroupSuffix]),
+                    new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)0), dataSet.Weights["BaseTree_EnemyInReach_BaseWalk-Pref_None" + weightGroupSuffix].GetValue()),
+                    new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)1), dataSet.Weights["BaseTree_EnemyInReach_BaseWalk-Pref_GetOutOfReach" + weightGroupSuffix].GetValue()),
+                    new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)2), dataSet.Weights["BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserCarefully" + weightGroupSuffix].GetValue()),
+                    new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)3), dataSet.Weights["BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserAggressively" + weightGroupSuffix].GetValue()),
+                    new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)4), dataSet.Weights["BaseTree_EnemyInReach_BaseWalk-Pref_OptimizeFortifiedPosition" + weightGroupSuffix].GetValue()),
+                    new DecisionTreeWeightedSet(new BaseBlock(), dataSet.Weights["BaseTree_EnemyInReach_BaseBlock" + weightGroupSuffix].GetValue()),
                 }));
             
             var enemyOutOfReachDecisionTree = new DecisionTreeWeightedActionSelection(new List<DecisionTreeWeightedSet>
             {
                 // todo parametrize weights
-                new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)0), dataSet.Weights["BaseTree_EnemyOutOfReach_BaseWalk-Pref_None" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)1), dataSet.Weights["BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetOutOfReach" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)2), dataSet.Weights["BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserCarefully" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)3), dataSet.Weights["BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserAggressively" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)4), dataSet.Weights["BaseTree_EnemyOutOfReach_BaseWalk-Pref_OptimizeFortifiedPosition" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new BaseBlock(), dataSet.Weights["BaseTree_EnemyOutOfReach_BaseBlock" + weightGroupSuffix]),
+                new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)0), dataSet.Weights["BaseTree_EnemyOutOfReach_BaseWalk-Pref_None" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)1), dataSet.Weights["BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetOutOfReach" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)2), dataSet.Weights["BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserCarefully" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)3), dataSet.Weights["BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserAggressively" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)4), dataSet.Weights["BaseTree_EnemyOutOfReach_BaseWalk-Pref_OptimizeFortifiedPosition" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new BaseBlock(), dataSet.Weights["BaseTree_EnemyOutOfReach_BaseBlock" + weightGroupSuffix].GetValue()),
             });
             
             return new DecisionTreeTestCanPerform<BaseAttack>(
@@ -211,30 +211,30 @@ namespace SMUBE.AI.DecisionTree
             return new DecisionTreeWeightedActionSelection(new List<DecisionTreeWeightedSet>
             {
                 // todo parametrize weights
-                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.None), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_None" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.Closest), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_Closest" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPoints" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPercentage" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MostDmgDealt), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_MostDmgDealt" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_EnemyWithMostAlliesInRange" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MinimizeReachableEnemiesAfterTurn), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_MinimizeReachableEnemiesAfterTurn" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MaximiseReachableEnemiesAfterTurn), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_MaximiseReachableEnemiesAfterTurn" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MinimisePositionBuffAfterTurn), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_MinimisePositionBuffAfterTurn" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MaximisePositionBuffAfterTurn), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_MaximisePositionBuffAfterTurn" + weightGroupSuffix]),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.None), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_None" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.Closest), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_Closest" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPoints" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPercentage" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MostDmgDealt), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_MostDmgDealt" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_EnemyWithMostAlliesInRange" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MinimizeReachableEnemiesAfterTurn), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_MinimizeReachableEnemiesAfterTurn" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MaximiseReachableEnemiesAfterTurn), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_MaximiseReachableEnemiesAfterTurn" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MinimisePositionBuffAfterTurn), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_MinimisePositionBuffAfterTurn" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MaximisePositionBuffAfterTurn), dataSet.Weights["ExtensionTree-Hunter-HeavyAttack-Pref_MaximisePositionBuffAfterTurn" + weightGroupSuffix].GetValue()),
 
-                new DecisionTreeWeightedSet(new Teleport().WithPreferences(ArgsMovementTargetingPreference.None), dataSet.Weights["ExtensionTree-Hunter-Teleport-Pref_None" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new Teleport().WithPreferences(ArgsMovementTargetingPreference.GetOutOfReach), dataSet.Weights["ExtensionTree-Hunter-Teleport-Pref_GetOutOfReach" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new Teleport().WithPreferences(ArgsMovementTargetingPreference.GetCloserCarefully), dataSet.Weights["ExtensionTree-Hunter-Teleport-Pref_GetCloserCarefully" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new Teleport().WithPreferences(ArgsMovementTargetingPreference.GetCloserAggressively), dataSet.Weights["ExtensionTree-Hunter-Teleport-Pref_GetCloserAggressively" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new Teleport().WithPreferences(ArgsMovementTargetingPreference.OptimizeFortifiedPosition), dataSet.Weights["ExtensionTree-Hunter-Teleport-Pref_OptimizeFortifiedPosition" + weightGroupSuffix]),
+                new DecisionTreeWeightedSet(new Teleport().WithPreferences(ArgsMovementTargetingPreference.None), dataSet.Weights["ExtensionTree-Hunter-Teleport-Pref_None" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new Teleport().WithPreferences(ArgsMovementTargetingPreference.GetOutOfReach), dataSet.Weights["ExtensionTree-Hunter-Teleport-Pref_GetOutOfReach" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new Teleport().WithPreferences(ArgsMovementTargetingPreference.GetCloserCarefully), dataSet.Weights["ExtensionTree-Hunter-Teleport-Pref_GetCloserCarefully" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new Teleport().WithPreferences(ArgsMovementTargetingPreference.GetCloserAggressively), dataSet.Weights["ExtensionTree-Hunter-Teleport-Pref_GetCloserAggressively" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new Teleport().WithPreferences(ArgsMovementTargetingPreference.OptimizeFortifiedPosition), dataSet.Weights["ExtensionTree-Hunter-Teleport-Pref_OptimizeFortifiedPosition" + weightGroupSuffix].GetValue()),
 
-                new DecisionTreeWeightedSet(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.None), dataSet.Weights["ExtensionTree-Hunter-RaiseObstacle-Pref_None" + weightGroupSuffix]),
+                new DecisionTreeWeightedSet(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.None), dataSet.Weights["ExtensionTree-Hunter-RaiseObstacle-Pref_None" + weightGroupSuffix].GetValue()),
                 //new DecisionTreeWeightedSet(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.OnLeastHpPercentageAlly), 15),
                 //new DecisionTreeWeightedSet(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.OnMostHpPercentageAlly), 15),
-                new DecisionTreeWeightedSet(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.NextToClosestEnemy), dataSet.Weights["ExtensionTree-Hunter-RaiseObstacle-Pref_NextToClosestEnemy" + weightGroupSuffix]),
+                new DecisionTreeWeightedSet(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.NextToClosestEnemy), dataSet.Weights["ExtensionTree-Hunter-RaiseObstacle-Pref_NextToClosestEnemy" + weightGroupSuffix].GetValue()),
                 //new DecisionTreeWeightedSet(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.OnAllyWithMostEnemiesInReach), 5),
-                new DecisionTreeWeightedSet(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.InBetweenEnemies), dataSet.Weights["ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenTeams" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.InBetweenTeams), dataSet.Weights["ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenTeams" + weightGroupSuffix]),
+                new DecisionTreeWeightedSet(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.InBetweenEnemies), dataSet.Weights["ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenTeams" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.InBetweenTeams), dataSet.Weights["ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenTeams" + weightGroupSuffix].GetValue()),
             });
         }
         
@@ -245,25 +245,25 @@ namespace SMUBE.AI.DecisionTree
             return new DecisionTreeWeightedActionSelection(new List<DecisionTreeWeightedSet>
             {
                 // todo parametrize weights
-                new DecisionTreeWeightedSet(new HealAll(), dataSet.Weights["ExtensionTree-Scholar-HealAll" + weightGroupSuffix]),
+                new DecisionTreeWeightedSet(new HealAll(), dataSet.Weights["ExtensionTree-Scholar-HealAll" + weightGroupSuffix].GetValue()),
 
-                new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.None), dataSet.Weights["ExtensionTree-Scholar-LowerEnemyDefense-Pref_None" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.Closest), dataSet.Weights["ExtensionTree-Scholar-LowerEnemyDefense-Pref_Closest" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints), dataSet.Weights["ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPoints" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage), dataSet.Weights["ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPercentage" + weightGroupSuffix]),
+                new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.None), dataSet.Weights["ExtensionTree-Scholar-LowerEnemyDefense-Pref_None" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.Closest), dataSet.Weights["ExtensionTree-Scholar-LowerEnemyDefense-Pref_Closest" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints), dataSet.Weights["ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPoints" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage), dataSet.Weights["ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPercentage" + weightGroupSuffix].GetValue()),
                 //new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.MostDmgDealt), 50),
-                new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange), dataSet.Weights["ExtensionTree-Scholar-LowerEnemyDefense-Pref_EnemyWithMostAlliesInRange" + weightGroupSuffix]),
+                new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange), dataSet.Weights["ExtensionTree-Scholar-LowerEnemyDefense-Pref_EnemyWithMostAlliesInRange" + weightGroupSuffix].GetValue()),
                 //new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.MinimizeReachableEnemiesAfterTurn), 50),
                 //new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.MaximiseReachableEnemiesAfterTurn), 5),
                 //new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.MinimisePositionBuffAfterTurn), 5),
                 //new DecisionTreeWeightedSet(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.MaximisePositionBuffAfterTurn), 50),
 
-                new DecisionTreeWeightedSet(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.None), dataSet.Weights["ExtensionTree-Scholar-ShieldPosition-Pref_None" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.OnLeastHpPercentageAlly), dataSet.Weights["ExtensionTree-Scholar-ShieldPosition-Pref_OnLeastHpPercentageAlly" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.OnMostHpPercentageAlly), dataSet.Weights["ExtensionTree-Scholar-ShieldPosition-Pref_OnMostHpPercentageAlly" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.NextToClosestEnemy), dataSet.Weights["ExtensionTree-Scholar-ShieldPosition-Pref_NextToClosestEnemy" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.OnAllyWithMostEnemiesInReach), dataSet.Weights["ExtensionTree-Scholar-ShieldPosition-Pref_OnAllyWithMostEnemiesInReach" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.InBetweenTeams), dataSet.Weights["ExtensionTree-Scholar-ShieldPosition-Pref_InBetweenTeams" + weightGroupSuffix]),
+                new DecisionTreeWeightedSet(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.None), dataSet.Weights["ExtensionTree-Scholar-ShieldPosition-Pref_None" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.OnLeastHpPercentageAlly), dataSet.Weights["ExtensionTree-Scholar-ShieldPosition-Pref_OnLeastHpPercentageAlly" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.OnMostHpPercentageAlly), dataSet.Weights["ExtensionTree-Scholar-ShieldPosition-Pref_OnMostHpPercentageAlly" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.NextToClosestEnemy), dataSet.Weights["ExtensionTree-Scholar-ShieldPosition-Pref_NextToClosestEnemy" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.OnAllyWithMostEnemiesInReach), dataSet.Weights["ExtensionTree-Scholar-ShieldPosition-Pref_OnAllyWithMostEnemiesInReach" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.InBetweenTeams), dataSet.Weights["ExtensionTree-Scholar-ShieldPosition-Pref_InBetweenTeams" + weightGroupSuffix].GetValue()),
 
             });
         }
@@ -275,25 +275,25 @@ namespace SMUBE.AI.DecisionTree
             return new DecisionTreeWeightedActionSelection(new List<DecisionTreeWeightedSet>
             {
                 // todo parametrize weights
-                new DecisionTreeWeightedSet(new DefendAll(), dataSet.Weights["ExtensionTree-Squire-DefendAll" + weightGroupSuffix]),
+                new DecisionTreeWeightedSet(new DefendAll(), dataSet.Weights["ExtensionTree-Squire-DefendAll" + weightGroupSuffix].GetValue()),
                 
-                new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.None), dataSet.Weights["ExtensionTree-Squire-Taunt-Pref_None" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.Closest), dataSet.Weights["ExtensionTree-Squire-Taunt-Pref_Closest" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints), dataSet.Weights["ExtensionTree-Squire-Taunt-Pref_LeastHpPoints" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage), dataSet.Weights["ExtensionTree-Squire-Taunt-Pref_LeastHpPercentage" + weightGroupSuffix]),
+                new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.None), dataSet.Weights["ExtensionTree-Squire-Taunt-Pref_None" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.Closest), dataSet.Weights["ExtensionTree-Squire-Taunt-Pref_Closest" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints), dataSet.Weights["ExtensionTree-Squire-Taunt-Pref_LeastHpPoints" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage), dataSet.Weights["ExtensionTree-Squire-Taunt-Pref_LeastHpPercentage" + weightGroupSuffix].GetValue()),
                 //new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.MostDmgDealt), 50),
-                new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange), dataSet.Weights["ExtensionTree-Squire-Taunt-Pref_EnemyWithMostAlliesInRange" + weightGroupSuffix]),
+                new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange), dataSet.Weights["ExtensionTree-Squire-Taunt-Pref_EnemyWithMostAlliesInRange" + weightGroupSuffix].GetValue()),
                 //new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.MinimizeReachableEnemiesAfterTurn), 50),
                 //new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.MaximiseReachableEnemiesAfterTurn), 5),
                 //new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.MinimisePositionBuffAfterTurn), 5),
                 //new DecisionTreeWeightedSet(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.MaximisePositionBuffAfterTurn), 50),
 
-                new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.None), dataSet.Weights["ExtensionTree-Squire-Tackle-Pref_None" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.Closest), dataSet.Weights["ExtensionTree-Squire-Tackle-Pref_Closest" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints), dataSet.Weights["ExtensionTree-Squire-Tackle-Pref_LeastHpPoints" + weightGroupSuffix]),
-                new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage), dataSet.Weights["ExtensionTree-Squire-Tackle-Pref_LeastHpPercentage" + weightGroupSuffix]),
+                new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.None), dataSet.Weights["ExtensionTree-Squire-Tackle-Pref_None" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.Closest), dataSet.Weights["ExtensionTree-Squire-Tackle-Pref_Closest" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints), dataSet.Weights["ExtensionTree-Squire-Tackle-Pref_LeastHpPoints" + weightGroupSuffix].GetValue()),
+                new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage), dataSet.Weights["ExtensionTree-Squire-Tackle-Pref_LeastHpPercentage" + weightGroupSuffix].GetValue()),
                 //new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.MostDmgDealt), 50),
-                new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange), dataSet.Weights["ExtensionTree-Squire-Tackle-Pref_EnemyWithMostAlliesInRange" + weightGroupSuffix]),
+                new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange), dataSet.Weights["ExtensionTree-Squire-Tackle-Pref_EnemyWithMostAlliesInRange" + weightGroupSuffix].GetValue()),
                 //new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.MinimizeReachableEnemiesAfterTurn), 50),
                 //new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.MaximiseReachableEnemiesAfterTurn), 5),
                 //new DecisionTreeWeightedSet(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.MinimisePositionBuffAfterTurn), 5),

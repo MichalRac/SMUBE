@@ -9,11 +9,14 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using SMUBE_Utils.Simulator.Utils;
 
 namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurator
 {
     internal class DefaultGameSimulatorConfigurator : IGameSimulatorConfigurator
     {
+        private static string ConfigSetPath = "E:\\_RepositoryE\\SMUBE\\Output\\JsonConfigs\\";
+        
         private Func<AIModel> team1AIModelProvider = null;
         private Func<AIModel> team2AIModelProvider = null;
 
@@ -86,15 +89,34 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
                 case ConsoleKey.D6:
                     return () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetConditionalDecisionTree(bc));
                 case ConsoleKey.D7:
-                    return () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetConditionalDecisionTree(bc, GetJsonDataSet()));
+                    DecisionTreeDataSet jsonDataSet = null;
+
+                    while(!Directory.Exists(ConfigSetPath))
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Path to configs not chosen! \n" +
+                                          "Input path where your DecisionTreeConfigs are, or enter \"Q\" to leave");
+                        ConfigSetPath = Console.ReadLine();
+                    }
+                    
+                    var files = Directory.GetFiles(ConfigSetPath);
+                    var choice = new List<(string msg, string path)>();
+                    foreach (var file in files)
+                    {
+                        var filename = Path.GetFileName(file);
+                        choice.Add((filename, file));
+                    }
+                    var result = GenericChoiceUtils.GetListChoice("choose config file to load as decision tree config set", false, choice);
+                    
+                    return () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetConditionalDecisionTree(bc, GetJsonDataSet(result)));
                 default:
                     return null;
             }
         }
 
-        private DecisionTreeDataSet GetJsonDataSet()
+        private DecisionTreeDataSet GetJsonDataSet(string filePath)
         {
-            var fileContent = File.ReadAllText("E:\\_RepositoryE\\SMUBE\\Output\\JsonConfigs\\40gen24x300.json");
+            var fileContent = File.ReadAllText(filePath);
             var config = JsonConvert.DeserializeObject<DecisionTreeDataSet>(fileContent);
             return config;
         }

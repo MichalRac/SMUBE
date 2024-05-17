@@ -13,12 +13,10 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
     {
         private Random _rng;
         
-        private const int MIN_START_WEIGHT = 0;
-        private const int MAX_START_WEIGHT = 100;
         
         // for 24 genomes per generation
         private const int GENERATION_SIZE = 12;
-        private const int GENERATIONS_TO_RUN = 250;
+        private const int GENERATIONS_TO_RUN = 5;
         private const int SIMULATIONS_PER_FITNESS_TEST = 1000;
         private const int IMMUNITY_RATE = 1;
         private const int ELITISM_RATE = 4;
@@ -34,6 +32,9 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
         private const int ELITISM_RATE = 6;
         private const int RESSURECTION_RATE = 2;
         */
+        
+        // thread groups per solution simulation set, preferably valid divisor for sims per fitness test
+        private const int SUB_THREADING_RATE = 2;
 
         private const float CHANCE_TO_MUTATE_GENOME = 0.7f;
         private const float CHANCE_TO_MUTATE_PARAMETER = 0.25f;
@@ -57,6 +58,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
         public override async void Run()
         {
+            SimulatorDebugData.EnsurePath();
             _solutions = InitializeFirstGeneration();
 
             Console.WriteLine("Give an unique id for the run:");
@@ -73,6 +75,8 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             (DecisionTreeDataSet best_solution, int fitness) bestSolutionTuple = (null, int.MinValue);
             List<string> allGenSummary = new List<string>();
             allGenSummary.Add($"generation,best-fitness,avg-win-rate");
+            
+            int simulationsPerThread = SIMULATIONS_PER_FITNESS_TEST / SUB_THREADING_RATE;
 
             for (int i = 0; i < GENERATIONS_TO_RUN; i++)
             {
@@ -89,14 +93,19 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                     var gameConfigurator = new DecisionTreeLearningConfigurator(
                         () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetConditionalDecisionTree(bc, solution)));
 
-                    tasks.Add(Task.Run(() => SingleSimulationWrapper(solutionId, SIMULATIONS_PER_FITNESS_TEST)));
+                    for (int subThreadId = 0; subThreadId < SUB_THREADING_RATE; subThreadId++)
+                    {
+                        var subThread = subThreadId;
+                        tasks.Add(Task.Run(() => SingleSimulationWrapper(solutionId, subThread, simulationsPerThread)));
+                    }
+                    
                     continue;
 
-                    Task SingleSimulationWrapper(int run, int simulationsPerThread)
+                    Task SingleSimulationWrapper(int run, int subThread, int simCount)
                     {
                         var simulationWrapper = new BattleCoreSimulationWrapper();
                         int simulationsRun = 0;
-                        while (simulationsRun++ < simulationsPerThread)
+                        while (simulationsRun++ < simCount)
                         {
                             try
                             {
@@ -104,30 +113,53 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                             }
                             catch (Exception e)
                             {
-                                Console.WriteLine($"Gen{generation}, thread/solution {run} simulation group was corrupted!");
+                                Console.WriteLine($"Gen{generation}, thread/solution {run}, group {subThread}, simulation group was corrupted!");
                             }
 
                             if (simulationsRun % 25 == 0)
                             {
-                                Console.WriteLine($"Gen{generation}, thread/solution {run} simulation group progress: {simulationsRun}/{SIMULATIONS_PER_FITNESS_TEST}");
+                                Console.WriteLine($"Gen{generation}, thread/solution {run}, group {subThread}, simulation group progress: {simulationsRun}/{simCount}");
                             }
                         }
 
+                        simulationWrapper._simulatorDebugData.solutionId = run;
                         results.Add(simulationWrapper._simulatorDebugData);
-                        var debugDataForSolutionListed = simulationWrapper._simulatorDebugData.GetDebugDataListed();
-                        debugDataForSolutionListed.Add("\n");
-                        debugDataForSolutionListed.Add("Serialized Config Set:");
-                        debugDataForSolutionListed.Add($"{JsonConvert.SerializeObject(solution).ToString()}");
-                        solutionDebugResults.TryAdd(solutionId, simulationWrapper._simulatorDebugData);
                         
-                        simulationWrapper._simulatorDebugData.SaveToFile(debugDataForSolutionListed, $"_gen{generation}_sol{solutionId}", learningRunId);
                         return Task.CompletedTask;
                     }
                 }
                 
                 await Task.WhenAll(tasks);
 
-                var aggregatedData = new SimulatorDebugData(results);
+                // group subthreaded data and print results of each
+                var preAggregatedData = new ConcurrentBag<SimulatorDebugData>();
+                for (var solutionIndex = 0; solutionIndex < _solutions.Count; solutionIndex++)
+                {
+                    var matchingData = new ConcurrentBag<SimulatorDebugData>();
+                    foreach (var result in results)
+                    {
+                        if (result.solutionId == solutionIndex)
+                        {
+                            matchingData.Add(result);
+                        }
+                    }
+
+                    var groupedMatchingData = new SimulatorDebugData(matchingData);
+                    preAggregatedData.Add(groupedMatchingData);
+                    
+                    var debugDataForSolutionListed = groupedMatchingData.GetDebugDataListed();
+                    debugDataForSolutionListed.Add("\n");
+                    debugDataForSolutionListed.Add("Serialized Config Set:");
+                    debugDataForSolutionListed.Add($"{JsonConvert.SerializeObject(groupedMatchingData.solutionId).ToString()}");
+                    
+                    solutionDebugResults.TryAdd(solutionIndex, groupedMatchingData);
+                    groupedMatchingData.SaveToFile(debugDataForSolutionListed, $"_gen{generation}_sol{solutionIndex}", learningRunId);
+                }
+                
+                
+
+                // aggregate all and print results
+                var aggregatedData = new SimulatorDebugData(preAggregatedData);
                 var debugDataListed = aggregatedData.GetDebugDataListed();
                 //aggregatedData.PrintToConsole(debugDataListed);
                 Console.WriteLine($"Gen{i} completed!");
@@ -155,8 +187,10 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 var genSummary = new List<string>(allGenSummary);
                 genSummary.Add("\n");
                 genSummary.Add($"Best Fitness {bestSolutionTuple.fitness} Serialized Config Set:");
-                genSummary.Add($"{JsonConvert.SerializeObject(bestSolutionTuple.best_solution).ToString()}");
+                var bestSolution = JsonConvert.SerializeObject(bestSolutionTuple.best_solution).ToString();
+                genSummary.Add($"{bestSolution}");
                 SimulatorDebugData.SaveToFileSummary(genSummary, $"gen{i}_summary",learningRunId);
+                SimulatorDebugData.SaveToFileSummary(new List<string>{bestSolution}, $"gen{i}_{bestSolutionTuple.fitness}fit",learningRunId, true);
                 
                 // early return on final loop
                 if (i == GENERATIONS_TO_RUN - 1)
@@ -243,6 +277,9 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                         {
                             if (_rng.NextDouble() < CHANCE_TO_MUTATE_PARAMETER)
                             {
+                                weight.Value.RandomizeAssignedWeight(_rng);
+                                
+                                /*
                                 var delta = _rng.Next(MIN_WEIGHT_MUTATION, MAX_WEIGHT_MUTATION);
                                 if (_rng.Next(0, 2) == 0)
                                     delta *= -1;
@@ -252,16 +289,19 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                                 newValue = Math.Max(newValue, MIN_WEIGHT);
                                 
                                 weightChanges.Add((weight.Key, newValue));
+                            */
                             }
                         }
                         foreach (var probabilityChange in probabilityChanges)
                         {
                             newSolution.Probabilities[probabilityChange.key] = probabilityChange.newValue;
                         }
+                        /*
                         foreach (var weightChange in weightChanges)
                         {
                             newSolution.Weights[weightChange.key] = weightChange.newValue;
                         }
+                    */
                     }
                 }
                 
@@ -290,17 +330,20 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                         {
                             if (_rng.NextDouble() < CHANCE_TO_RANDOMIZE_PARAMETER)
                             {
-                                weightChanges.Add((weight.Key, _rng.Next(MIN_WEIGHT, MAX_WEIGHT)));
+                                weight.Value.RandomizeAssignedWeight(_rng);
+                                //weightChanges.Add((weight.Key, _rng.Next(MIN_WEIGHT, MAX_WEIGHT)));
                             }
                         }
                         foreach (var probabilityChange in probabilityChanges)
                         {
                             newSolution.Probabilities[probabilityChange.key] = probabilityChange.newValue;
                         }
+                        /*
                         foreach (var weightChange in weightChanges)
                         {
-                            newSolution.Weights[weightChange.key] = weightChange.newValue;
+                            newSolution.Weights[weightChange.key];
                         }
+                        */
                     }
                 }
 
@@ -488,179 +531,179 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                     { "BaseTree_EnemyInReach_BaseAttackChance-HealthyStatus", (float)_rng.NextDouble() },
                     { "BaseTree_EnemyInReach_BaseAttackChance-HurtStatus", (float)_rng.NextDouble() },
                 },
-                Weights = new Dictionary<string, int>()
+                Weights = new Dictionary<string, DecisionTreeDataSetWeight>()
                 {
                     // BASE TREE < < WHEN HEALTHY > >
                     //   enemy in reach
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_None-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_Closest-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPoints-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPercentage-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MostDmgDealt-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_EnemyWithMostAlliesInRange-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MinimizeReachableEnemiesAfterTurn-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MaximiseReachableEnemiesAfterTurn-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MinimisePositionBuffAfterTurn-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MaximisePositionBuffAfterTurn-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_None-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_Closest-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPoints-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPercentage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MostDmgDealt-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_EnemyWithMostAlliesInRange-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MinimizeReachableEnemiesAfterTurn-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MaximiseReachableEnemiesAfterTurn-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MinimisePositionBuffAfterTurn-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MaximisePositionBuffAfterTurn-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
-                    {"BaseTree_EnemyInReach_BaseWalk-Pref_None-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetOutOfReach-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserCarefully-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserAggressively-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_BaseWalk-Pref_OptimizeFortifiedPosition-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_None-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetOutOfReach-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserCarefully-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserAggressively-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_OptimizeFortifiedPosition-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
-                    {"BaseTree_EnemyInReach_BaseBlock-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"BaseTree_EnemyInReach_BaseBlock-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
                     //   enemy out of reach
-                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_None-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetOutOfReach-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserCarefully-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserAggressively-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_OptimizeFortifiedPosition-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_None-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetOutOfReach-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserCarefully-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserAggressively-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_OptimizeFortifiedPosition-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
-                    {"BaseTree_EnemyOutOfReach_BaseBlock-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"BaseTree_EnemyOutOfReach_BaseBlock-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
 
                     // EXTENSION TREES
                     //    hunter
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_None-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_Closest-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPoints-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPercentage-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MostDmgDealt-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_EnemyWithMostAlliesInRange-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MinimizeReachableEnemiesAfterTurn-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MaximiseReachableEnemiesAfterTurn-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MinimisePositionBuffAfterTurn-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MaximisePositionBuffAfterTurn-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_None-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_Closest-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPoints-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPercentage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MostDmgDealt-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_EnemyWithMostAlliesInRange-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MinimizeReachableEnemiesAfterTurn-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MaximiseReachableEnemiesAfterTurn-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MinimisePositionBuffAfterTurn-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MaximisePositionBuffAfterTurn-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
-                    {"ExtensionTree-Hunter-Teleport-Pref_None-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-Teleport-Pref_GetOutOfReach-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-Teleport-Pref_GetCloserCarefully-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-Teleport-Pref_GetCloserAggressively-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-Teleport-Pref_OptimizeFortifiedPosition-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_None-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_GetOutOfReach-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_GetCloserCarefully-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_GetCloserAggressively-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_OptimizeFortifiedPosition-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
-                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_None-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_NextToClosestEnemy-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenEnemies-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenTeams-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_None-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_NextToClosestEnemy-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenEnemies-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenTeams-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
                     //   scholar
-                    {"ExtensionTree-Scholar-HealAll-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"ExtensionTree-Scholar-HealAll-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
-                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_None-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_Closest-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPoints-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPercentage-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_EnemyWithMostAlliesInRange-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_None-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_Closest-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPoints-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPercentage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_EnemyWithMostAlliesInRange-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
-                    {"ExtensionTree-Scholar-ShieldPosition-Pref_None-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnLeastHpPercentageAlly-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnMostHpPercentageAlly-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Scholar-ShieldPosition-Pref_NextToClosestEnemy-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnAllyWithMostEnemiesInReach-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Scholar-ShieldPosition-Pref_InBetweenTeams-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_None-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnLeastHpPercentageAlly-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnMostHpPercentageAlly-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_NextToClosestEnemy-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnAllyWithMostEnemiesInReach-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_InBetweenTeams-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
                     //   squire
-                    {"ExtensionTree-Squire-DefendAll-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"ExtensionTree-Squire-DefendAll-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
-                    {"ExtensionTree-Squire-Taunt-Pref_None-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Squire-Taunt-Pref_Closest-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Squire-Taunt-Pref_LeastHpPoints-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Squire-Taunt-Pref_LeastHpPercentage-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Squire-Taunt-Pref_EnemyWithMostAlliesInRange-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"ExtensionTree-Squire-Taunt-Pref_None-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_Closest-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_LeastHpPoints-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_LeastHpPercentage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_EnemyWithMostAlliesInRange-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
-                    {"ExtensionTree-Squire-Tackle-Pref_None-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Squire-Tackle-Pref_Closest-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Squire-Tackle-Pref_LeastHpPoints-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Squire-Tackle-Pref_LeastHpPercentage-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Squire-Tackle-Pref_EnemyWithMostAlliesInRange-HealthyStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"ExtensionTree-Squire-Tackle-Pref_None-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_Closest-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_LeastHpPoints-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_LeastHpPercentage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_EnemyWithMostAlliesInRange-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
                     // BASE TREE < < WHEN HURT > >
                     //   enemy in reach
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_None-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_Closest-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPoints-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPercentage-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MostDmgDealt-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_EnemyWithMostAlliesInRange-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MinimizeReachableEnemiesAfterTurn-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MaximiseReachableEnemiesAfterTurn-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MinimisePositionBuffAfterTurn-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MaximisePositionBuffAfterTurn-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_None-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_Closest-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPoints-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPercentage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MostDmgDealt-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_EnemyWithMostAlliesInRange-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MinimizeReachableEnemiesAfterTurn-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MaximiseReachableEnemiesAfterTurn-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MinimisePositionBuffAfterTurn-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MaximisePositionBuffAfterTurn-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
-                    {"BaseTree_EnemyInReach_BaseWalk-Pref_None-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetOutOfReach-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserCarefully-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserAggressively-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyInReach_BaseWalk-Pref_OptimizeFortifiedPosition-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_None-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetOutOfReach-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserCarefully-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserAggressively-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_OptimizeFortifiedPosition-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
-                    {"BaseTree_EnemyInReach_BaseBlock-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"BaseTree_EnemyInReach_BaseBlock-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
                     //   enemy out of reach
-                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_None-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetOutOfReach-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserCarefully-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserAggressively-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_OptimizeFortifiedPosition-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_None-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetOutOfReach-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserCarefully-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserAggressively-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_OptimizeFortifiedPosition-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
-                    {"BaseTree_EnemyOutOfReach_BaseBlock-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"BaseTree_EnemyOutOfReach_BaseBlock-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
 
                     // EXTENSION TREES
                     //    hunter
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_None-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_Closest-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPoints-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPercentage-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MostDmgDealt-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_EnemyWithMostAlliesInRange-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MinimizeReachableEnemiesAfterTurn-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MaximiseReachableEnemiesAfterTurn-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MinimisePositionBuffAfterTurn-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MaximisePositionBuffAfterTurn-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_None-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_Closest-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPoints-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPercentage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MostDmgDealt-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_EnemyWithMostAlliesInRange-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MinimizeReachableEnemiesAfterTurn-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MaximiseReachableEnemiesAfterTurn-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MinimisePositionBuffAfterTurn-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MaximisePositionBuffAfterTurn-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
-                    {"ExtensionTree-Hunter-Teleport-Pref_None-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-Teleport-Pref_GetOutOfReach-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-Teleport-Pref_GetCloserCarefully-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-Teleport-Pref_GetCloserAggressively-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-Teleport-Pref_OptimizeFortifiedPosition-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_None-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_GetOutOfReach-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_GetCloserCarefully-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_GetCloserAggressively-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_OptimizeFortifiedPosition-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
-                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_None-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_NextToClosestEnemy-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenEnemies-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenTeams-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_None-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_NextToClosestEnemy-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenEnemies-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenTeams-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
                     //   scholar
-                    {"ExtensionTree-Scholar-HealAll-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"ExtensionTree-Scholar-HealAll-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
-                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_None-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_Closest-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPoints-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPercentage-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_EnemyWithMostAlliesInRange-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_None-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_Closest-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPoints-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPercentage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_EnemyWithMostAlliesInRange-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
-                    {"ExtensionTree-Scholar-ShieldPosition-Pref_None-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnLeastHpPercentageAlly-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnMostHpPercentageAlly-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Scholar-ShieldPosition-Pref_NextToClosestEnemy-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnAllyWithMostEnemiesInReach-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Scholar-ShieldPosition-Pref_InBetweenTeams-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_None-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnLeastHpPercentageAlly-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnMostHpPercentageAlly-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_NextToClosestEnemy-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnAllyWithMostEnemiesInReach-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_InBetweenTeams-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
                     //   squire
-                    {"ExtensionTree-Squire-DefendAll-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"ExtensionTree-Squire-DefendAll-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
-                    {"ExtensionTree-Squire-Taunt-Pref_None-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Squire-Taunt-Pref_Closest-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Squire-Taunt-Pref_LeastHpPoints-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Squire-Taunt-Pref_LeastHpPercentage-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Squire-Taunt-Pref_EnemyWithMostAlliesInRange-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"ExtensionTree-Squire-Taunt-Pref_None-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_Closest-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_LeastHpPoints-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_LeastHpPercentage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_EnemyWithMostAlliesInRange-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
 
-                    {"ExtensionTree-Squire-Tackle-Pref_None-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Squire-Tackle-Pref_Closest-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Squire-Tackle-Pref_LeastHpPoints-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Squire-Tackle-Pref_LeastHpPercentage-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
-                    {"ExtensionTree-Squire-Tackle-Pref_EnemyWithMostAlliesInRange-HurtStatus", _rng.Next(MIN_START_WEIGHT, MAX_START_WEIGHT)},
+                    {"ExtensionTree-Squire-Tackle-Pref_None-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_Closest-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_LeastHpPoints-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_LeastHpPercentage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_EnemyWithMostAlliesInRange-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
                 }
             };
             return dtDataSet;

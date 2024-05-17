@@ -24,6 +24,8 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 {
     public class SimulatorDebugData
     {
+        public int solutionId;
+        
         public string teamOneAiName = "unknown";
         public string teamTwoAiName = "unknown";
         
@@ -306,11 +308,24 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             }
         }
 
+        private static string ConfigSetPath = "E:\\_RepositoryE\\SMUBE\\Output\\logs\\";
+        public static void EnsurePath()
+        {
+            while(!Directory.Exists(ConfigSetPath))
+            {
+                Console.Clear();
+                Console.WriteLine("Path to save logs not chosen! \n" +
+                                  "Input path where your logs should be saved");
+                ConfigSetPath = Console.ReadLine();
+            }
+        }
+        
         public void SaveToFile(List<string> results, string nameSuffix, string group)
         {
             var date = DateTime.UtcNow;
             var dateSuffix = $"{date.Year}_{date.Month}_{date.Day}_{date.Hour}_{date.Minute}_{date.Second}";
-            var path = $"E:\\_RepositoryE\\SMUBE\\Output\\logs\\";
+            EnsurePath();
+            var path = ConfigSetPath;
 
             if (!Directory.Exists(path + group))
             {
@@ -337,12 +352,14 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             newFile.Close();
         }
         
-        public static void SaveToFileSummary(List<string> results, string name, string group)
+        public static void SaveToFileSummary(List<string> results, string name, string group, bool skipHeader = false)
         {
             var date = DateTime.UtcNow;
             var dateSuffix = $"{date.Year}_{date.Month}_{date.Day}_{date.Hour}_{date.Minute}_{date.Second}";
-            var path = $"E:\\_RepositoryE\\SMUBE\\Output\\logs\\";
-
+            
+            EnsurePath();
+            var path = ConfigSetPath;
+            
             if (!Directory.Exists(path + group))
             {
                 path = $"{path}\\{group}";
@@ -354,10 +371,13 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             }
             
             var newFile = File.CreateText($"{path}\\log_{dateSuffix}_{name}.txt");
-                
-            newFile.WriteLine($"Simulation results \"{group}\"");
-            newFile.WriteLine($"date: {dateSuffix}");
-            newFile.WriteLine($"\n");
+            
+            if (!skipHeader)
+            {
+                newFile.WriteLine($"Simulation results \"{group}\"");
+                newFile.WriteLine($"date: {dateSuffix}");
+                newFile.WriteLine($"\n");
+            }
 
             foreach (var result in results)
             {

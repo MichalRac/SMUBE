@@ -12,6 +12,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 {
     internal class GameSimulatorModule : IInternalRunnerModule
     {
+        public const int CURRENTLY_USED_THREADS = 10;
         protected BattleCoreSimulationWrapper _coreSimulator;
         private AIModel ai1;
         private AIModel ai2;
@@ -29,7 +30,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             
             var simulationSeries = GenericChoiceUtils.GetBooleanChoice("Run N Simulation Series?");
             int simulationNumber = simulationSeries 
-                ? GenericChoiceUtils.GetInt("Number of simulations to be run:") 
+                ? GenericChoiceUtils.GetInt($"Number of simulations per used thread (currently configured to: {CURRENTLY_USED_THREADS}) to be run:") 
                 : 1;
 
             if (simulationSeries)
@@ -50,7 +51,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             List<Task> tasks = new List<Task>();
             var results = new ConcurrentBag<SimulatorDebugData>();
             
-            for (int repeats = 0; repeats < 10; repeats++)
+            for (int repeats = 0; repeats < CURRENTLY_USED_THREADS; repeats++)
             {
                 int repeat = repeats;
                 tasks.Add(Task.Run(() => SingleSimulationWrapper(repeat, simulationNumber)));

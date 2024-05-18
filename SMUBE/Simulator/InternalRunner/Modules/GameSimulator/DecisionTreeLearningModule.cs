@@ -241,7 +241,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
                 for (int resurrection = 0; resurrection < RESSURECTION_RATE; resurrection++)
                 {
-                    newSolutions.Add(GenerateDecisionTreeDataSet());
+                    newSolutions.Add(GenerateConditionalDecisionTreeDataSet());
                 }
                 
                 // Mutation
@@ -510,14 +510,15 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             
             for (int i = 0; i < GENERATION_SIZE; i++)
             {
-                var dtDataSet = GenerateDecisionTreeDataSet();
+                //var dtDataSet = GenerateConditionalDecisionTreeDataSet();
+                var dtDataSet = GenerateComplexDecisionTreeDataSet();
                 _solutions.Add(dtDataSet);
             }
 
             return _solutions;
         }
 
-        private DecisionTreeDataSet GenerateDecisionTreeDataSet()
+        private DecisionTreeDataSet GenerateConditionalDecisionTreeDataSet()
         {
             var dtDataSet = new DecisionTreeDataSet()
             {
@@ -704,6 +705,371 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                     {"ExtensionTree-Squire-Tackle-Pref_LeastHpPoints-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
                     {"ExtensionTree-Squire-Tackle-Pref_LeastHpPercentage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
                     {"ExtensionTree-Squire-Tackle-Pref_EnemyWithMostAlliesInRange-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                }
+            };
+            return dtDataSet;
+        }
+        
+        private DecisionTreeDataSet GenerateComplexDecisionTreeDataSet()
+        {
+            var dtDataSet = new DecisionTreeDataSet()
+            {
+                Probabilities = new Dictionary<string, float>()
+                {
+                    { "HurtThreshold", (float)_rng.NextDouble() },
+                
+                    { "SpecialIfPossible-HealthyStatus", (float)_rng.NextDouble() },
+                    { "SpecialIfPossible-HurtStatus", (float)_rng.NextDouble() },
+                
+                    { "BaseTree_EnemyInReach_BaseAttackChance-HealthyStatus", (float)_rng.NextDouble() },
+                    { "BaseTree_EnemyInReach_BaseAttackChance-HurtStatus", (float)_rng.NextDouble() },
+                },
+                Weights = new Dictionary<string, DecisionTreeDataSetWeight>()
+                {
+                    // BASE TREE < < TEAM ADVANTAGE + HEALTHY > >
+                    //   enemy in reach
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_None-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_Closest-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPoints-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPercentage-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MostDmgDealt-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_EnemyWithMostAlliesInRange-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MinimizeReachableEnemiesAfterTurn-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MaximiseReachableEnemiesAfterTurn-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MinimisePositionBuffAfterTurn-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MaximisePositionBuffAfterTurn-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_None-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetOutOfReach-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserCarefully-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserAggressively-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_OptimizeFortifiedPosition-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"BaseTree_EnemyInReach_BaseBlock-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    //   enemy out of reach
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_None-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetOutOfReach-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserCarefully-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserAggressively-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_OptimizeFortifiedPosition-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"BaseTree_EnemyOutOfReach_BaseBlock-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    
+                    // EXTENSION TREES
+                    //    hunter
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_None-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_Closest-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPoints-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPercentage-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MostDmgDealt-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_EnemyWithMostAlliesInRange-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MinimizeReachableEnemiesAfterTurn-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MaximiseReachableEnemiesAfterTurn-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MinimisePositionBuffAfterTurn-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MaximisePositionBuffAfterTurn-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Hunter-Teleport-Pref_None-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_GetOutOfReach-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_GetCloserCarefully-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_GetCloserAggressively-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_OptimizeFortifiedPosition-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_None-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_NextToClosestEnemy-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenEnemies-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenTeams-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    //   scholar
+                    {"ExtensionTree-Scholar-HealAll-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_None-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_Closest-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPoints-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPercentage-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_EnemyWithMostAlliesInRange-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_None-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnLeastHpPercentageAlly-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnMostHpPercentageAlly-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_NextToClosestEnemy-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnAllyWithMostEnemiesInReach-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_InBetweenTeams-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    //   squire
+                    {"ExtensionTree-Squire-DefendAll-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Squire-Taunt-Pref_None-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_Closest-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_LeastHpPoints-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_LeastHpPercentage-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_EnemyWithMostAlliesInRange-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Squire-Tackle-Pref_None-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_Closest-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_LeastHpPoints-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_LeastHpPercentage-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_EnemyWithMostAlliesInRange-Advantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    // BASE TREE < < TEAM ADVANTAGE + UNHEALTHY > >
+                    //   enemy in reach
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_None-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_Closest-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPoints-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPercentage-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MostDmgDealt-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_EnemyWithMostAlliesInRange-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MinimizeReachableEnemiesAfterTurn-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MaximiseReachableEnemiesAfterTurn-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MinimisePositionBuffAfterTurn-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MaximisePositionBuffAfterTurn-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_None-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetOutOfReach-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserCarefully-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserAggressively-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_OptimizeFortifiedPosition-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"BaseTree_EnemyInReach_BaseBlock-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    //   enemy out of reach
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_None-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetOutOfReach-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserCarefully-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserAggressively-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_OptimizeFortifiedPosition-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"BaseTree_EnemyOutOfReach_BaseBlock-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    
+                    // EXTENSION TREES
+                    //    hunter
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_None-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_Closest-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPoints-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPercentage-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MostDmgDealt-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_EnemyWithMostAlliesInRange-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MinimizeReachableEnemiesAfterTurn-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MaximiseReachableEnemiesAfterTurn-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MinimisePositionBuffAfterTurn-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MaximisePositionBuffAfterTurn-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Hunter-Teleport-Pref_None-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_GetOutOfReach-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_GetCloserCarefully-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_GetCloserAggressively-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_OptimizeFortifiedPosition-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_None-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_NextToClosestEnemy-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenEnemies-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenTeams-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    //   scholar
+                    {"ExtensionTree-Scholar-HealAll-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_None-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_Closest-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPoints-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPercentage-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_EnemyWithMostAlliesInRange-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_None-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnLeastHpPercentageAlly-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnMostHpPercentageAlly-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_NextToClosestEnemy-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnAllyWithMostEnemiesInReach-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_InBetweenTeams-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    //   squire
+                    {"ExtensionTree-Squire-DefendAll-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Squire-Taunt-Pref_None-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_Closest-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_LeastHpPoints-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_LeastHpPercentage-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_EnemyWithMostAlliesInRange-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Squire-Tackle-Pref_None-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_Closest-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_LeastHpPoints-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_LeastHpPercentage-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_EnemyWithMostAlliesInRange-Advantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    
+                    // BASE TREE < < TEAM DISADVANTAGE + HEALTHY > >
+                    //   enemy in reach
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_None-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_Closest-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPoints-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPercentage-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MostDmgDealt-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_EnemyWithMostAlliesInRange-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MinimizeReachableEnemiesAfterTurn-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MaximiseReachableEnemiesAfterTurn-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MinimisePositionBuffAfterTurn-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MaximisePositionBuffAfterTurn-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_None-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetOutOfReach-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserCarefully-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserAggressively-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_OptimizeFortifiedPosition-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"BaseTree_EnemyInReach_BaseBlock-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    //   enemy out of reach
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_None-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetOutOfReach-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserCarefully-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserAggressively-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_OptimizeFortifiedPosition-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"BaseTree_EnemyOutOfReach_BaseBlock-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    
+                    // EXTENSION TREES
+                    //    hunter
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_None-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_Closest-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPoints-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPercentage-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MostDmgDealt-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_EnemyWithMostAlliesInRange-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MinimizeReachableEnemiesAfterTurn-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MaximiseReachableEnemiesAfterTurn-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MinimisePositionBuffAfterTurn-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MaximisePositionBuffAfterTurn-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Hunter-Teleport-Pref_None-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_GetOutOfReach-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_GetCloserCarefully-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_GetCloserAggressively-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_OptimizeFortifiedPosition-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_None-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_NextToClosestEnemy-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenEnemies-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenTeams-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    //   scholar
+                    {"ExtensionTree-Scholar-HealAll-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_None-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_Closest-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPoints-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPercentage-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_EnemyWithMostAlliesInRange-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_None-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnLeastHpPercentageAlly-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnMostHpPercentageAlly-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_NextToClosestEnemy-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnAllyWithMostEnemiesInReach-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_InBetweenTeams-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    //   squire
+                    {"ExtensionTree-Squire-DefendAll-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Squire-Taunt-Pref_None-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_Closest-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_LeastHpPoints-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_LeastHpPercentage-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_EnemyWithMostAlliesInRange-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Squire-Tackle-Pref_None-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_Closest-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_LeastHpPoints-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_LeastHpPercentage-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_EnemyWithMostAlliesInRange-Disadvantage-HealthyStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    // BASE TREE < < TEAM DISADVANTAGE + UNHEALTHY > >
+                    //   enemy in reach
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_None-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_Closest-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPoints-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_LeastHpPercentage-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MostDmgDealt-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_EnemyWithMostAlliesInRange-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MinimizeReachableEnemiesAfterTurn-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MaximiseReachableEnemiesAfterTurn-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MinimisePositionBuffAfterTurn-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_AttackWeight-Pref_MaximisePositionBuffAfterTurn-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_None-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetOutOfReach-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserCarefully-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_GetCloserAggressively-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyInReach_BaseWalk-Pref_OptimizeFortifiedPosition-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"BaseTree_EnemyInReach_BaseBlock-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    //   enemy out of reach
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_None-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetOutOfReach-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserCarefully-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_GetCloserAggressively-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"BaseTree_EnemyOutOfReach_BaseWalk-Pref_OptimizeFortifiedPosition-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"BaseTree_EnemyOutOfReach_BaseBlock-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    
+                    // EXTENSION TREES
+                    //    hunter
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_None-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_Closest-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPoints-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_LeastHpPercentage-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MostDmgDealt-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_EnemyWithMostAlliesInRange-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MinimizeReachableEnemiesAfterTurn-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MaximiseReachableEnemiesAfterTurn-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MinimisePositionBuffAfterTurn-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-HeavyAttack-Pref_MaximisePositionBuffAfterTurn-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Hunter-Teleport-Pref_None-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_GetOutOfReach-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_GetCloserCarefully-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_GetCloserAggressively-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-Teleport-Pref_OptimizeFortifiedPosition-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_None-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_NextToClosestEnemy-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenEnemies-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Hunter-RaiseObstacle-Pref_InBetweenTeams-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    //   scholar
+                    {"ExtensionTree-Scholar-HealAll-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_None-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_Closest-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPoints-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_LeastHpPercentage-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-LowerEnemyDefense-Pref_EnemyWithMostAlliesInRange-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_None-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnLeastHpPercentageAlly-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnMostHpPercentageAlly-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_NextToClosestEnemy-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_OnAllyWithMostEnemiesInReach-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Scholar-ShieldPosition-Pref_InBetweenTeams-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    //   squire
+                    {"ExtensionTree-Squire-DefendAll-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Squire-Taunt-Pref_None-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_Closest-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_LeastHpPoints-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_LeastHpPercentage-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Taunt-Pref_EnemyWithMostAlliesInRange-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    
+                    {"ExtensionTree-Squire-Tackle-Pref_None-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_Closest-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_LeastHpPoints-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_LeastHpPercentage-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
+                    {"ExtensionTree-Squire-Tackle-Pref_EnemyWithMostAlliesInRange-Disadvantage-HurtStatus", DecisionTreeDataSetWeight.Random(_rng)},
                 }
             };
             return dtDataSet;

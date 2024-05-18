@@ -62,6 +62,7 @@
     <Compile Include="AI\DecisionTree\DecisionNodes\DecisionTreeTestActiveUnitHealth.cs" />
     <Compile Include="AI\DecisionTree\DecisionNodes\DecisionTreeTestCanPerform.cs" />
     <Compile Include="AI\DecisionTree\DecisionNodes\DecisionTreeTestAnySpecialActionViable.cs" />
+    <Compile Include="AI\DecisionTree\DecisionNodes\DecisionTreeTestTeamAdvantage.cs" />
     <Compile Include="AI\DecisionTree\DecisionTreeDataSet.cs" />
     <Compile Include="AI\DecisionTree\DecisionTreeDataSetConfigs.cs" />
     <Compile Include="AI\DecisionTree\EndNodes\DecisionTreeAction.cs" />

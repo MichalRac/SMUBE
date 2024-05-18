@@ -162,6 +162,84 @@ namespace SMUBE.AI.DecisionTree
                         baseTreeForHurt)));
         }
         
+        public static DecisionTreeNode GetComplexDecisionTree(BaseCharacter character, DecisionTreeDataSet dataSet = null)
+        {
+            var conditionalDataSet = dataSet ?? DecisionTreeDataSetConfigs.ComplexPlayConfig;
+            
+            float hurtThreshold =  conditionalDataSet.Probabilities["HurtThreshold"];
+            
+            string advantageWeightGroup = "-Advantage";
+            string disadvantageWeightGroup = "-Disadvantage";
+            string healthyWeightGroup = "-HealthyStatus";
+            string unhealthyWeightGroup = "-HurtStatus";
+            
+            var baseTreeForAdvantageHealthy = GetBaseDecisionTree(advantageWeightGroup + healthyWeightGroup, conditionalDataSet);
+            var baseTreeForAdvantageUnhealthy = GetBaseDecisionTree(advantageWeightGroup + unhealthyWeightGroup, conditionalDataSet);
+            var baseTreeForDisadvantageHealthy = GetBaseDecisionTree(disadvantageWeightGroup + healthyWeightGroup, conditionalDataSet);
+            var baseTreeForDisadvantageUnhealthy = GetBaseDecisionTree(disadvantageWeightGroup + unhealthyWeightGroup, conditionalDataSet);
+            
+            DecisionTreeNode advantageHealthyExtensionTree;
+            DecisionTreeNode advantageUnhealthyExtensionTree;
+            DecisionTreeNode disadvantageHealthyExtensionTree;
+            DecisionTreeNode disadvantageUnhealthyExtensionTree;
+
+            switch (character)
+            {
+                case Hunter _:
+                    advantageHealthyExtensionTree = GetHunterExtensionDecisionTree(advantageWeightGroup + healthyWeightGroup, conditionalDataSet);
+                    advantageUnhealthyExtensionTree = GetHunterExtensionDecisionTree(advantageWeightGroup + unhealthyWeightGroup, conditionalDataSet);
+                    disadvantageHealthyExtensionTree = GetHunterExtensionDecisionTree(disadvantageWeightGroup + healthyWeightGroup, conditionalDataSet);
+                    disadvantageUnhealthyExtensionTree = GetHunterExtensionDecisionTree(disadvantageWeightGroup + unhealthyWeightGroup, conditionalDataSet);
+                    break;
+                case Scholar _:
+                    advantageHealthyExtensionTree = GetScholarExtensionDecisionTree(advantageWeightGroup + healthyWeightGroup, conditionalDataSet);
+                    advantageUnhealthyExtensionTree = GetScholarExtensionDecisionTree(advantageWeightGroup + unhealthyWeightGroup, conditionalDataSet);
+                    disadvantageHealthyExtensionTree = GetScholarExtensionDecisionTree(disadvantageWeightGroup + healthyWeightGroup, conditionalDataSet);
+                    disadvantageUnhealthyExtensionTree = GetScholarExtensionDecisionTree(disadvantageWeightGroup + unhealthyWeightGroup, conditionalDataSet);
+                    break;
+                case Squire _:
+                    advantageHealthyExtensionTree = GetSquireExtensionDecisionTree(advantageWeightGroup + healthyWeightGroup, conditionalDataSet);
+                    advantageUnhealthyExtensionTree = GetSquireExtensionDecisionTree(advantageWeightGroup + unhealthyWeightGroup, conditionalDataSet);
+                    disadvantageHealthyExtensionTree = GetSquireExtensionDecisionTree(disadvantageWeightGroup + healthyWeightGroup, conditionalDataSet);
+                    disadvantageUnhealthyExtensionTree = GetSquireExtensionDecisionTree(disadvantageWeightGroup + unhealthyWeightGroup, conditionalDataSet);
+                    break;
+                default:
+                    return null;
+            }    
+
+            return GetSafeAction<TauntedAttack>(
+                new DecisionTreeTestTeamAdvantage(
+                    // Advantage Group
+                    new DecisionTreeTestActiveUnitHealth(hurtThreshold,
+                        // Healthy Subgroup
+                        new DecisionTreeTestAnySpecialActionViable(
+                            new DecisionTreeTestRandom(conditionalDataSet.Probabilities["SpecialIfPossible" + advantageWeightGroup + healthyWeightGroup], // chance of using special if it's possible WHEN HEALTHY 
+                                advantageHealthyExtensionTree,
+                                baseTreeForAdvantageHealthy),
+                            baseTreeForAdvantageHealthy), 
+                        // Unhealthy Subgroup
+                        new DecisionTreeTestAnySpecialActionViable(
+                            new DecisionTreeTestRandom(conditionalDataSet.Probabilities["SpecialIfPossible" + advantageWeightGroup + unhealthyWeightGroup], // chance of using special if it's possible WHEN HURT 
+                                advantageUnhealthyExtensionTree,
+                                baseTreeForAdvantageUnhealthy),
+                            baseTreeForAdvantageUnhealthy)),
+                    // Disadvantage Group
+                        new DecisionTreeTestActiveUnitHealth(hurtThreshold,
+                            // Healthy Subgroup
+                            new DecisionTreeTestAnySpecialActionViable(
+                                new DecisionTreeTestRandom(conditionalDataSet.Probabilities["SpecialIfPossible" + disadvantageWeightGroup + healthyWeightGroup], // chance of using special if it's possible WHEN HEALTHY 
+                                    disadvantageHealthyExtensionTree,
+                                    baseTreeForDisadvantageHealthy),
+                                baseTreeForDisadvantageHealthy), 
+                            // Unhealthy Subgroup
+                            new DecisionTreeTestAnySpecialActionViable(
+                                new DecisionTreeTestRandom(conditionalDataSet.Probabilities["SpecialIfPossible" + disadvantageWeightGroup + unhealthyWeightGroup], // chance of using special if it's possible WHEN HURT 
+                                    disadvantageUnhealthyExtensionTree,
+                                    baseTreeForDisadvantageUnhealthy),
+                                baseTreeForDisadvantageUnhealthy)))
+                );
+        }
+        
         private static DecisionTreeNode GetBaseDecisionTree(string weightGroupSuffix, DecisionTreeDataSet dataSet)
         {
             var enemyInReachDecisionTree = GetRandomAction(dataSet.Probabilities["BaseTree_EnemyInReach_BaseAttackChance" + weightGroupSuffix], // chance of attack if enemy in reach

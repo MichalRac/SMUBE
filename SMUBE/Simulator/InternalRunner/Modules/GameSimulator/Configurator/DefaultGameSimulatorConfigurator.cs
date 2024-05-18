@@ -67,7 +67,8 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
             Console.WriteLine("5. Behavior Tree AI");
             
             Console.WriteLine("6. Decision Tree - Extended Conditional AI");
-            Console.WriteLine("7. Decision Tree - json config");
+            Console.WriteLine("7. Decision Tree - Extended Complex AI");
+            Console.WriteLine("8. Decision Tree - json config");
             
             Console.WriteLine("\nChoice:");
         }
@@ -89,6 +90,8 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
                 case ConsoleKey.D6:
                     return () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetConditionalDecisionTree(bc));
                 case ConsoleKey.D7:
+                    return () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetComplexDecisionTree(bc));
+                case ConsoleKey.D8:
                     DecisionTreeDataSet jsonDataSet = null;
 
                     while(!Directory.Exists(ConfigSetPath))

@@ -15,7 +15,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
         
         private const int GENERATION_SIZE = 10;
         private const int GENERATIONS_TO_RUN = 100;
-        private const int SIMULATIONS_PER_FITNESS_TEST = 250;
+        private const int SIMULATIONS_PER_FITNESS_TEST = 10000;
         private const int IMMUNITY_RATE = 1;
         private const int ELITISM_RATE = 2;
         private const int RESSURECTION_RATE = 2;

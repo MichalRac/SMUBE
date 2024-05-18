@@ -13,38 +13,20 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
     {
         private Random _rng;
         
-        
-        // for 24 genomes per generation
-        private const int GENERATION_SIZE = 12;
-        private const int GENERATIONS_TO_RUN = 5;
-        private const int SIMULATIONS_PER_FITNESS_TEST = 1000;
-        private const int IMMUNITY_RATE = 1;
-        private const int ELITISM_RATE = 4;
-        private const int RESSURECTION_RATE = 2;
-        
-        /*
-        // for 12 genomes per generation
-        private const int GENERATION_SIZE = 12;
+        private const int GENERATION_SIZE = 10;
         private const int GENERATIONS_TO_RUN = 100;
-        private const int SIMULATIONS_PER_FITNESS_TEST = 100;
-        
-        private const int IMMUNITY_RATE = 2;
-        private const int ELITISM_RATE = 6;
+        private const int SIMULATIONS_PER_FITNESS_TEST = 250;
+        private const int IMMUNITY_RATE = 1;
+        private const int ELITISM_RATE = 2;
         private const int RESSURECTION_RATE = 2;
-        */
         
         // thread groups per solution simulation set, preferably valid divisor for sims per fitness test
-        private const int SUB_THREADING_RATE = 2;
+        private const int SUB_THREADING_RATE = 10;
 
         private const float CHANCE_TO_MUTATE_GENOME = 0.7f;
         private const float CHANCE_TO_MUTATE_PARAMETER = 0.25f;
         private const int MIN_PROBABILITY_MUTATION = 25;
         private const int MAX_PROBABILITY_MUTATION = 300;
-        private const int MIN_WEIGHT_MUTATION = 2;
-        private const int MAX_WEIGHT_MUTATION = 50;
-        
-        private const int MIN_WEIGHT = 0;
-        private const int MAX_WEIGHT = 200;
         
         private const float CHANCE_TO_RANDOMIZE_GENOME = 0.15f;
         private const float CHANCE_TO_RANDOMIZE_PARAMETER = 0.5f;
@@ -91,7 +73,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                     var solution = _solutions[solutionId];
 
                     var gameConfigurator = new DecisionTreeLearningConfigurator(
-                        () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetConditionalDecisionTree(bc, solution)));
+                        () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetComplexDecisionTree(bc, solution)));
 
                     for (int subThreadId = 0; subThreadId < SUB_THREADING_RATE; subThreadId++)
                     {
@@ -241,7 +223,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
                 for (int resurrection = 0; resurrection < RESSURECTION_RATE; resurrection++)
                 {
-                    newSolutions.Add(GenerateConditionalDecisionTreeDataSet());
+                    newSolutions.Add(GenerateComplexDecisionTreeDataSet());
                 }
                 
                 // Mutation
@@ -718,11 +700,16 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 {
                     { "HurtThreshold", (float)_rng.NextDouble() },
                 
-                    { "SpecialIfPossible-HealthyStatus", (float)_rng.NextDouble() },
-                    { "SpecialIfPossible-HurtStatus", (float)_rng.NextDouble() },
+                    { "SpecialIfPossible-Advantage-HealthyStatus", (float)_rng.NextDouble() },
+                    { "SpecialIfPossible-Advantage-HurtStatus", (float)_rng.NextDouble() },
+                    { "SpecialIfPossible-Disadvantage-HealthyStatus", (float)_rng.NextDouble() },
+                    { "SpecialIfPossible-Disadvantage-HurtStatus", (float)_rng.NextDouble() },
                 
-                    { "BaseTree_EnemyInReach_BaseAttackChance-HealthyStatus", (float)_rng.NextDouble() },
-                    { "BaseTree_EnemyInReach_BaseAttackChance-HurtStatus", (float)_rng.NextDouble() },
+                    { "BaseTree_EnemyInReach_BaseAttackChance-Advantage-HealthyStatus", (float)_rng.NextDouble() },
+                    { "BaseTree_EnemyInReach_BaseAttackChance-Advantage-HurtStatus", (float)_rng.NextDouble() },
+                
+                    { "BaseTree_EnemyInReach_BaseAttackChance-Disadvantage-HealthyStatus", (float)_rng.NextDouble() },
+                    { "BaseTree_EnemyInReach_BaseAttackChance-Disadvantage-HurtStatus", (float)_rng.NextDouble() },
                 },
                 Weights = new Dictionary<string, DecisionTreeDataSetWeight>()
                 {

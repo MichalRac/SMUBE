@@ -30,7 +30,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 {
     internal class BattleCoreSimulationWrapper
     {
-        public const int TURN_TIMEOUT_COUNT = 2500; 
+        public const int TURN_TIMEOUT_COUNT = 5000; 
 
         private BattleCore _core;
         public BattleCore Core => _core;

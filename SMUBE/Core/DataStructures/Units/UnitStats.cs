@@ -12,7 +12,7 @@ namespace SMUBE.DataStructures.Units
     [Serializable]
     public class UnitStats
     {
-        public const int PER_TURN_HP_REPLENISH = 20;
+        public const int PER_TURN_HP_REPLENISH = 10;
         public const int PER_TURN_MANA_REPLENISH = 5;
         public const int PER_TURN_STAMINA_REPLENISH = 5;
         public BaseCharacter BaseCharacter { get; }

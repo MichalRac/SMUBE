@@ -9,6 +9,7 @@ using SMUBE_Utils.Simulator.InternalRunner.Modules.Pathfinding;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using SMUBE.Commands;
 using SMUBE.Commands.Args;
 
@@ -16,9 +17,9 @@ namespace SMUBE_Utils.Simulator
 {
     public class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            new InternalRunner.InternalRunner().Run();
+            await new InternalRunner.InternalRunner().Run();
             //Init();
         }
 

@@ -15,13 +15,13 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
         
         private const int GENERATION_SIZE = 10;
         private const int GENERATIONS_TO_RUN = 100;
-        private const int SIMULATIONS_PER_FITNESS_TEST = 10000;
-        private const int IMMUNITY_RATE = 1;
-        private const int ELITISM_RATE = 2;
-        private const int RESSURECTION_RATE = 2;
+        private const int SIMULATIONS_PER_FITNESS_TEST = 5000;
+        private const int IMMUNITY_RATE = 2;
+        private const int ELITISM_RATE = 3;
+        private const int RESSURECTION_RATE = 1;
         
         // thread groups per solution simulation set, preferably valid divisor for sims per fitness test
-        private const int SUB_THREADING_RATE = 10;
+        private const int SUB_THREADING_RATE = 2;
 
         private const float CHANCE_TO_MUTATE_GENOME = 0.7f;
         private const float CHANCE_TO_MUTATE_PARAMETER = 0.25f;
@@ -38,7 +38,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             _rng = new Random();
         }
 
-        public override async void Run()
+        public override async Task Run()
         {
             SimulatorDebugData.EnsurePath();
             _solutions = InitializeFirstGeneration();
@@ -98,7 +98,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                                 Console.WriteLine($"Gen{generation}, thread/solution {run}, group {subThread}, simulation group was corrupted!");
                             }
 
-                            if (simulationsRun % 25 == 0)
+                            if (simulationsRun % 50 == 0)
                             {
                                 Console.WriteLine($"Gen{generation}, thread/solution {run}, group {subThread}, simulation group progress: {simulationsRun}/{simCount}");
                             }
@@ -217,8 +217,14 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                     
                     // Crossover
                     var crossoverResult = SinglePointCrossover(parent1, parent2);
-                    newSolutions.Add(crossoverResult.res1);
-                    newSolutions.Add(crossoverResult.res2);
+                    if (newSolutions.Count < GENERATION_SIZE - RESSURECTION_RATE)
+                    {
+                        newSolutions.Add(crossoverResult.res1);
+                    }
+                    if (newSolutions.Count < GENERATION_SIZE - RESSURECTION_RATE)
+                    {
+                        newSolutions.Add(crossoverResult.res2);
+                    }
                 }
 
                 for (int resurrection = 0; resurrection < RESSURECTION_RATE; resurrection++)

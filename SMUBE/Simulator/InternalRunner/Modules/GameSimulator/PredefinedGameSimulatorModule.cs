@@ -1,4 +1,5 @@
-﻿using SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurator;
+﻿using System.Threading.Tasks;
+using SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurator;
 using SMUBE.AI;
 
 namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
@@ -11,7 +12,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             return new PredefinedGameSimulatorConfigurator(AiModel, AiModel);
         }
 
-        public override void Run()
+        public override Task Run()
         {
             _coreSimulator = new BattleCoreSimulationWrapper();
 
@@ -21,6 +22,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             
             _coreSimulator.OnFinishedLog(AiModel, AiModel);
             Finish();
+            return Task.CompletedTask;
         }
     }
 }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using SMUBE_Utils.Simulator.Utils.MapPrinter;
 
 namespace SMUBE_Utils.Simulator.InternalRunner.Modules.Pathfinding
@@ -23,7 +24,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.Pathfinding
             pathfindingModel = new DijkstraPathfindingAlgorithm();
         }
 
-        public void Run()
+        public Task Run()
         {
             Console.Clear();
             DisplayGrid();
@@ -164,10 +165,11 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.Pathfinding
                     }
 
                 case ConsoleKey.D0:
-                    return;
+                    return Task.CompletedTask;
             }
 
             Run();
+            return Task.CompletedTask;
         }
 
         private void RunAllConfigurations()

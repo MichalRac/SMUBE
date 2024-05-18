@@ -335,11 +335,6 @@ namespace SMUBE.Commands.Args.ArgsPicker
                 var coordinates = validTarget.UnitData.BattleScenePosition.Coordinates;
                 var distance = distanceToAnyAllyHeatmap.Heatmap[coordinates.x][coordinates.y];
                 
-                if (!_allowSpecial && validTarget.UnitData.BattleScenePosition.IsSpecial())
-                {
-                    continue;
-                }
-
                 if (distance < minDistance)
                 {
                     minDistance = distance;
@@ -349,6 +344,11 @@ namespace SMUBE.Commands.Args.ArgsPicker
 
             var surroundingPositions = BattleStateModel.BattleSceneState.PathfindingHandler.GetSurroundingPositions(BattleStateModel, closestUnitPosition);
 
+            if (!_allowSpecial)
+            {
+                surroundingPositions = surroundingPositions.Where(pos => !pos.IsSpecial()).ToList();
+            }
+            
             if (surroundingPositions.Count == 0)
             {
                 var nonEmptyNeighbours = BattleStateModel.BattleSceneState.PathfindingHandler.GetSurroundingPositions(BattleStateModel, closestUnitPosition, false);
@@ -357,6 +357,12 @@ namespace SMUBE.Commands.Args.ArgsPicker
                 foreach (var nonEmptyNeighbour in nonEmptyNeighbours)
                 {
                     surroundingPositions = BattleStateModel.BattleSceneState.PathfindingHandler.GetSurroundingPositions(BattleStateModel, nonEmptyNeighbour);
+                   
+                    if (!_allowSpecial)
+                    {
+                        surroundingPositions = surroundingPositions.Where(pos => !pos.IsSpecial()).ToList();
+                    }
+                   
                     if (surroundingPositions.Any())
                     {
                         break;

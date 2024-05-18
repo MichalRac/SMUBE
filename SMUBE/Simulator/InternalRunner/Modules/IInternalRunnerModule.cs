@@ -1,7 +1,9 @@
-﻿namespace SMUBE_Utils.Simulator.InternalRunner.Modules
+﻿using System.Threading.Tasks;
+
+namespace SMUBE_Utils.Simulator.InternalRunner.Modules
 {
     internal interface IInternalRunnerModule
     {
-        void Run();
+        Task Run();
     }
 }

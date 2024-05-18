@@ -111,7 +111,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
                     }
                     var result = GenericChoiceUtils.GetListChoice("choose config file to load as decision tree config set", false, choice);
                     
-                    return () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetConditionalDecisionTree(bc, GetJsonDataSet(result)));
+                    return () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetComplexDecisionTree(bc, GetJsonDataSet(result)));
                 default:
                     return null;
             }

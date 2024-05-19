@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SMUBE.Core;
 
 namespace SMUBE.AI.DecisionTree
 {
@@ -32,10 +33,10 @@ namespace SMUBE.AI.DecisionTree
         public WeightOption CurrentWeightOption;
         public int GetValue() => WeightOptionToValue();
 
-        public static DecisionTreeDataSetWeight Random(Random rng)
+        public static DecisionTreeDataSetWeight Random()
         {
             var weight = Disabled();
-            weight.RandomizeAssignedWeight(rng);
+            weight.RandomizeAssignedWeight();
             return weight;
         }
         public static DecisionTreeDataSetWeight Disabled() => new DecisionTreeDataSetWeight(WeightOption.Disabled);
@@ -53,9 +54,9 @@ namespace SMUBE.AI.DecisionTree
             CurrentWeightOption = currentWeightOption;
         }
 
-        public void RandomizeAssignedWeight(Random rng)
+        public void RandomizeAssignedWeight()
         {
-            CurrentWeightOption = (WeightOption)rng.Next(0, 8);
+            CurrentWeightOption = (WeightOption)RngProvider.Next(0, 8);
         }
         
         private int WeightOptionToValue()

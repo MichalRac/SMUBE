@@ -83,7 +83,6 @@
     <Compile Include="AI\GoalOrientedBehavior\LowerEnemyHealthGoal.cs" />
     <Compile Include="AI\GoalOrientedBehavior\SurviveGoal.cs" />
     <Compile Include="AI\GoalOrientedBehavior\WinGoal.cs" />
-    <Compile Include="AI\ParameterOptimization\GeneticAlgorithmDecisionTree.cs" />
     <Compile Include="AI\RandomAIModel.cs" />
     <Compile Include="AI\StateMachine\StateMachineAIModel.cs" />
     <Compile Include="AI\StateMachine\StateMachineCanPerformTransition.cs" />
@@ -150,6 +149,7 @@
     <Compile Include="Commands\_Common\PositionDelta.cs" />
     <Compile Include="Commands\_Common\UnitRoundStartTrigger.cs" />
     <Compile Include="Core\BattleCore.cs" />
+    <Compile Include="Core\RngProvider.cs" />
     <Compile Include="DataStructures\BattleScene\BattleSceneBase.cs" />
     <Compile Include="DataStructures\BattleScene\BattleScenePosition.cs" />
     <Compile Include="DataStructures\BattleScene\GridBattleScene.cs" />
@@ -176,6 +176,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="AI\QLearning\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

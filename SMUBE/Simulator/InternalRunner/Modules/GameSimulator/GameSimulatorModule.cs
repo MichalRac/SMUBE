@@ -12,7 +12,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 {
     internal class GameSimulatorModule : IInternalRunnerModule
     {
-        public const int CURRENTLY_USED_THREADS = 12;
+        public const int CURRENTLY_USED_THREADS = 10;
         protected BattleCoreSimulationWrapper _coreSimulator;
         private AIModel ai1;
         private AIModel ai2;

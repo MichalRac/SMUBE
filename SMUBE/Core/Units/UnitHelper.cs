@@ -4,22 +4,17 @@ using SMUBE.DataStructures.Units;
 using SMUBE.Units.CharacterTypes;
 using System;
 using System.Collections.Generic;
+using SMUBE.Core;
 
 namespace SMUBE.Units
 {
     public static class UnitHelper
     {
-        private static Random _randomCache;
-        private static Random Random => _randomCache ?? (_randomCache = new Random());
-
-
         private static Dictionary<int, int> teamCounts = new Dictionary<int, int>();
 
         public static Unit CreateRandomUnit(int teamId, AIModel aiModel, bool useSimpleBehavior = false)
         {
-            var rng = Random;
-
-            switch (rng.Next(3))
+            switch (RngProvider.Next(3))
             {
                 case 0:
                     return CreateUnit<Scholar>(teamId, aiModel, useSimpleBehavior);

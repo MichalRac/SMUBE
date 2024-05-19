@@ -5,6 +5,7 @@ using SMUBE.AI.DecisionTree.EndNodes.SecondaryChecks;
 using SMUBE.BattleState;
 using SMUBE.Commands;
 using SMUBE.Commands.Args;
+using SMUBE.Core;
 
 namespace SMUBE.AI.DecisionTree.EndNodes
 {
@@ -24,7 +25,6 @@ namespace SMUBE.AI.DecisionTree.EndNodes
     
     public class DecisionTreeWeightedActionSelection : DecisionTreeNode
     {
-        private readonly Random _random = new Random();
         private readonly IReadOnlyList<DecisionTreeWeightedSet> _options;
 
         public DecisionTreeWeightedActionSelection(IReadOnlyList<DecisionTreeWeightedSet> options)
@@ -53,7 +53,7 @@ namespace SMUBE.AI.DecisionTree.EndNodes
             }
 
             var max = viableOptions.Sum(viableOption => viableOption.Weight);
-            var test =  _random.NextDouble() * max;
+            var test =  RngProvider.NextDouble() * max;
             var currentSum = 0;
    
             foreach (var currentOption in viableOptions)

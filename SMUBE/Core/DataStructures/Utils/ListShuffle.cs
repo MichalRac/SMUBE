@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using SMUBE.Core;
 
 namespace SMUBE.DataStructures.Utils
 {
@@ -41,8 +42,7 @@ namespace SMUBE.DataStructures.Utils
                 return list[0];
             }
             
-            Random random = new Random();
-            return list[random.Next(0, list.Count)];
+            return list[RngProvider.Next(0, list.Count)];
         }
     }
 

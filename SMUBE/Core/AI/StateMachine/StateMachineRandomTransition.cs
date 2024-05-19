@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SMUBE.Core;
 
 namespace SMUBE.AI.StateMachine
 {
@@ -19,8 +20,7 @@ namespace SMUBE.AI.StateMachine
 
         public override bool IsTriggered(BattleStateModel _)
         {
-            var rng = new Random();
-            return rng.NextDouble() <= _chance;
+            return RngProvider.NextDouble() <= _chance;
         }
     }
 }

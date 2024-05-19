@@ -5,6 +5,7 @@ using SMUBE.BattleState;
 using SMUBE.BattleState.Heatmap.GeneralHeatmaps;
 using SMUBE.Commands._Common;
 using SMUBE.Commands.Effects;
+using SMUBE.Core;
 using SMUBE.DataStructures.BattleScene;
 using SMUBE.DataStructures.Units;
 using SMUBE.DataStructures.Utils;
@@ -210,7 +211,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
             var enemyTeamUnits = BattleStateModel.GetTeamUnits(enemyTeamId).Where(u => u.UnitData.UnitStats.IsAlive()).ToList();
             if (enemyTeamUnits.Any())
             {
-                var targetUnitData = enemyTeamUnits.ElementAt(new Random().Next(enemyTeamUnits.Count() - 1)).UnitData;
+                var targetUnitData = enemyTeamUnits.ElementAt(RngProvider.Next(enemyTeamUnits.Count() - 1)).UnitData;
                 return new CommonArgs(unit.UnitData, new List<UnitData>() { targetUnitData }, BattleStateModel);
             }
 

@@ -5,6 +5,7 @@ using SMUBE.BattleState;
 using SMUBE.Commands._Common;
 using SMUBE.Commands.Args.ArgsPicker;
 using SMUBE.Commands.Args.ArgsValidators;
+using SMUBE.Core;
 using SMUBE.DataStructures.Units;
 using SMUBE.DataStructures.Utils;
 
@@ -154,7 +155,7 @@ namespace SMUBE.Commands.Args
                     var enemyTeamUnits = battleStateModel.GetTeamUnits(enemyTeamId).Where(u => u.UnitData.UnitStats.IsAlive());
                     if (enemyTeamUnits != null && enemyTeamUnits.Count() > 0)
                     {
-                        var targetUnitData = enemyTeamUnits.ElementAt(new Random().Next(enemyTeamUnits.Count() - 1)).UnitData;
+                        var targetUnitData = enemyTeamUnits.ElementAt(RngProvider.Next(enemyTeamUnits.Count() - 1)).UnitData;
                         return new CommonArgs(unit.UnitData, new List<UnitData>() { targetUnitData }, battleStateModel);
                     }
 

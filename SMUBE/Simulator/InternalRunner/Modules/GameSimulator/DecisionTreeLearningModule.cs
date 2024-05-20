@@ -12,18 +12,19 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 {
     internal class DecisionTreeLearningModule : GameSimulatorModule
     {
-        private const int GENERATION_SIZE = 10;
+        private const int GENERATION_SIZE = 18;
         private const int GENERATIONS_TO_RUN = 250;
-        private const int SIMULATIONS_PER_FITNESS_TEST = 5000;
+        private const int SIMULATIONS_PER_FITNESS_TEST = 2500;
         private const int IMMUNITY_RATE = 2;
-        private const int ELITISM_RATE = 3;
-        private const int RESSURECTION_RATE = 1;
+        private const int ELITISM_RATE = 4;
+        private const int RESSURECTION_RATE = 4;
         
         // thread groups per solution simulation set, preferably valid divisor for sims per fitness test
-        private const int SUB_THREADING_RATE = 2;
+        private const int SUB_THREADING_RATE = 1;
 
         private const float CHANCE_TO_MUTATE_GENOME = 0.7f;
         private const float CHANCE_TO_MUTATE_PARAMETER = 0.25f;
+        private const float PROBABILITY_MUTATION = 0.05f;
         private const int MIN_PROBABILITY_MUTATION = 25;
         private const int MAX_PROBABILITY_MUTATION = 300;
         
@@ -156,19 +157,23 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
                 // log generation summary
                 var genBestSolution = selectionList.First();
+                bool newBestFound = false;
                 if (bestSolutionTuple.best_solution == null || genBestSolution.fitness > bestSolutionTuple.fitness)
                 {
-                    bestSolutionTuple = (genBestSolution.simulationSolution, genBestSolution.fitness);
+                    var solutionDeepCopy = genBestSolution.simulationSolution.DeepCopy();
+                    bestSolutionTuple = (solutionDeepCopy, genBestSolution.fitness);
+                    newBestFound = true;
                 }
+                
                 var avgFitness = selectionList.Average(sol => sol.fitness);
                 allGenSummary.Add($"{generation},{genBestSolution.fitness},{avgFitness}");
                 var genSummary = new List<string>(allGenSummary);
                 genSummary.Add("\n");
                 genSummary.Add($"Best Fitness {bestSolutionTuple.fitness} Serialized Config Set:");
-                var bestSolution = JsonConvert.SerializeObject(bestSolutionTuple.best_solution).ToString();
-                genSummary.Add($"{bestSolution}");
+                var bestSolutionJson = JsonConvert.SerializeObject(bestSolutionTuple.best_solution).ToString();
+                genSummary.Add($"{bestSolutionJson}");
                 SimulatorDebugData.SaveToFileSummary(genSummary, $"gen{i}_summary",learningRunId);
-                SimulatorDebugData.SaveToFileSummary(new List<string>{bestSolution}, $"gen{i}_{bestSolutionTuple.fitness}fit",learningRunId, true);
+                SimulatorDebugData.SaveToFileSummary(new List<string>{bestSolutionJson}, $"gen{i}_{bestSolutionTuple.fitness}fit",learningRunId, true);
                 
                 // early return on final loop
                 if (i == GENERATIONS_TO_RUN - 1)
@@ -181,9 +186,14 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 {
                     newSolutions.Add(selectionList[topId].simulationSolution);
                 }
-                
-                var totalFitness = selectionList.Sum(s => s.fitness);
 
+                // If no new best found, consider known best for natural selection (but don't re-add it)
+                if (!newBestFound)
+                {
+                    selectionList.Add(bestSolutionTuple);
+                }
+                var totalFitness = selectionList.Sum(s => s.fitness);
+                
                 // Natural Selection
                 while (newSolutions.Count < GENERATION_SIZE - RESSURECTION_RATE)
                 {
@@ -246,7 +256,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                         {
                             if (RngProvider.NextDouble() < CHANCE_TO_MUTATE_PARAMETER)
                             {
-                                var delta = (float)RngProvider.Next(MIN_PROBABILITY_MUTATION, MAX_PROBABILITY_MUTATION) / 1_000;
+                                var delta = PROBABILITY_MUTATION;
                                 if (RngProvider.Next(0, 2) == 0)
                                     delta *= -1;
 
@@ -262,30 +272,12 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                             if (RngProvider.NextDouble() < CHANCE_TO_MUTATE_PARAMETER)
                             {
                                 weight.Value.RandomizeAssignedWeight();
-                                
-                                /*
-                                var delta = RngProvider.Next(MIN_WEIGHT_MUTATION, MAX_WEIGHT_MUTATION);
-                                if (RngProvider.Next(0, 2) == 0)
-                                    delta *= -1;
-
-                                var newValue = newSolution.Weights[weight.Key] + delta;
-                                newValue = Math.Min(newValue, MAX_WEIGHT);
-                                newValue = Math.Max(newValue, MIN_WEIGHT);
-                                
-                                weightChanges.Add((weight.Key, newValue));
-                            */
                             }
                         }
                         foreach (var probabilityChange in probabilityChanges)
                         {
                             newSolution.Probabilities[probabilityChange.key] = probabilityChange.newValue;
                         }
-                        /*
-                        foreach (var weightChange in weightChanges)
-                        {
-                            newSolution.Weights[weightChange.key] = weightChange.newValue;
-                        }
-                    */
                     }
                 }
                 
@@ -301,7 +293,6 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                     if (RngProvider.NextDouble() < CHANCE_TO_RANDOMIZE_GENOME)
                     {
                         List<(string key, float newValue)> probabilityChanges = new List<(string, float)>();
-                        List<(string key, int newValue)> weightChanges = new List<(string, int)>();
                         
                         foreach (var probability in newSolution.Probabilities)
                         {
@@ -315,19 +306,12 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                             if (RngProvider.NextDouble() < CHANCE_TO_RANDOMIZE_PARAMETER)
                             {
                                 weight.Value.RandomizeAssignedWeight();
-                                //weightChanges.Add((weight.Key, RngProvider.Next(MIN_WEIGHT, MAX_WEIGHT)));
                             }
                         }
                         foreach (var probabilityChange in probabilityChanges)
                         {
                             newSolution.Probabilities[probabilityChange.key] = probabilityChange.newValue;
                         }
-                        /*
-                        foreach (var weightChange in weightChanges)
-                        {
-                            newSolution.Weights[weightChange.key];
-                        }
-                        */
                     }
                 }
 
@@ -376,115 +360,17 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 var key = weight.Key;
                 if (currentIndex < crossoverPoint)
                 {
-                    res1.Weights.Add(key, weight.Value);
-                    res2.Weights.Add(key, sol2.Weights[key]);
+                    res1.Weights.Add(key, new DecisionTreeDataSetWeight(weight.Value.CurrentWeightOption));
+                    res2.Weights.Add(key, new DecisionTreeDataSetWeight(sol2.Weights[key].CurrentWeightOption));
                 }
                 else
                 {
-                    res1.Weights.Add(key, sol2.Weights[key]);
-                    res2.Weights.Add(key, weight.Value);
+                    res1.Weights.Add(key, new DecisionTreeDataSetWeight(sol2.Weights[key].CurrentWeightOption));
+                    res2.Weights.Add(key, new DecisionTreeDataSetWeight(weight.Value.CurrentWeightOption));
                 }
                 currentIndex++;
             }
             
-            /*
-            if (crossoverPoint < sol1.Probabilities.Count)
-            {
-                
-                
-                
-                foreach (var probability1 in sol1.Probabilities)
-                {
-                    res1.Probabilities.Add(probability1.Key, probability1.Value);
-                    currentIndex++;
-                }
-                foreach (var probability1 in sol2.Probabilities)
-                {
-                    res2.Probabilities.Add(probability1.Key, probability1.Value);
-                    currentIndex++;
-                }
-
-                
-                if (currentIndex < crossoverPoint)
-                {
-
-                }
-                else
-                {
-                    foreach (var probability2 in sol2.Probabilities)
-                    {
-                        res1.Probabilities.Add(probability2.Key, probability2.Value);
-                    }
-                    foreach (var probability1 in sol1.Probabilities)
-                    {
-                        res2.Probabilities.Add(probability1.Key, probability1.Value);
-                    }
-                }
-
-                foreach (var weight2 in sol2.Weights)
-                {
-                    res1.Weights.Add(weight2.Key, weight2.Value);
-                }
-                foreach (var weight1 in sol1.Weights)
-                {
-                    res2.Weights.Add(weight1.Key, weight1.Value);
-                }
-            }
-            else
-            {
-                foreach (var weight1 in sol1.Weights)
-                {
-                    res1.Weights.Add(weight1.Key, weight1.Value);
-                }
-                foreach (var weight2 in sol2.Weights)
-                {
-                    res2.Weights.Add(weight2.Key, weight2.Value);
-                }
-                
-                int currentIndex = 0;
-                foreach (var weight in sol1.Weights)
-                {
-                    //var id = weight.Key;
-                    /*
-                    if (currentIndex < crossoverPoint)
-                    {
-                        res1.Weights[id] = sol1.Weights[id];
-                        res2.Weights[id] = sol2.Weights[id];
-                    }
-                    else
-                    {
-                        res1.Weights[id] = sol2.Weights[id];
-                        res2.Weights[id] = sol1.Weights[id];
-                    }
-                    #1#
-                    if (currentIndex < crossoverPoint)
-                    {
-                        foreach (var weight1 in sol1.Weights)
-                        {
-                            res1.Weights.Add(weight1.Key, weight1.Value);
-                        }
-                        foreach (var weight2 in sol2.Weights)
-                        {
-                            res2.Weights.Add(weight2.Key, weight2.Value);
-                        }
-                    }
-                    else
-                    {
-                        foreach (var weight2 in sol2.Weights)
-                        {
-                            res1.Weights.Add(weight2.Key, weight2.Value);
-                        }
-                        foreach (var weight1 in sol1.Weights)
-                        {
-                            res2.Weights.Add(weight1.Key, weight1.Value);
-                        }
-                    }
-
-                    currentIndex++;
-                }
-            }
-            */
-
             return (res1, res2);
         }
 

@@ -9,6 +9,20 @@ namespace SMUBE.AI.DecisionTree
     {
         public Dictionary<string, float> Probabilities = new Dictionary<string, float>();
         public Dictionary<string, DecisionTreeDataSetWeight> Weights = new Dictionary<string, DecisionTreeDataSetWeight>();
+
+        public DecisionTreeDataSet DeepCopy()
+        {
+            var copy = new DecisionTreeDataSet();
+            foreach (var probability in Probabilities)
+            {
+                copy.Probabilities[probability.Key] = probability.Value;
+            }
+            foreach (var weight in Weights)
+            {
+                copy.Weights[weight.Key] = new DecisionTreeDataSetWeight(weight.Value.CurrentWeightOption);
+            }
+            return copy;
+        }
     }
     
     [Serializable]

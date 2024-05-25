@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using SMUBE.AI;
+using SMUBE.AI.QLearning;
 using SMUBE.BattleState;
 using SMUBE.Commands;
 using SMUBE.Commands.Args;
@@ -311,10 +312,12 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
         public void AutoResolveTurn(bool log = true)
         {
+            /*
             if (_simulatorDebugData.turnCount > TURN_TIMEOUT_COUNT)
             {
                 throw new ApplicationException();
             }
+            */
 
             if (!_core.currentStateModel.GetNextActiveUnit(out var unit))
             {
@@ -327,7 +330,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             BaseCommand nextCommand = null;
             CommandArgs nextArgs = null;
 
-            if (unit.AiModel is BehaviorTreeAIModel)
+            if (unit.AiModel is BehaviorTreeAIModel || unit.AiModel is QLearningModel)
             {
                 commandStopwatch.Start();
                 nextCommand = unit.AiModel.ResolveNextCommand(_core.currentStateModel, unit.UnitData.UnitIdentifier);
@@ -406,7 +409,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 _simulatorDebugData.teamTwoActions++;
             }
 
-            if (!(unit.AiModel is BehaviorTreeAIModel))
+            if (!(unit.AiModel is BehaviorTreeAIModel || unit.AiModel is QLearningModel))
             {
                 _core.currentStateModel.ExecuteCommand(nextCommand, nextArgs);
             }

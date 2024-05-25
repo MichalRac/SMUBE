@@ -611,7 +611,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
                 }
                 else
                 {
-                    if (unitsOfTeamIdInRangeHeatmap.Heatmap[coordinates.x][coordinates.y] < maxReachedUnits)
+                    if (unitsOfTeamIdInRangeHeatmap.Heatmap[coordinates.x][coordinates.y] > maxReachedUnits)
                     {
                         maxReachedUnits = unitsOfTeamIdInRangeHeatmap.Heatmap[coordinates.x][coordinates.y];
                         minDistance = closestSurroundingNode.ShortestDistance;
@@ -645,8 +645,8 @@ namespace SMUBE.Commands.Args.ArgsPicker
             
             validTargets.Shuffle();
             
-            var minReachableEnemies = int.MinValue;
-            var maxReachableEnemies = int.MaxValue;
+            var minReachableEnemies = int.MaxValue;
+            var maxReachableEnemies = int.MinValue;
             CommonArgs optimalReachedUnitsArgs = null;
             
             var inEnemyRangeCountHeatmap = new CountReachingUnitsOfTeamIdHeatmap(enemyTeamId, BattleStateModel, true);

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using SMUBE.BattleState;
 using SMUBE.Commands;
+using SMUBE.Commands.Args;
 using SMUBE.Commands.Effects;
 using SMUBE.Commands.SpecificCommands.Taunt;
 using SMUBE.DataStructures.Units;
@@ -13,9 +14,18 @@ namespace SMUBE.Units
         public List<BaseCommand> AllCommands { get; }
         public List<BaseCommand> ViableCommands { get; } = new List<BaseCommand>();
         public List<UnitIdentifier> ViableTargets = new List<UnitIdentifier>();
-
+        
         public bool IsTaunted { get; set; } = false;
 
+        internal QLearningLastActionCacheData QLearningLastActionCache;
+
+        internal class QLearningLastActionCacheData
+        {
+            public long stateId;
+            public CommandId CommandId;
+            public ArgsPreferences ArgsPreferences;
+        }
+        
 
         public UnitCommandProvider(UnitData unitData, List<BaseCommand> unitCommands)
         {

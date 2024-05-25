@@ -6,6 +6,7 @@ namespace SMUBE.Commands.Effects
 {
     public class BlockEffect : Effect
     {
+        public readonly float Multiplier = 0.5f;
         private const int DEFAULT_PERSISTENCE = 1;
         private int currentPersistence = DEFAULT_PERSISTENCE;
 
@@ -33,7 +34,7 @@ namespace SMUBE.Commands.Effects
             {
                 if(effect is DamageEffect damageEffect)
                 {
-                    damageEffect.Value /= 2; 
+                    damageEffect.Value = (int)(damageEffect.Value * Multiplier);
                 }
             }
         }

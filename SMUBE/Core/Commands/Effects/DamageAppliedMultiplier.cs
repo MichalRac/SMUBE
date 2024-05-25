@@ -11,18 +11,18 @@ namespace SMUBE.Commands.Effects
     {
         private const int DEFAULT_PERSISTANCE = 3;
         
-        private readonly float _multiplier;
+        public readonly float Multiplier;
         private readonly UnitRoundStartTrigger _persistenceUpdateTrigger;
         private int _currentPersistence = DEFAULT_PERSISTANCE;
 
         public DamageAppliedMultiplier(float multiplier, UnitRoundStartTrigger persistenceUpdateTrigger, int startingPersistence = DEFAULT_PERSISTANCE)
         {
-            _multiplier = multiplier;
+            Multiplier = multiplier;
             _persistenceUpdateTrigger = persistenceUpdateTrigger;
 
-            if (Math.Abs(_multiplier) <= float.Epsilon)
+            if (Math.Abs(Multiplier) <= float.Epsilon)
             {
-                _multiplier = 1f;
+                Multiplier = 1f;
             }
             
             _currentPersistence = startingPersistence;
@@ -56,14 +56,14 @@ namespace SMUBE.Commands.Effects
             {
                 if(effect is DamageEffect damageEffect)
                 {
-                    damageEffect.Value = (int)(damageEffect.Value * _multiplier); 
+                    damageEffect.Value = (int)(damageEffect.Value * Multiplier);
                 }
             }
         }
         
         public override string GetDescriptor()
         {
-            return $"AppliedDmg: x{_multiplier}";
+            return $"AppliedDmg: x{Multiplier}";
         }
     }
 }

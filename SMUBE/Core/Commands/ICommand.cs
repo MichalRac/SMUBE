@@ -12,6 +12,7 @@ namespace SMUBE.Commands
 
         CommandId CommandId { get; }
         BaseCommandArgsValidator CommandArgsValidator { get; }
+        ArgsPreferences ArgsPreferences { get; } 
         bool TryExecute(BattleStateModel battleStateModel, CommandArgs commandArgs);
         CommandResults GetCommandResults(CommandArgs commandArgs);
     }

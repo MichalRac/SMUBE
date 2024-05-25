@@ -72,12 +72,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="InternalRunner\Modules\GameSimulator\ActionContexts\InternalRunnerContextPicker.cs" />
-    <Compile Include="InternalRunner\Modules\GameSimulator\ActionContexts\PickTeamActionContext.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerDisplayHeatmap.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerDisplayMap.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerManualAction.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerLogUnitSummary.cs" />
+    <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerPrintQLearningStateResults.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerSkipForward.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerStepForward.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\BattleCoreSimulationWrapper.cs" />
@@ -85,12 +84,13 @@
     <Compile Include="InternalRunner\Modules\GameSimulator\Configurator\PredefinedGameSimulatorConfigurator.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\Configurator\IGameSimulatorConfigurator.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\Configurator\DefaultGameSimulatorConfigurator.cs" />
+    <Compile Include="InternalRunner\Modules\GameSimulator\Configurator\QLearningConfigurator.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\DecisionTreeLearningModule.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\GameSimulatorModule.cs" />
     <Compile Include="InternalRunner\InternalRunner.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\Actions\InternalRunnerAction.cs" />
-    <Compile Include="InternalRunner\Modules\GameSimulator\ActionContexts\InternalRunnerActionContext.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\PredefinedGameSimulatorModule.cs" />
+    <Compile Include="InternalRunner\Modules\GameSimulator\QLearningModule.cs" />
     <Compile Include="InternalRunner\Modules\GameSimulator\SimulatorDebugData.cs" />
     <Compile Include="InternalRunner\Modules\IInternalRunnerModule.cs" />
     <Compile Include="InternalRunner\Modules\InternalRunnerModulePicker.cs" />

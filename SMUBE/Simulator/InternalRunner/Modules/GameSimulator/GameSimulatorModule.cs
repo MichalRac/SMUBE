@@ -12,7 +12,8 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 {
     internal class GameSimulatorModule : IInternalRunnerModule
     {
-        public const int CURRENTLY_USED_THREADS = 10;
+        protected virtual int CURRENTLY_USED_THREADS => 10;
+
         protected BattleCoreSimulationWrapper _coreSimulator;
         private AIModel ai1;
         private AIModel ai2;
@@ -30,12 +31,12 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             
             var simulationSeries = GenericChoiceUtils.GetBooleanChoice("Run N Simulation Series?");
             int simulationNumber = simulationSeries 
-                ? GenericChoiceUtils.GetInt($"Number of simulations per used thread (currently configured to: {CURRENTLY_USED_THREADS}) to be run:") 
+                ? GenericChoiceUtils.GetInt($"Number of simulations (configured to ran on {CURRENTLY_USED_THREADS} threads) to be run:") 
                 : 1;
 
             if (simulationSeries)
             {
-                await RunSimulationSeries(simulationNumber, gameConfigurator, useSimpleBehavior, simulationSeries);
+                await RunSimulationSeries(simulationNumber, gameConfigurator, useSimpleBehavior, simulationSeries, "RegularSimulations", string.Empty);
             }
             else
             {
@@ -46,7 +47,8 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             Finish();
         }
 
-        private async Task RunSimulationSeries(int simulationNumber, IGameSimulatorConfigurator gameConfigurator, bool useSimpleBehavior, bool simulationSeries)
+        protected async Task RunSimulationSeries(int simulationNumber, IGameSimulatorConfigurator gameConfigurator, bool useSimpleBehavior, 
+            bool simulationSeries, string groupId, string nameSuffix)
         {
             List<Task> tasks = new List<Task>();
             var results = new ConcurrentBag<SimulatorDebugData>();
@@ -54,7 +56,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             for (int repeats = 0; repeats < CURRENTLY_USED_THREADS; repeats++)
             {
                 int repeat = repeats;
-                tasks.Add(Task.Run(() => SingleSimulationWrapper(repeat, simulationNumber)));
+                tasks.Add(Task.Run(() => SingleSimulationWrapper(repeat, simulationNumber / CURRENTLY_USED_THREADS)));
                 continue;
 
                 Task SingleSimulationWrapper(int run, int simulationsPerThread)
@@ -63,32 +65,15 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                     int simulationsRun = 0;
                     while (simulationsRun++ < simulationsPerThread)
                     {
-                        /*
-                                          try
-                                          {
-                                              */
-                        //RunSingleSimulation(simulationWrapper, gameConfigurator, useSimpleBehavior, simulationSeries);
                         RunSingleSimulation(simulationWrapper, gameConfigurator, useSimpleBehavior, simulationSeries);
-                        /*
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine($"Simulation {simulationsRun} corrupted, press anything to continue;");
-                            new InternalRunnerDisplayMap(_coreSimulator, true).OnPicked();
-                            new InternalRunnerDisplayHeatmap(_coreSimulator).OnPicked();
-                            Console.ReadKey();
-                        }
-                        */
 
                         if (simulationsRun % 25 == 0)
                         {
-                            Console.WriteLine($"thread {run} simulation group progress: {simulationsRun}/{simulationNumber}");
+                            Console.WriteLine($"thread {run} simulation group progress: {simulationsRun}/{simulationsPerThread}");
                         }
                     }
                     
                     results.Add(simulationWrapper._simulatorDebugData);
-                    //simulationWrapper.OnFinishedLog(ai1, ai2, true);
-                    //simulationWrapper.RestartDebugCounters();
                     return Task.CompletedTask;
                 }
             }
@@ -98,7 +83,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             var aggregatedData = new SimulatorDebugData(results);
             var debugDataListed = aggregatedData.GetDebugDataListed();
             aggregatedData.PrintToConsole(debugDataListed);
-            aggregatedData.SaveToFile(debugDataListed, string.Empty, "RegularSimulations");
+            aggregatedData.SaveToFile(debugDataListed, nameSuffix, groupId);
         }
 
         protected void RunSingleSimulation(BattleCoreSimulationWrapper simulationWrapper, IGameSimulatorConfigurator gameConfigurator, bool useSimpleBehavior, bool simulationSeries)
@@ -136,6 +121,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 ("Display Map With Descriptors", new InternalRunnerDisplayMap(simulator, true)),
                 ("Display Ally Distance Heatmap", new InternalRunnerDisplayHeatmap(simulator)),
                 ("Log Unit Summary", new InternalRunnerLogUnitSummary(simulator)),
+                ("QLearningStateSummary", new InternalRunnerPrintQLearningStateResults(simulator)),
             }, false);
 
             result.OnPicked();

@@ -10,12 +10,14 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using SMUBE_Utils.Simulator.Utils;
+using SMUBE.AI.QLearning;
 
 namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurator
 {
     internal class DefaultGameSimulatorConfigurator : IGameSimulatorConfigurator
     {
-        private static string ConfigSetPath = "E:\\_RepositoryE\\SMUBE\\Output\\JsonConfigs\\";
+        private static string DTConfigSetPath = "E:\\_RepositoryE\\SMUBE\\Output\\JsonConfigs\\DT\\";
+        private static string QTablePath = "E:\\_RepositoryE\\SMUBE\\Output\\JsonConfigs\\QTable\\";
         
         private Func<AIModel> team1AIModelProvider = null;
         private Func<AIModel> team2AIModelProvider = null;
@@ -70,6 +72,8 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
             Console.WriteLine("7. Decision Tree - Extended Complex AI");
             Console.WriteLine("8. Decision Tree - json config");
             
+            Console.WriteLine("9. QTable - json config");
+            
             Console.WriteLine("\nChoice:");
         }
 
@@ -92,17 +96,18 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
                 case ConsoleKey.D7:
                     return () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetComplexDecisionTree(bc));
                 case ConsoleKey.D8:
+                {
                     DecisionTreeDataSet jsonDataSet = null;
 
-                    while(!Directory.Exists(ConfigSetPath))
+                    while(!Directory.Exists(DTConfigSetPath))
                     {
                         Console.Clear();
                         Console.WriteLine("Path to configs not chosen! \n" +
                                           "Input path where your DecisionTreeConfigs are, or enter \"Q\" to leave");
-                        ConfigSetPath = Console.ReadLine();
+                        DTConfigSetPath = Console.ReadLine();
                     }
                     
-                    var files = Directory.GetFiles(ConfigSetPath);
+                    var files = Directory.GetFiles(DTConfigSetPath);
                     var choice = new List<(string msg, string path)>();
                     foreach (var file in files)
                     {
@@ -112,6 +117,31 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
                     var result = GenericChoiceUtils.GetListChoice("choose config file to load as decision tree config set", false, choice);
                     
                     return () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetComplexDecisionTree(bc, GetJsonDataSet(result)));
+                }
+                case ConsoleKey.D9:
+                {
+                    DecisionTreeDataSet qLearningResultsJson = null;
+
+                    while(!Directory.Exists(QTablePath))
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Path to configs not chosen! \n" +
+                                          "Input path where your QTable json files are, or enter \"Q\" to leave");
+                        DTConfigSetPath = Console.ReadLine();
+                    }
+                    
+                    var qTableFiles = Directory.GetFiles(QTablePath);
+                    var choice = new List<(string msg, string path)>();
+                    foreach (var file in qTableFiles)
+                    {
+                        var filename = Path.GetFileName(file);
+                        choice.Add((filename, file));
+                    }
+                    var result = GenericChoiceUtils.GetListChoice("choose config file to load as QTable", false, choice);
+                    
+                    return () => new QLearningModel(GetJsonQTable(result));
+                }
+
                 default:
                     return null;
             }
@@ -121,6 +151,13 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
         {
             var fileContent = File.ReadAllText(filePath);
             var config = JsonConvert.DeserializeObject<DecisionTreeDataSet>(fileContent);
+            return config;
+        }
+        
+        private QValueData GetJsonQTable(string filePath)
+        {
+            var fileContent = File.ReadAllText(filePath);
+            var config = JsonConvert.DeserializeObject<QValueData>(fileContent);
             return config;
         }
     }

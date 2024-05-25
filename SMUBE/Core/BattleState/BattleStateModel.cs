@@ -5,6 +5,7 @@ using SMUBE.Units;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SMUBE.AI.QLearning;
 using SMUBE.Commands;
 using SMUBE.Commands.Args;
 using SMUBE.Pathfinding;
@@ -117,6 +118,8 @@ namespace SMUBE.BattleState
 
         public bool ExecuteCommand(ICommand command, CommandArgs commandArgs)
         {
+            ProcessQLearningActionCache(command);
+            
             bool success = command.TryExecute(this, commandArgs);
 
             if (!success)
@@ -134,31 +137,30 @@ namespace SMUBE.BattleState
                 Unit unit = Units[i];
                 if (unit.UnitData.UnitStats.CurrentHealth <= 0)
                 {
+                    unit.UnitCommandProvider.QLearningLastActionCache = null;
                     TryRemoveUnit(unit);
                 }
             }
-
-            /*
-            var commandResults = command.GetCommandResults(commandArgs);
-            if (commandResults.PositionDeltas != null)
-            {
-                foreach (var positionDelta in commandResults.PositionDeltas)
-                {
-                    PathfindingAlgorithm.DirtyPositionCache.Add(positionDelta.Start);
-                    PathfindingAlgorithm.DirtyPositionCache.Add(positionDelta.Target);
-                }
-            }
-            */
             
             OnNewTurn();
             return true;
+        }
+
+        private void ProcessQLearningActionCache(ICommand command)
+        {
+            ActiveUnit.UnitCommandProvider.QLearningLastActionCache = new UnitCommandProvider.QLearningLastActionCacheData()
+            {
+                stateId = new QLearningState().GetStateNumber(this, ActiveUnit), 
+                CommandId = command.CommandId,
+                ArgsPreferences = command.ArgsPreferences,
+            };
         }
 
         public void DebugReevaluateCommands()
         {
             ActiveUnit.UnitCommandProvider.OnNewTurn(this);
         }
-
+        
         public void OnNewTurn()
         {
             foreach (var battleScenePosition in BattleSceneState.Grid)

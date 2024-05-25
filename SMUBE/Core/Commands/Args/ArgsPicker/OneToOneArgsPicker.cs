@@ -256,6 +256,11 @@ namespace SMUBE.Commands.Args.ArgsPicker
                 }
             }
 
+            if (minDistanceArgs == null)
+            {
+                return GetAnyStrategy();
+            }
+            
             return minDistanceArgs;
         }
         
@@ -325,7 +330,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
             {
                 var coordinates = validTarget.UnitData.BattleScenePosition.Coordinates;
 
-                if (alliesInRangeHeatmap.Heatmap[coordinates.x][coordinates.y] < maxReachedUnits)
+                if (alliesInRangeHeatmap.Heatmap[coordinates.x][coordinates.y] > maxReachedUnits)
                 {
                     maxReachedUnits = alliesInRangeHeatmap.Heatmap[coordinates.x][coordinates.y];
                     maxReachedUnitsArgs = new CommonArgs(activeUnit.UnitData, new List<UnitData> { validTarget.UnitData }, BattleStateModel);

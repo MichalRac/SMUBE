@@ -12,11 +12,12 @@ namespace SMUBE.AI.QLearning
     public class QLearningModel : AIModel
     {
         public const float WIN_GAME_REWARD = 5;
+        public const float LOSE_GAME_PENALTY = -3;
         public const float ENEMY_DEFEATED_REWARD = 1;
         
-        public float Alpha_LearningRate = 0.7f; // influence of feedback to current Q value, potentially to be gradually reduced
-        public float Gamma_DiscountRate = 0.85f; // how much next state Q contributes (0.75 contributes around 0.05 to 10 steps before reward 1) 
-        public float Rho_RandomRate = 0.6f; // chance of picking random action instead of best known
+        public float Alpha_LearningRate = 0.6f; // influence of feedback to current Q value, potentially to be gradually reduced
+        public float Gamma_DiscountRate = 0.4f; // how much next state Q contributes (0.75 contributes around 0.05 to 10 steps before reward 1) 
+        public float Rho_RandomRate = 0.5f; // chance of picking random action instead of best known
         public float Nu_LenghtOfWalk = 0f; // chance of starting over from random state, can be 0 in this context
 
         public QValueData _qValueData = new QValueData();
@@ -40,9 +41,9 @@ namespace SMUBE.AI.QLearning
             learningEnabled = value;
             if (value)
             {
-                Alpha_LearningRate = 0.7f;
-                Gamma_DiscountRate = 0.85f;
-                Rho_RandomRate = 0.6f;
+                Alpha_LearningRate = 0.6f;
+                Gamma_DiscountRate = 0.4f;
+                Rho_RandomRate = 0.5f;
                 Nu_LenghtOfWalk = 0f;
             }
             else
@@ -78,7 +79,7 @@ namespace SMUBE.AI.QLearning
             var viableCommands = _qLearningCommandHelper.GetSubcommands(battleStateModel.ActiveUnit);
             
             BaseCommand commandToTake = null;
-            if (RngProvider.NextDouble() < Rho_RandomRate)
+            if (learningEnabled && RngProvider.NextDouble() < Rho_RandomRate)
             {
                 viableCommands.Shuffle();
                 commandToTake = viableCommands.First();
@@ -105,12 +106,33 @@ namespace SMUBE.AI.QLearning
                 {
                     totalReward += WIN_GAME_REWARD;
                 }
+                else
+                {
+                    totalReward += LOSE_GAME_PENALTY;
+                }
             }
 
             var opponentPostActionDifference = opponentTeamCount - battleStateModel.GetTeamUnits(opponentTeamId).Count;
             if (opponentPostActionDifference > 0)
             {
                 totalReward += opponentPostActionDifference * ENEMY_DEFEATED_REWARD;
+            }
+
+            if (battleStateModel.ActionsTakenCount > 5000)
+            {
+                totalReward -= 2;
+            }
+            else if (battleStateModel.ActionsTakenCount > 2500)
+            {
+                totalReward -= 1;
+            }
+            else if (battleStateModel.ActionsTakenCount > 1000)
+            {
+                totalReward -= 0.5f;
+            }
+            else if (battleStateModel.ActionsTakenCount > 500)
+            {
+                totalReward -= 0.25f;
             }
 
             foreach (var teamUnit in teamUnits)

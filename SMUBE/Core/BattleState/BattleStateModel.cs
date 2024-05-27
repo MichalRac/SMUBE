@@ -20,9 +20,12 @@ namespace SMUBE.BattleState
         public List<Unit> Units { get; }
         private Queue<Unit> ActionQueue { get; set; } = new Queue<Unit>();
         public GridBattleScene BattleSceneState { get; }
+
+        public int ActionsTakenCount = 0;
         
         public BattleStateModel(List<Unit> units)
         {
+            ActionsTakenCount = 0;
             Units = units;
             var initGridData = PrepareInitialGridData();
             BattleSceneState = new GridBattleScene(initGridData);
@@ -32,8 +35,9 @@ namespace SMUBE.BattleState
             OnNewTurn();
         }
 
-        private BattleStateModel(BattleStateModel sourceBattleStateModel) 
+        private BattleStateModel(BattleStateModel sourceBattleStateModel)
         {
+            ActionsTakenCount = sourceBattleStateModel.ActionsTakenCount;
             Units = new List<Unit>();
             ActionQueue = new Queue<Unit>();
             foreach (var unit in sourceBattleStateModel.Units)
@@ -143,6 +147,7 @@ namespace SMUBE.BattleState
             }
             
             OnNewTurn();
+            ActionsTakenCount++;
             return true;
         }
 

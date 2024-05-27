@@ -35,5 +35,13 @@ namespace SMUBE.AI.QLearning
                    && ArgsPreferences.MovementTargetingPreference == command.ArgsPreferences.MovementTargetingPreference 
                    && ArgsPreferences.PositionTargetingPreference == command.ArgsPreferences.PositionTargetingPreference;
         }
+
+        public bool Matches(QValueActionPair qValueActionPair)
+        {
+            return CommandId == qValueActionPair.CommandId 
+                   && ArgsPreferences.TargetingPreference == qValueActionPair.ArgsPreferences.TargetingPreference 
+                   && ArgsPreferences.MovementTargetingPreference == qValueActionPair.ArgsPreferences.MovementTargetingPreference 
+                   && ArgsPreferences.PositionTargetingPreference == qValueActionPair.ArgsPreferences.PositionTargetingPreference;
+        }
     }
 }

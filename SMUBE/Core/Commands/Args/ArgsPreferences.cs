@@ -1,4 +1,7 @@
-﻿namespace SMUBE.Commands.Args
+﻿using System;
+using Newtonsoft.Json;
+
+namespace SMUBE.Commands.Args
 {
     public enum ArgsEnemyTargetingPreference
     {
@@ -39,17 +42,18 @@
         InBetweenTeams = 6,
     }
     
+    [Serializable]
     public class ArgsPreferences
     {
         public readonly ArgsEnemyTargetingPreference TargetingPreference;
         public readonly ArgsMovementTargetingPreference MovementTargetingPreference;
         public readonly ArgsPositionTargetingPreference PositionTargetingPreference;
-
+        
         public static ArgsPreferences Default()
         {
             return new ArgsPreferences();
         }
-
+        
         private ArgsPreferences()
         {
             TargetingPreference = ArgsEnemyTargetingPreference.None;
@@ -72,6 +76,7 @@
             PositionTargetingPreference = positionTargetingPreference;
         }
 
+        [JsonConstructor]
         public ArgsPreferences(
             ArgsEnemyTargetingPreference targetingPreference = ArgsEnemyTargetingPreference.None, 
             ArgsMovementTargetingPreference movementTargetingPreference = ArgsMovementTargetingPreference.None, 

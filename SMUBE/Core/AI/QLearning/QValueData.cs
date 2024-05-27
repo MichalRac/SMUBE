@@ -115,7 +115,7 @@ namespace SMUBE.AI.QLearning
                             qValueActionPair.QValue = value;
                             return;
                         }
-                    } 
+                    }
                 }
 
                 // if state not initialized or no matching command, throw exception (should be auto set up)
@@ -134,6 +134,25 @@ namespace SMUBE.AI.QLearning
             QValueDataStorage.AddOrUpdate(stateId, 
                 l => qValueActionPairs, 
                 (l, list) => qValueActionPairs);
+                /*(l, list) =>
+                {
+                    var current = QValueDataStorage[l];
+                    var toAdd = qValueActionPairs;
+                    var results = new System.Collections.Generic.List<QValueActionPair>();
+                    foreach (var currentItem in current)
+                    {
+                        results.Add(currentItem);
+                    }
+                    foreach (var toAddItem in toAdd)
+                    {
+                        if (results.Any(item => item.Matches(toAddItem)))
+                        {
+                            continue;
+                        }
+                        results.Add(toAddItem);
+                    }
+                    return results;
+                }*/
         }
 
         private static List<QValueActionPair> GetAllPossibleCommands()

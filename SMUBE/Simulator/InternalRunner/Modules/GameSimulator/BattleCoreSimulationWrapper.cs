@@ -31,7 +31,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 {
     internal class BattleCoreSimulationWrapper
     {
-        public const int TURN_TIMEOUT_COUNT = 5000; 
+        public const int TURN_TIMEOUT_COUNT = 10_000; 
 
         private BattleCore _core;
         public BattleCore Core => _core;
@@ -312,12 +312,10 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
         public void AutoResolveTurn(bool log = true)
         {
-            /*
             if (_simulatorDebugData.turnCount > TURN_TIMEOUT_COUNT)
             {
-                throw new ApplicationException();
+                throw new TimeoutException();
             }
-            */
 
             if (!_core.currentStateModel.GetNextActiveUnit(out var unit))
             {
@@ -363,7 +361,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                     if (attempts > TURN_TIMEOUT_COUNT)
                     {
                         _simulatorDebugData.FailedCommandExecutions++;
-                        throw new ApplicationException();
+                        throw new TimeoutException();
                     }
                 }
 

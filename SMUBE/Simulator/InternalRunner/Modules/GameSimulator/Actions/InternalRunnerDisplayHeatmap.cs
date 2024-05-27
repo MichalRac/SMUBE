@@ -31,7 +31,8 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Actions
             var activeUnitTeamId = stateModel.ActiveUnit.UnitData.UnitIdentifier.TeamId;
             var enemyTeamId = activeUnitTeamId == 0 ? 1 : 0;
             
-            var heatmap = new CountReachingUnitsOfTeamIdHeatmap(activeUnitTeamId, stateModel, true);
+            //var heatmap = new CountReachingUnitsOfTeamIdHeatmap(activeUnitTeamId, stateModel, true);
+            var heatmap = new CountReachingUnitsOfTeamIdHeatmap(enemyTeamId, stateModel, true);
             //var heatmap = new DistanceToUnitOfTeamIdHeatmap(enemyTeamId, false, stateModel, stateModel.ActiveUnit.UnitData.UnitIdentifier);
             //var heatmap = new TeleportTargetScoreHeatmap(stateModel);
             heatmap.ProcessHeatmap(stateModel);

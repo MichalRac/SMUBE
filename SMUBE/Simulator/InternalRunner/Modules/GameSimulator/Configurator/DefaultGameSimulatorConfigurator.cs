@@ -120,8 +120,6 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
                 }
                 case ConsoleKey.D9:
                 {
-                    DecisionTreeDataSet qLearningResultsJson = null;
-
                     while(!Directory.Exists(QTablePath))
                     {
                         Console.Clear();
@@ -139,6 +137,9 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
                     }
                     var result = GenericChoiceUtils.GetListChoice("choose config file to load as QTable", false, choice);
                     
+                    var fileContent = File.ReadAllText(result);
+                    SimulatorDebugData.SaveToFileSummary(new List<string>{fileContent}, $"reserialize-source","reserialized-group", true);
+
                     return () => new QLearningModel(GetJsonQTable(result));
                 }
 

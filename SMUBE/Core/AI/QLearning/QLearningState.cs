@@ -16,14 +16,14 @@ namespace SMUBE.AI.QLearning
             _stateComponents = new List<BaseQLearningStateComponent>()
             {
                 // personal state components
-                new QLearningUnitTypeStateComponent(0),
-                //new QLearningHealthLevelStateComponent(1),
-                //new QLearningEffectLevelStateComponent(2),
-                //new QLearningPositionStateComponent(3),
+                new QLearningUnitTypeStateComponent(0), // 3 states: scholar / hunter / squire 
+                new QLearningHealthLevelStateComponent(1),
+                new QLearningEffectLevelStateComponent(2),
+                new QLearningPositionStateComponent(3), // 4 states: Far from enemy / Barely Outside enemy range / In Enemy Range / Among Enemies
                 // team-related state components
-                new QLearningTeamAdvantageStateComponent(4),
-                //new QLearningTeamHealthLevelStateComponent(5),
-                new QLearningTeamPositionStateComponent(6),
+                new QLearningTeamAdvantageStateComponent(4), // 3 states: Losing / Even / Winning
+                new QLearningTeamHealthLevelStateComponent(5),
+                new QLearningTeamPositionStateComponent(6), // 5 states: Far / Independent Battles / Under Assault / Assaulting / Full Battle
             };
         }
 
@@ -46,6 +46,37 @@ namespace SMUBE.AI.QLearning
             }
 
             return result;
+        }
+
+        public string ConvertStateToDescription(long state)
+        {
+            string description = string.Empty;
+            
+            description += $"state: {state}";
+            var id = state % 10;
+            
+            description += $"\n{new QLearningUnitTypeStateComponent(0).ValueToDescription(id)}";
+            state = remove_last_digit(state); id = state % 10;
+            description += $"\n{new QLearningHealthLevelStateComponent(1).ValueToDescription(id)}";
+            state = remove_last_digit(state); id = state % 10;
+            description += $"\n{new QLearningEffectLevelStateComponent(2).ValueToDescription(id)}";
+            state = remove_last_digit(state); id = state % 10;
+            description += $"\n{new QLearningPositionStateComponent(3).ValueToDescription(id)}";
+            state = remove_last_digit(state); id = state % 10;
+            description += $"\n{new QLearningTeamAdvantageStateComponent(4).ValueToDescription(id)}";
+            state = remove_last_digit(state); id = state % 10;
+            description += $"\n{new QLearningTeamHealthLevelStateComponent(5).ValueToDescription(id)}";
+            state = remove_last_digit(state); id = state % 10;
+            description += $"\n{new QLearningTeamPositionStateComponent(6).ValueToDescription(id)}";
+            
+            long remove_last_digit(long arg)
+            {
+                arg -= id; 
+                arg /= 10; 
+                return arg;
+            }
+            
+            return description;
         }
     }
 }

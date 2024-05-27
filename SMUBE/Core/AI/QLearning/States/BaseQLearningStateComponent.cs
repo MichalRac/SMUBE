@@ -29,5 +29,7 @@ namespace SMUBE.AI.QLearning
 
             return nonUniqueStateValue * order;
         }
+
+        internal abstract string ValueToDescription(long value);
     }
 }

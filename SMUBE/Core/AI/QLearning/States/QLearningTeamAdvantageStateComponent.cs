@@ -42,6 +42,11 @@ namespace SMUBE.AI.QLearning.States
         internal override string GetValueWithDescriptions(BattleStateModel stateModel, Unit actor)
         {
             var value = GetNonUniqueStateValue(stateModel, actor);
+            return ValueToDescription(value);
+        }
+
+        internal override string ValueToDescription(long value)
+        {
             switch (value)
             {
                 case 0:
@@ -54,6 +59,5 @@ namespace SMUBE.AI.QLearning.States
                     throw new ArgumentException();
             }
         }
-
     }
 }

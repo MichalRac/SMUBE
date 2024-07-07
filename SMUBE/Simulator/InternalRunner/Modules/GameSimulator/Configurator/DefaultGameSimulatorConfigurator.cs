@@ -21,6 +21,8 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
         
         private Func<AIModel> team1AIModelProvider = null;
         private Func<AIModel> team2AIModelProvider = null;
+        private static string qTableResult;
+        private static string dtResult;
 
         public ConcurrentBag<Unit> GetUnits(bool useSimpleBehaviour)
         {
@@ -60,6 +62,9 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
         
         private Func<AIModel> GetAiProvider(bool useSimpleBehavior)
         {
+            dtResult = null;
+            qTableResult = null;
+            
             var provider = GenericChoiceUtils.GetListChoice(String.Empty, false, new List<(string, Func<AIModel>)>()
             {
                 ("Random AI", () => new RandomAIModel(useSimpleBehavior)),
@@ -83,51 +88,56 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
 
             Func<AIModel> GetDTbyJsonConfig()
             {
-                DecisionTreeDataSet jsonDataSet = null;
+                if (dtResult == null)
+                {
+                    DecisionTreeDataSet jsonDataSet = null;
 
-                while(!Directory.Exists(DTConfigSetPath))
-                {
-                    Console.Clear();
-                    Console.WriteLine("Path to configs not chosen! \n" +
-                                      "Input path where your DecisionTreeConfigs are, or enter \"Q\" to leave");
-                    DTConfigSetPath = Console.ReadLine();
-                }
+                    while(!Directory.Exists(DTConfigSetPath))
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Path to configs not chosen! \n" +
+                                          "Input path where your DecisionTreeConfigs are, or enter \"Q\" to leave");
+                        DTConfigSetPath = Console.ReadLine();
+                    }
                     
-                var files = Directory.GetFiles(DTConfigSetPath);
-                var choice = new List<(string msg, string path)>();
-                foreach (var file in files)
-                {
-                    var filename = Path.GetFileName(file);
-                    choice.Add((filename, file));
+                    var files = Directory.GetFiles(DTConfigSetPath);
+                    var choice = new List<(string msg, string path)>();
+                    foreach (var file in files)
+                    {
+                        var filename = Path.GetFileName(file);
+                        choice.Add((filename, file));
+                    }
+                    dtResult = GenericChoiceUtils.GetListChoice("choose config file to load as decision tree config set", false, choice);
                 }
-                var result = GenericChoiceUtils.GetListChoice("choose config file to load as decision tree config set", false, choice);
-                    
-                return () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetComplexDecisionTree(bc, GetJsonDataSet(result)));
+                return () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetComplexDecisionTree(bc, GetJsonDataSet(dtResult)));
             }
 
             Func<AIModel> GetQTableByJsonConfig()
             {
-                while(!Directory.Exists(QTablePath))
-                {
-                    Console.Clear();
-                    Console.WriteLine("Path to configs not chosen! \n" +
-                                      "Input path where your QTable json files are, or enter \"Q\" to leave");
-                    DTConfigSetPath = Console.ReadLine();
-                }
+                if (qTableResult == null)
+                {                
+                    while(!Directory.Exists(QTablePath))
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Path to configs not chosen! \n" +
+                                          "Input path where your QTable json files are, or enter \"Q\" to leave");
+                        DTConfigSetPath = Console.ReadLine();
+                    }
                     
-                var qTableFiles = Directory.GetFiles(QTablePath);
-                var choice = new List<(string msg, string path)>();
-                foreach (var file in qTableFiles)
-                {
-                    var filename = Path.GetFileName(file);
-                    choice.Add((filename, file));
-                }
-                var result = GenericChoiceUtils.GetListChoice("choose config file to load as QTable", false, choice);
+                    var qTableFiles = Directory.GetFiles(QTablePath);
+                    var choice = new List<(string msg, string path)>();
+                    foreach (var file in qTableFiles)
+                    {
+                        var filename = Path.GetFileName(file);
+                        choice.Add((filename, file));
+                    }
+                    qTableResult = GenericChoiceUtils.GetListChoice("choose config file to load as QTable", false, choice);
                     
-                var fileContent = File.ReadAllText(result);
-                SimulatorDebugData.SaveToFileSummary(new List<string>{fileContent}, $"reserialize-source","reserialized-group", true);
+                    var fileContent = File.ReadAllText(qTableResult);
+                    SimulatorDebugData.SaveToFileSummary(new List<string>{fileContent}, $"reserialize-source","reserialized-group", true);
+                }
 
-                return () => new QLearningModel(GetJsonQTable(result));
+                return () => new QLearningModel(GetJsonQTable(qTableResult));
             }
 
             /*

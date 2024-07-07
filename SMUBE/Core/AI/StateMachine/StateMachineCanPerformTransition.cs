@@ -1,9 +1,4 @@
 ﻿using SMUBE.BattleState;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SMUBE.Commands;
 
 namespace SMUBE.AI.StateMachine
@@ -12,15 +7,27 @@ namespace SMUBE.AI.StateMachine
             where T : ICommand, new()
     {
 
+        private bool _negate;
+        
         public StateMachineCanPerformTransition(StateMachineState targetState) : base(targetState)
         {
         }
 
+        public StateMachineCanPerformTransition<T> AsNegated()
+        {
+            _negate = true;
+            return this;
+        }
+        
         public override bool IsTriggered(BattleStateModel battleStateModel)
         {
             if (battleStateModel.GetNextActiveUnit(out var nextUnit))
             {
-                return nextUnit.UnitData.UnitStats.CanUseAbility(new T());
+                var canPerform = nextUnit.UnitData.UnitStats.CanUseAbility(new T());
+
+                return _negate
+                    ? !canPerform
+                    : canPerform;
             }
             return false;
         }

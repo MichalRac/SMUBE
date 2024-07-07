@@ -10,7 +10,7 @@ namespace SMUBE.AI.GoalOrientedBehavior
 {
     public class WinGoal : Goal
     {
-        protected override float Importance => 100;
+        protected override float Importance => 250;
 
         public override float GetDiscontentment(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {

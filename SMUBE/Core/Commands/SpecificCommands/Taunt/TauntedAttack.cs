@@ -50,7 +50,7 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
             }
             
             var targetPosition = targetUnit.UnitData.BattleScenePosition;
-            var surroundingPositions = battleStateModel.BattleSceneState.PathfindingHandler.GetSurroundingPositions(battleStateModel, targetPosition);
+            var surroundingPositions = battleStateModel.BattleSceneState.PathfindingHandler.GetSurroundingPositions(battleStateModel, targetPosition, false);
 
             bool actionReachesTarget = ActionReachesTarget(battleStateModel, commandArgs, out var optimalMove);
             

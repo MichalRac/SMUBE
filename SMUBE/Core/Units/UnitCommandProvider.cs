@@ -33,6 +33,32 @@ namespace SMUBE.Units
             _unitData = unitData;
         }
 
+        private UnitCommandProvider(UnitCommandProvider source)
+        {
+            _unitData = source._unitData.DeepCopy();
+            IsTaunted = source.IsTaunted;
+            AllCommands = new List<BaseCommand>();
+            foreach (var allCommandItem in source.AllCommands)
+            {
+                AllCommands.Add(allCommandItem);
+            }
+            ViableCommands = new List<BaseCommand>();
+            foreach (var viableCommandsItem in source.ViableCommands)
+            {
+                ViableCommands.Add(viableCommandsItem);
+            }
+            ViableTargets = new List<UnitIdentifier>();
+            foreach (var viableTargetsItem in source.ViableTargets)
+            {
+                ViableTargets.Add(viableTargetsItem);
+            }
+        }
+
+        public UnitCommandProvider DeepCopy()
+        {
+            return new UnitCommandProvider(this);
+        }
+
         public void OnNewTurn(BattleStateModel battleStateModel)
         {
             ViableCommands.Clear();

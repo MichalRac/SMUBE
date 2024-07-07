@@ -6,6 +6,7 @@ using SMUBE.Commands.Args;
 using SMUBE.Core;
 using SMUBE.DataStructures.Units;
 using SMUBE.DataStructures.Utils;
+using SMUBE.Units;
 
 namespace SMUBE.AI.QLearning
 {
@@ -17,7 +18,7 @@ namespace SMUBE.AI.QLearning
         
         public float Alpha_LearningRate = 0.6f; // influence of feedback to current Q value, potentially to be gradually reduced
         public float Gamma_DiscountRate = 0.4f; // how much next state Q contributes (0.75 contributes around 0.05 to 10 steps before reward 1) 
-        public float Rho_RandomRate = 0.5f; // chance of picking random action instead of best known
+        public float Rho_RandomRate = 0.2f; // chance of picking random action instead of best known
         public float Nu_LenghtOfWalk = 0f; // chance of starting over from random state, can be 0 in this context
 
         public QValueData _qValueData = new QValueData();
@@ -43,7 +44,7 @@ namespace SMUBE.AI.QLearning
             {
                 Alpha_LearningRate = 0.6f;
                 Gamma_DiscountRate = 0.4f;
-                Rho_RandomRate = 0.5f;
+                Rho_RandomRate = 0.2f;
                 Nu_LenghtOfWalk = 0f;
             }
             else
@@ -65,9 +66,9 @@ namespace SMUBE.AI.QLearning
 
             var teamId = battleStateModel.ActiveUnit.UnitData.UnitIdentifier.TeamId;
             var opponentTeamId = teamId == 0 ? 1 : 0;
-            var opponentTeamCount = battleStateModel.GetTeamUnits(opponentTeamId).Count;
+            var opponentTeamCount = battleStateModel.GetAllTeamUnits(opponentTeamId).Count;
             
-            var teamUnits = battleStateModel.GetTeamUnits(teamId);
+            var teamUnits = battleStateModel.GetAllTeamUnits(teamId);
             var currentTeamUnitStates = new List<long>();
             foreach (var teamUnit in teamUnits)
             {
@@ -98,41 +99,30 @@ namespace SMUBE.AI.QLearning
                 return commandToTake;
             }
 
-            float totalReward = -0.25f;
-            
-            if (battleStateModel.IsFinished(out var winnerTeam))
-            {
-                if (winnerTeam == teamId)
-                {
-                    totalReward += WIN_GAME_REWARD;
-                }
-                else
-                {
-                    totalReward += LOSE_GAME_PENALTY;
-                }
-            }
+            float totalRewardForAll = -0;
+            float totalRewardForActiveWithPenalty = -0.25f;
 
             var opponentPostActionDifference = opponentTeamCount - battleStateModel.GetTeamUnits(opponentTeamId).Count;
             if (opponentPostActionDifference > 0)
             {
-                totalReward += opponentPostActionDifference * ENEMY_DEFEATED_REWARD;
+                totalRewardForAll += opponentPostActionDifference * ENEMY_DEFEATED_REWARD;
             }
 
             if (battleStateModel.ActionsTakenCount > 5000)
             {
-                totalReward -= 2;
+                totalRewardForActiveWithPenalty -= 2;
             }
             else if (battleStateModel.ActionsTakenCount > 2500)
             {
-                totalReward -= 1;
+                totalRewardForActiveWithPenalty -= 1;
             }
             else if (battleStateModel.ActionsTakenCount > 1000)
             {
-                totalReward -= 0.5f;
+                totalRewardForActiveWithPenalty -= 0.5f;
             }
             else if (battleStateModel.ActionsTakenCount > 500)
             {
-                totalReward -= 0.25f;
+                totalRewardForActiveWithPenalty -= 0.25f;
             }
 
             foreach (var teamUnit in teamUnits)
@@ -150,14 +140,57 @@ namespace SMUBE.AI.QLearning
                     var bestNextAction = _qValueData.GetBestViableCommandForState(newStateId, allCommands, learningEnabled);
 
                     var nextMaxQValue = _qValueData.GetQValue(newStateId, bestNextAction);
+
+                    var unitSpecificReward = teamUnit.UnitData.UnitIdentifier.Equals(activeUnitIdentifier)
+                        ? totalRewardForAll + totalRewardForActiveWithPenalty
+                        : totalRewardForAll;
                     
-                    var newQValue = (1 - Alpha_LearningRate) * qValue + Alpha_LearningRate * (totalReward + Gamma_DiscountRate * nextMaxQValue);
+                    var newQValue = (1 - Alpha_LearningRate) * qValue + Alpha_LearningRate * (unitSpecificReward + Gamma_DiscountRate * nextMaxQValue);
                     
                     _qValueData.SetQValue(previousStateId, lastTakenAction, newQValue);
                 }
             }
 
             return commandToTake;
+        }
+
+        public void OnGameEndCondition(BattleStateModel battleStateModel, Unit unit, int winnerTeamId)
+        {
+            if (!learningEnabled)
+            {
+                return;
+            }
+
+            var gameEndConditionReward = 0f;
+            
+            if (unit.UnitData.UnitIdentifier.TeamId == winnerTeamId)
+            {
+                gameEndConditionReward += WIN_GAME_REWARD;
+            }
+            else
+            {
+                gameEndConditionReward += LOSE_GAME_PENALTY;
+            }
+            
+            if (unit.UnitCommandProvider.QLearningLastActionCache != null)
+            {
+                var qLearningLastActionCache = unit.UnitCommandProvider.QLearningLastActionCache;
+                var previousStateId = qLearningLastActionCache.stateId;
+                var newStateId = _qLearningState.GetStateNumber(battleStateModel, unit);
+
+                var lastTakenAction = _qLearningCommandHelper.RetrieveCommand(qLearningLastActionCache.CommandId, qLearningLastActionCache.ArgsPreferences);
+                var qValue = _qValueData.GetQValue(previousStateId, lastTakenAction);
+
+                var allCommands = _qLearningCommandHelper.GetSubcommands(unit, false);
+                var bestNextAction = _qValueData.GetBestViableCommandForState(newStateId, allCommands, learningEnabled);
+
+                var nextMaxQValue = _qValueData.GetQValue(newStateId, bestNextAction);
+                    
+                var newQValue = (1 - Alpha_LearningRate) * qValue + Alpha_LearningRate * (gameEndConditionReward + Gamma_DiscountRate * nextMaxQValue);
+                    
+                _qValueData.SetQValue(previousStateId, lastTakenAction, newQValue);
+            }
+
         }
 
         public override CommandArgs GetCommandArgs(BaseCommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)

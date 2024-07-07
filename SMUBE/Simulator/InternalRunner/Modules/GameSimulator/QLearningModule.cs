@@ -34,12 +34,12 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
         /*
         protected override int CURRENTLY_USED_THREADS => 10;
         private const int LOOPS_TO_RUN = 250;
-        private const int SIMULATIONS_BETWEEN_VALIDATION = 2_700;
+        private const int SIMULATIONS_BETWEEN_VALIDATION = 13_500;
         
         private const int SIMULATIONS_PER_VALIDATION = 2_700;
         private const int VALIDATION_SUB_THREADING_RATE = 10;
         
-        private const bool PRE_VALIDATE_INIT_STATE = true;
+        private const bool PRE_VALIDATE_INIT_STATE = false;
         */
         
         public List<string> AggregatedSummary = new List<string>();

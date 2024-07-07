@@ -17,12 +17,12 @@ namespace SMUBE.AI.QLearning
             {
                 // personal state components
                 new QLearningUnitTypeStateComponent(0), // 3 states: scholar / hunter / squire 
-                new QLearningHealthLevelStateComponent(1),
-                new QLearningEffectLevelStateComponent(2),
+                new QLearningHealthLevelStateComponent(1), // 3 states
+                new QLearningEffectLevelStateComponent(2), // 3 states
                 new QLearningPositionStateComponent(3), // 4 states: Far from enemy / Barely Outside enemy range / In Enemy Range / Among Enemies
                 // team-related state components
                 new QLearningTeamAdvantageStateComponent(4), // 3 states: Losing / Even / Winning
-                new QLearningTeamHealthLevelStateComponent(5),
+                new QLearningTeamHealthLevelStateComponent(5), // 3 states
                 new QLearningTeamPositionStateComponent(6), // 5 states: Far / Independent Battles / Under Assault / Assaulting / Full Battle
             };
         }

@@ -15,6 +15,29 @@ namespace SMUBE.Pathfinding
             {
                 Data = new PathfindingPathCache[width, height];
             }
+            
+            private PathfindingPathCacheSet(PathfindingPathCacheSet source)
+            {
+                var width = source.Data.GetLength(0);
+                var height = source.Data.GetLength(1);
+                Data = new PathfindingPathCache[width, height];
+                for (var i = 0; i < width; i++)
+                {
+                    for (var j = 0; j < height; j++)
+                    {
+                        if (source.Data[i, j] != null)
+                        {
+                            Data[i, j] = source.Data[i, j].DeepCopy();
+                        }
+                    }
+                }
+            }
+
+
+            public PathfindingPathCacheSet DeepCopy()
+            {
+                return new PathfindingPathCacheSet(this);
+            }
         }
         
         public class PathfindingPathCache
@@ -39,6 +62,23 @@ namespace SMUBE.Pathfinding
             {
                 StartPosition = startPosition;
                 TargetPosition = targetPosition;
+            }
+
+            private PathfindingPathCache(PathfindingPathCache source)
+            {
+                StartPosition = source.StartPosition.DeepCopy();
+                TargetPosition = source.TargetPosition.DeepCopy();
+                WasVisited = source.WasVisited;
+                ShortestDistance = source.ShortestDistance;
+                foreach (var shortestKnownPathEntry in source.ShortestKnownPathBackingField)
+                {
+                    ShortestKnownPathBackingField.Add(shortestKnownPathEntry);
+                }
+            }
+
+            public PathfindingPathCache DeepCopy()
+            {
+                return new PathfindingPathCache(this);
             }
 
             //public bool IsDirty => ShortestKnownPath.Any(pathNode => DirtyPositionCache.Any(pos => pos.pos.Equals(pathNode.Coordinates)));

@@ -73,6 +73,8 @@ namespace SMUBE.DataStructures.Units
             Power = sourceUnitStats.Power;
             Defense = sourceUnitStats.Defense;
             Speed = sourceUnitStats.Speed;
+
+            _persistentEffects = sourceUnitStats._persistentEffects;
         }
 
         public bool IsAlive()

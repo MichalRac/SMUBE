@@ -42,9 +42,8 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
         private Func<AIModel> GetTeamAiProvider(int teamNumber, bool useSimpleBehavior)
         {
             Console.Clear();
-            PrintAiOptions(teamNumber);
-            var key = Console.ReadKey(true);
-            var result = GetAiProvider(key.Key, useSimpleBehavior);
+            Console.WriteLine($"Team {teamNumber} AI:");
+            var result = GetAiProvider(useSimpleBehavior);
 
             if (result == null)
             {
@@ -58,27 +57,80 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
                 return result;
             }
         }
-
-        private void PrintAiOptions(int teamNumber)
+        
+        private Func<AIModel> GetAiProvider(bool useSimpleBehavior)
         {
-            Console.WriteLine($"Team {teamNumber} AI:");
-            Console.WriteLine("1. Random AI");
-            Console.WriteLine("2. Decision Tree AI");
-            Console.WriteLine("3. Goal Oriented Behavior AI");
-            Console.WriteLine("4. Finite State Machine AI");
-            Console.WriteLine("5. Behavior Tree AI");
-            
-            Console.WriteLine("6. Decision Tree - Extended Conditional AI");
-            Console.WriteLine("7. Decision Tree - Extended Complex AI");
-            Console.WriteLine("8. Decision Tree - json config");
-            
-            Console.WriteLine("9. QTable - json config");
-            
-            Console.WriteLine("\nChoice:");
-        }
+            var provider = GenericChoiceUtils.GetListChoice(String.Empty, false, new List<(string, Func<AIModel>)>()
+            {
+                ("Random AI", () => new RandomAIModel(useSimpleBehavior)),
+                ("Decision Tree AI", () => new DecisionTreeAIModel(useSimpleBehavior)),
+                ("Goal Oriented Behavior AI", () => new GoalOrientedBehaviorAIModel(useSimpleBehavior)),
+                ("Finite State Machine AI", () => new StateMachineAIModel(null, useSimpleBehavior)),
+                ("Behavior Tree AI", () => new BehaviorTreeAIModel(useSimpleBehavior)),
+                
+                ("Decision Tree - Extended Conditional AI", () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetConditionalDecisionTree(bc))),
+                ("Decision Tree - Extended Complex AI", () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetComplexDecisionTree(bc))),
+                // todo a way to provide these? 
+                ("Decision Tree - json config", () => GetDTbyJsonConfig().Invoke()),
+                
+                ("QTable - json config", () => GetQTableByJsonConfig().Invoke()),
+                
+                ("Finite State Machine - Competent AI", () => new StateMachineAIModel(null, useSimpleBehavior).AsCompetent()),
+                ("Competent Behavior Tree AI", () => new CompetentBehaviorTreeAIModel()),
+            }, false);
 
-        private Func<AIModel> GetAiProvider(ConsoleKey input, bool useSimpleBehavior)
-        {
+            return provider;
+
+            Func<AIModel> GetDTbyJsonConfig()
+            {
+                DecisionTreeDataSet jsonDataSet = null;
+
+                while(!Directory.Exists(DTConfigSetPath))
+                {
+                    Console.Clear();
+                    Console.WriteLine("Path to configs not chosen! \n" +
+                                      "Input path where your DecisionTreeConfigs are, or enter \"Q\" to leave");
+                    DTConfigSetPath = Console.ReadLine();
+                }
+                    
+                var files = Directory.GetFiles(DTConfigSetPath);
+                var choice = new List<(string msg, string path)>();
+                foreach (var file in files)
+                {
+                    var filename = Path.GetFileName(file);
+                    choice.Add((filename, file));
+                }
+                var result = GenericChoiceUtils.GetListChoice("choose config file to load as decision tree config set", false, choice);
+                    
+                return () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetComplexDecisionTree(bc, GetJsonDataSet(result)));
+            }
+
+            Func<AIModel> GetQTableByJsonConfig()
+            {
+                while(!Directory.Exists(QTablePath))
+                {
+                    Console.Clear();
+                    Console.WriteLine("Path to configs not chosen! \n" +
+                                      "Input path where your QTable json files are, or enter \"Q\" to leave");
+                    DTConfigSetPath = Console.ReadLine();
+                }
+                    
+                var qTableFiles = Directory.GetFiles(QTablePath);
+                var choice = new List<(string msg, string path)>();
+                foreach (var file in qTableFiles)
+                {
+                    var filename = Path.GetFileName(file);
+                    choice.Add((filename, file));
+                }
+                var result = GenericChoiceUtils.GetListChoice("choose config file to load as QTable", false, choice);
+                    
+                var fileContent = File.ReadAllText(result);
+                SimulatorDebugData.SaveToFileSummary(new List<string>{fileContent}, $"reserialize-source","reserialized-group", true);
+
+                return () => new QLearningModel(GetJsonQTable(result));
+            }
+
+            /*
             switch (input)
             {
                 case ConsoleKey.D1:
@@ -146,6 +198,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurato
                 default:
                     return null;
             }
+        */
         }
 
         private DecisionTreeDataSet GetJsonDataSet(string filePath)

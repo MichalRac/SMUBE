@@ -43,46 +43,31 @@ namespace SMUBE.AI.GoalOrientedBehavior
                 CommandArgs bestArgs = null;
                 float minDiscontentment = float.MaxValue;
 
-                foreach (var action in viableActions)
+                var validCommandPreferencesVariants = CommandArgsHelper.GetAllCommandPreferencesVariants(viableActions);
+                
+                foreach (var action in validCommandPreferencesVariants)
                 {
                     var battleStateModelDeepCopy = battleStateModel.DeepCopy();
-                    var validCommandArgs = CommandArgsHelper.GetAllViableRandomCommandArgs(action, battleStateModelDeepCopy, activeUnitIdentifier);
 
-                    foreach (var commandArgs in validCommandArgs)
+                    var battleStateModelArgDeepCopy = battleStateModelDeepCopy.DeepCopy();
+                    var args = action.GetSuggestedPseudoRandomArgs(battleStateModelDeepCopy);
+                    bool success = action.TryExecute(battleStateModelArgDeepCopy, args);
+
+                    if (!success)
                     {
-                        var battleStateModelArgDeepCopy = battleStateModelDeepCopy.DeepCopy();
-                        bool success = action.TryExecute(battleStateModelArgDeepCopy, commandArgs);
+                        continue;
+                    }
 
-                        if (!success)
-                        {
-                            continue;
-                        }
-
-                        var discontentment = GetDiscontentment(goals, battleStateModelArgDeepCopy, activeUnitIdentifier);
-                        if (discontentment < minDiscontentment)
-                        {
-                            minDiscontentment = discontentment;
-                            bestAction = action;
-                            bestArgs = commandArgs;
-                        }
+                    var discontentment = GetDiscontentment(goals, battleStateModelArgDeepCopy, activeUnitIdentifier);
+                    if (discontentment < minDiscontentment)
+                    {
+                        minDiscontentment = discontentment;
+                        bestAction = action;
+                        bestArgs = args;
                     }
                 }
-
-                var targetUnits = new List<UnitData>();
-                if(bestArgs.TargetUnits?.Count > 0)
-                {
-                    foreach (var deepCopyTargetUnit in bestArgs.TargetUnits)
-                    {
-                        if (battleStateModel.TryGetUnit(deepCopyTargetUnit.UnitIdentifier, out var targetUnit))
-                        {
-                            targetUnits.Add(targetUnit.UnitData);
-                            continue;
-                        }
-                        return null;
-                    }
-                }
-
-                bestAction.ArgsCache = new CommonArgs(activeUnit.UnitData, targetUnits, battleStateModel);
+                
+                bestAction.ArgsCache = bestArgs.DeepCopyWithNewBattleStateModel(battleStateModel);
                 return bestAction;
             }
 

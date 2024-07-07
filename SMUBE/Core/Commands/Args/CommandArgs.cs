@@ -9,12 +9,15 @@ namespace SMUBE.Commands.Args
     public abstract class CommandArgs
     {
         internal string DebugSource { get; set; }
-        public UnitData ActiveUnit { get; }
-        public List<UnitData> TargetUnits { get; }
-        public List<SMUBEVector2<int>> TargetPositions { get; }
-        public BattleStateModel BattleStateModel { get; }
+        public UnitData ActiveUnit { get; protected set; }
+        public List<UnitData> TargetUnits { get; protected set;}
+        public List<SMUBEVector2<int>> TargetPositions { get; protected set;}
+        public BattleStateModel BattleStateModel { get; protected set;}
 
         public PositionDelta PositionDelta { get; set; }
+        
+        protected CommandArgs()
+        {}
         
         protected CommandArgs(UnitData activeUnit, List<UnitData> targetUnits, BattleStateModel battleStateModel, PositionDelta positionDelta = null,
             List<SMUBEVector2<int>> targetPositions = null)
@@ -25,6 +28,7 @@ namespace SMUBE.Commands.Args
             this.PositionDelta = positionDelta;
             TargetPositions = targetPositions;
         }
-
+        
+        public abstract CommandArgs DeepCopyWithNewBattleStateModel(BattleStateModel newModel);
     }
 }

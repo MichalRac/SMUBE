@@ -458,6 +458,12 @@ namespace SMUBE.Commands.Args.ArgsPicker
                     }
                 }
             }
+            if (minDistanceArgs == null)
+            {
+                var fallback = GetAnyStrategy();
+                fallback.DebugSource = $"{nameof(OneMoveToPositionArgsPicker)}:{nameof(GetClosestStrategy)}-fallback:{nameof(GetAnyStrategy)}";
+                return fallback;
+            }
 
             return minDistanceArgs;
         }
@@ -509,6 +515,12 @@ namespace SMUBE.Commands.Args.ArgsPicker
                     }
                 }
             }
+            if (minHpArgs == null)
+            {
+                var fallback = GetAnyStrategy();
+                fallback.DebugSource = $"{nameof(OneMoveToPositionArgsPicker)}:{nameof(GetLeastHpStrategy)}-fallback:{nameof(GetAnyStrategy)}";
+                return fallback;
+            }
 
             return minHpArgs;
         }
@@ -554,6 +566,12 @@ namespace SMUBE.Commands.Args.ArgsPicker
                         maxDmgArgs = potentialArgs;
                     }
                 }
+            }
+            if (maxDmgArgs == null)
+            {
+                var fallback = GetAnyStrategy();
+                fallback.DebugSource = $"{nameof(OneMoveToPositionArgsPicker)}:{nameof(GetMaxDmgDealtStrategy)}-fallback:{nameof(GetAnyStrategy)}";
+                return fallback;
             }
 
             return maxDmgArgs;
@@ -627,6 +645,12 @@ namespace SMUBE.Commands.Args.ArgsPicker
                     }
                 }
             }
+            if (optimalReachedUnitsArgs == null)
+            {
+                var fallback = GetAnyStrategy();
+                fallback.DebugSource = $"{nameof(OneMoveToPositionArgsPicker)}:{nameof(GetByEnemyWithTeamIdInRangeCountStrategy)}-fallback:{nameof(GetAnyStrategy)}";
+                return fallback;
+            }
 
             return optimalReachedUnitsArgs;
         }
@@ -687,6 +711,13 @@ namespace SMUBE.Commands.Args.ArgsPicker
                 }
             }
 
+            if (optimalReachedUnitsArgs == null)
+            {
+                var fallback = GetAnyStrategy();
+                fallback.DebugSource = $"{nameof(OneMoveToPositionArgsPicker)}:{nameof(GetByReachableEnemiesAfterTurnStrategy)}-fallback:{nameof(GetAnyStrategy)}";
+                return fallback;
+            }
+
             return optimalReachedUnitsArgs;
         }
         
@@ -744,6 +775,12 @@ namespace SMUBE.Commands.Args.ArgsPicker
                         }
                     }
                 }
+            }
+            if (optimalArgs == null)
+            {
+                var fallback = GetAnyStrategy();
+                fallback.DebugSource = $"{nameof(OneMoveToPositionArgsPicker)}:{nameof(GetByPositionBuffStrategy)}-fallback:{nameof(GetAnyStrategy)}";
+                return fallback;
             }
 
             return optimalArgs;

@@ -17,7 +17,6 @@ namespace SMUBE.Units.CharacterTypes
     {
         public abstract UnitStats DefaultStats { get; }
         public abstract BaseCharacterType BaseCharacterType { get; }
-
         public abstract List<BaseCommand> AvailableCommands { get; }
     }
 }

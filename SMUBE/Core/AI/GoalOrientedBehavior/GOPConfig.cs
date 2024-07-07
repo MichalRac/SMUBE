@@ -33,6 +33,7 @@ namespace SMUBE.AI.GoalOrientedBehavior
                 new WinGoal(),
                 new LowerEnemyHealthGoal(),
                 new SurviveGoal(),
+                new PositionGoal(0.25f),
             };
         }
         public static List<Goal> GetScholarGoals()
@@ -45,6 +46,7 @@ namespace SMUBE.AI.GoalOrientedBehavior
                 new LowerEnemyHealthGoal(),
                 new KeepTeamHealthUpGoal(),
                 new SurviveGoal(),
+                new PositionGoal(0.6f),
             };
         }
         public static List<Goal> GetSquireGoals()
@@ -57,6 +59,7 @@ namespace SMUBE.AI.GoalOrientedBehavior
                 new LowerEnemyHealthGoal(),
                 new KeepTeamGuardedGoal(),
                 new SurviveGoal(),
+                new PositionGoal(0.4f),
             };
         }
 

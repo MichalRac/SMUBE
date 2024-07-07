@@ -9,14 +9,13 @@ namespace SMUBE.Pathfinding
 {
     public class PathfindingHandler
     {
+        private List<UnitIdentifier> _initializedPaths = new List<UnitIdentifier>();
+        private BattleScenePosition _activeUnitPosition;
+        public PathfindingAlgorithm Pathfinding { get; } = new AStarPathfindingAlgorithm();
+        
         public List<(SMUBEVector2<int> pos, bool emptyAfter)> AggregatedDirtyPositionCache = new List<(SMUBEVector2<int>, bool)>();
         public Dictionary<UnitIdentifier, List<(SMUBEVector2<int> pos, bool emptyAfter)>> PersonalDirtyPositionCache 
             = new Dictionary<UnitIdentifier, List<(SMUBEVector2<int> pos, bool emptyAfter)>>();
-        
-        private List<UnitIdentifier> _initializedPaths = new List<UnitIdentifier>();
-        
-        public PathfindingAlgorithm Pathfinding { get; } = new AStarPathfindingAlgorithm();
-        private BattleScenePosition _activeUnitPosition;
         
         private Dictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>> _allUnitPaths 
             = new Dictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>>();
@@ -60,6 +59,78 @@ namespace SMUBE.Pathfinding
 
         private bool initialized = false;
 
+        public PathfindingHandler(){}
+
+        private PathfindingHandler(PathfindingHandler sourcePathfindingHandler)
+        {
+            
+            initialized = sourcePathfindingHandler.initialized;
+            Pathfinding = sourcePathfindingHandler.Pathfinding;
+            _activeUnitPosition = sourcePathfindingHandler._activeUnitPosition.DeepCopy();
+            
+            _initializedPaths = new List<UnitIdentifier>();
+            foreach (var initializedPath in sourcePathfindingHandler._initializedPaths)
+            {
+                _initializedPaths.Add(initializedPath);
+            }
+
+            AggregatedDirtyPositionCache = new List<(SMUBEVector2<int> pos, bool emptyAfter)>();
+            foreach (var item in sourcePathfindingHandler.AggregatedDirtyPositionCache)
+            {
+                AggregatedDirtyPositionCache.Add((new SMUBEVector2<int>(item.pos.x, item.pos.y), item.emptyAfter));
+            }
+
+            PersonalDirtyPositionCache = new Dictionary<UnitIdentifier, List<(SMUBEVector2<int> pos, bool emptyAfter)>>();
+            foreach (var item in sourcePathfindingHandler.PersonalDirtyPositionCache)
+            {
+                if (item.Value != null)
+                {
+                    var unitCache = new List<(SMUBEVector2<int> pos, bool emptyAfter)>();
+                    foreach (var cache in item.Value)
+                    {
+                        unitCache.Add((new SMUBEVector2<int>(cache.pos.x, cache.pos.y), cache.emptyAfter));
+                    }
+                    PersonalDirtyPositionCache.Add(item.Key, unitCache);
+                }
+            }
+
+            _allUnitPaths = new Dictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>>();
+            foreach (var item in sourcePathfindingHandler._allUnitPaths)
+            {
+                var unitPathCache = new List<PathfindingAlgorithm.PathfindingPathCache>();
+                foreach (var cache in item.Value)
+                {
+                    unitPathCache.Add(cache.DeepCopy());
+                }
+                _allUnitPaths.Add(item.Key, unitPathCache);
+            }
+            
+            _allUnitReachablePaths = new Dictionary<UnitIdentifier, List<PathfindingAlgorithm.PathfindingPathCache>>();
+            foreach (var item in sourcePathfindingHandler._allUnitReachablePaths)
+            {
+                var unitPathCache = new List<PathfindingAlgorithm.PathfindingPathCache>();
+                foreach (var cache in item.Value)
+                {
+                    unitPathCache.Add(cache.DeepCopy());
+                }
+                _allUnitReachablePaths.Add(item.Key, unitPathCache);
+            }
+
+            foreach (var pathCacheSet in sourcePathfindingHandler.PathCacheSets)
+            {
+                PathCacheSets.Add(pathCacheSet.Key, pathCacheSet.Value.DeepCopy());
+            }
+            foreach (var reachablePathCacheSet in sourcePathfindingHandler.ReachablePathCacheSets)
+            {
+                ReachablePathCacheSets.Add(reachablePathCacheSet.Key, reachablePathCacheSet.Value.DeepCopy());
+            }
+        }
+        
+        public PathfindingHandler DeepCopy()
+        {
+            return new PathfindingHandler(this);
+        }
+        
         private void Initialize(BattleStateModel battleState)
         {
             EvaluateAllPaths(battleState);
@@ -285,10 +356,18 @@ namespace SMUBE.Pathfinding
                         continue;
                     }
                     
+                    /*
                     if(ignoredOccupant != null)
                     {
                         continue;
                     }
+                    
+                    if (position.StartPosition.Coordinates.Equals(position.TargetPosition.Coordinates))
+                    {
+                        result.Add(position.TargetPosition);
+                        continue;
+                    }
+                */
                 }
                 if(!position.TargetPosition.IsWalkable())
                     continue;
@@ -375,7 +454,29 @@ namespace SMUBE.Pathfinding
         {
             lastReachable = null;
             pathCost = int.MaxValue;
+
+            var isReachable = false;
+            var activeUnitPathCache = GetAllPathCacheSetsForUnit(battleState, battleState.ActiveUnit.UnitData.UnitIdentifier);
+            var path = activeUnitPathCache.Data[target.Coordinates.x, target.Coordinates.y];
             
+            if (path == null)
+            {
+                return false;
+            }
+            else
+            {
+                pathCost = PathfindingAlgorithm.GetPathCost(path.ShortestKnownPath);
+                for (var i = path.ShortestKnownPath.Count - 1; i >= 0; i--)
+                {
+                    if (GetAllReachablePathsForActiveUnit(battleState).Any(activeReachablePos => activeReachablePos.TargetPosition.Coordinates.Equals(path.ShortestKnownPath[i].Coordinates)))
+                    {
+                        lastReachable = path.ShortestKnownPath[i];
+                        return true;
+                    }
+                }
+            }
+            
+            /*
             var reachable = PathExists(battleState, _activeUnitPosition, target, out var path);
             if (!reachable)
             {
@@ -393,6 +494,7 @@ namespace SMUBE.Pathfinding
                     }
                 }
             }
+            */
 
             return false;
         }

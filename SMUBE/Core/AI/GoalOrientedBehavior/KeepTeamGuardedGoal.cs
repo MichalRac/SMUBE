@@ -11,7 +11,7 @@ namespace SMUBE.AI.GoalOrientedBehavior
 {
     internal class KeepTeamGuardedGoal : Goal
     {
-        protected override float Importance => 95;
+        protected override float Importance => 85;
 
         public override float GetDiscontentment(BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {

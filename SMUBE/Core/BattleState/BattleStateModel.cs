@@ -18,6 +18,7 @@ namespace SMUBE.BattleState
         
         public Unit ActiveUnit { get; private set; }
         public List<Unit> Units { get; }
+        public List<Unit> AllUnits { get; }
         private Queue<Unit> ActionQueue { get; set; } = new Queue<Unit>();
         public GridBattleScene BattleSceneState { get; }
 
@@ -27,6 +28,11 @@ namespace SMUBE.BattleState
         {
             ActionsTakenCount = 0;
             Units = units;
+            AllUnits = new List<Unit>();
+            foreach (var unit in Units)
+            {
+                AllUnits.Add(unit);
+            }
             var initGridData = PrepareInitialGridData();
             BattleSceneState = new GridBattleScene(initGridData);
             PreAssignUnitsToPositions(initGridData);
@@ -39,12 +45,18 @@ namespace SMUBE.BattleState
         {
             ActionsTakenCount = sourceBattleStateModel.ActionsTakenCount;
             Units = new List<Unit>();
+            ActiveUnit = sourceBattleStateModel.ActiveUnit.DeepCopy();
             ActionQueue = new Queue<Unit>();
             foreach (var unit in sourceBattleStateModel.Units)
             {
                 Units.Add(unit.DeepCopy());
             }
-            
+            AllUnits = new List<Unit>();
+            foreach (var unit in AllUnits)
+            {
+                AllUnits.Add(unit.DeepCopy());
+            }
+
             foreach (var unit in sourceBattleStateModel.ActionQueue)
             {
                 var matchingUnit = Units.Find(u => u.UnitData.UnitIdentifier == unit.UnitData.UnitIdentifier);
@@ -58,7 +70,7 @@ namespace SMUBE.BattleState
                     Console.WriteLine($"Unable to find matching unit for id {unit.UnitData} when deep copying world state");
                 }
             }
-            BattleSceneState = sourceBattleStateModel.BattleSceneState;
+            BattleSceneState = sourceBattleStateModel.BattleSceneState.DeepCopy();
         }
 
         private InitialGridData PrepareInitialGridData()
@@ -141,7 +153,7 @@ namespace SMUBE.BattleState
                 Unit unit = Units[i];
                 if (unit.UnitData.UnitStats.CurrentHealth <= 0)
                 {
-                    unit.UnitCommandProvider.QLearningLastActionCache = null;
+                    //unit.UnitCommandProvider.QLearningLastActionCache = null;
                     TryRemoveUnit(unit);
                 }
             }
@@ -230,6 +242,18 @@ namespace SMUBE.BattleState
             }
             return teamUnits;
         }
+        public List<Unit> GetAllTeamUnits(int teamId)
+        {
+            var teamUnits = new List<Unit>();
+            foreach (var unit in AllUnits)
+            {
+                if (unit.UnitData.UnitIdentifier.TeamId == teamId)
+                {
+                    teamUnits.Add(unit);
+                }
+            }
+            return teamUnits;
+        }
 
         public bool TryGetUnit(UnitIdentifier unitIdentifier, out Unit result)
         {
@@ -253,11 +277,11 @@ namespace SMUBE.BattleState
             ActionQueue.Clear();
 
             Units.Shuffle();
-            //var unitsBySpeed = Units.OrderByDescending(u => u.UnitData.UnitStats.Speed);
+            //var unitsByTeamId = Units.OrderBy(u => u.UnitData.UnitIdentifier.TeamId);
 
-            foreach (var unitBySpeed in Units)
+            foreach (var unit in Units)
             {
-                ActionQueue.Enqueue(unitBySpeed);
+                ActionQueue.Enqueue(unit);
             }
         }
 

@@ -21,6 +21,9 @@ namespace SMUBE.DataStructures.BattleScene
     public class BattleScenePosition
     {
         public SMUBEVector2<int> Coordinates { get; }
+        public UnitIdentifier UnitIdentifier { get; private set; }
+        public BattleScenePositionContentType ContentType { get; private set; }
+        public int RemainingDuration { get; private set; } = -1;
 
         public BattleScenePosition(int x, int y)
         {
@@ -32,9 +35,18 @@ namespace SMUBE.DataStructures.BattleScene
             Coordinates = pos;
         }
 
-        public UnitIdentifier UnitIdentifier { get; private set; }
-        public BattleScenePositionContentType ContentType { get; private set; }
-        public int RemainingDuration { get; private set; } = -1;
+        private BattleScenePosition(BattleScenePosition sourceBattleScenePosition)
+        {
+            UnitIdentifier = sourceBattleScenePosition.UnitIdentifier;
+            Coordinates = new SMUBEVector2<int>(sourceBattleScenePosition.Coordinates.x, sourceBattleScenePosition.Coordinates.y);
+            ContentType = sourceBattleScenePosition.ContentType;
+            RemainingDuration = sourceBattleScenePosition.RemainingDuration;
+        }
+
+        public BattleScenePosition DeepCopy()
+        {
+            return new BattleScenePosition(this);
+        }
 
         public void OnNewTurn(BattleStateModel battleStateModel)
         {

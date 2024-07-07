@@ -26,6 +26,28 @@ namespace SMUBE.AI.BehaviorTree
             }
         }
 
+        public static BehaviorTreeTask GetCompetentBehaviorTree()
+        {
+            return new BehaviorTreeSelector(new List<BehaviorTreeTask>()
+            {
+                new BehaviorTreeSequence(
+                    new List<BehaviorTreeTask>()
+                    {
+                        new BehaviorTreeIsHealthyCheck(0.4f),
+                        new BehaviorTreeSelector(new List<BehaviorTreeTask>()
+                        {
+                            new BehaviorTreeSequence(new List<BehaviorTreeTask>()
+                            {
+                                new BehaviorTreeAnyEnemyInReachCheck(),
+                                new BehaviorTreePerformInCombatAction(),
+                            }),
+                            new BehaviorTreePerformFarAwayAction()
+                        }),
+                    }),
+                new BehaviorTreePerformHurtAction(),
+            });
+        }
+
         public static BehaviorTreeTask GetHunterBehaviorTree()
         {
             return new BehaviorTreeSelector(new List<BehaviorTreeTask>() { 

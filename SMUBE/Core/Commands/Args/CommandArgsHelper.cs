@@ -5,6 +5,19 @@ using SMUBE.BattleState;
 using SMUBE.Commands._Common;
 using SMUBE.Commands.Args.ArgsPicker;
 using SMUBE.Commands.Args.ArgsValidators;
+using SMUBE.Commands.SpecificCommands.BaseAttack;
+using SMUBE.Commands.SpecificCommands.BaseBlock;
+using SMUBE.Commands.SpecificCommands.BaseWalk;
+using SMUBE.Commands.SpecificCommands.DefendAll;
+using SMUBE.Commands.SpecificCommands.HealAll;
+using SMUBE.Commands.SpecificCommands.HeavyAttack;
+using SMUBE.Commands.SpecificCommands.LowerEnemyDefense;
+using SMUBE.Commands.SpecificCommands.RaiseObstacle;
+using SMUBE.Commands.SpecificCommands.ShieldPosition;
+using SMUBE.Commands.SpecificCommands.Tackle;
+using SMUBE.Commands.SpecificCommands.Taunt;
+using SMUBE.Commands.SpecificCommands.Teleport;
+using SMUBE.Commands.SpecificCommands.Wait;
 using SMUBE.Core;
 using SMUBE.DataStructures.Units;
 using SMUBE.DataStructures.Utils;
@@ -301,6 +314,112 @@ namespace SMUBE.Commands.Args
             }
 
             return null;
+        }
+
+        public static List<BaseCommand> GetAllCommandPreferencesVariants(List<BaseCommand> viableCommands)
+        {
+            var result = new List<BaseCommand>();
+
+            foreach (var validUnitCommand in viableCommands)
+            {
+                switch (validUnitCommand.CommandId)
+                {
+                    case CommandId.BaseWalk:
+                        result.Add(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)0));
+                        result.Add(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)1));
+                        result.Add(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)2));
+                        result.Add(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)3));
+                        result.Add(new BaseWalk().WithPreferences((ArgsMovementTargetingPreference)4));
+                        break;
+                    case CommandId.BaseAttack:
+                        result.Add(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.None));
+                        result.Add(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.Closest));
+                        result.Add(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints));
+                        result.Add(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage));
+                        result.Add(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MostDmgDealt));
+                        result.Add(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange));
+                        result.Add(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MinimizeReachableEnemiesAfterTurn));
+                        result.Add(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MaximiseReachableEnemiesAfterTurn));
+                        result.Add(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MinimisePositionBuffAfterTurn));
+                        result.Add(new BaseAttack().WithPreferences(ArgsEnemyTargetingPreference.MaximisePositionBuffAfterTurn));
+                        break;
+                    case CommandId.BaseBlock:
+                        result.Add(new BaseBlock());
+                        break;
+                    case CommandId.Wait:
+                        result.Add(new Wait());
+                        break;
+                    case CommandId.DefendAll:
+                        result.Add(new DefendAll());
+                        break;
+                    case CommandId.Taunt:
+                        result.Add(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.None));
+                        result.Add(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.Closest));
+                        result.Add(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints));
+                        result.Add(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage));
+                        result.Add(new Taunt().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange));
+                        break;
+                    case CommandId.TauntedAttack:
+                        result.Add(new TauntedAttack());
+                        break;
+                    case CommandId.Tackle:
+                        result.Add(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.None));
+                        result.Add(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.Closest));
+                        result.Add(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints));
+                        result.Add(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage));
+                        result.Add(new Tackle().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange));
+                        break;
+                    case CommandId.RaiseObstacle:
+                        result.Add(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.None));
+                        result.Add(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.NextToClosestEnemy));
+                        result.Add(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.InBetweenEnemies));
+                        result.Add(new RaiseObstacle().WithPreferences(ArgsPositionTargetingPreference.InBetweenTeams));
+                        break;
+                    case CommandId.HeavyAttack:
+                        result.Add(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.None));
+                        result.Add(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.Closest));
+                        result.Add(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints));
+                        result.Add(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage));
+                        result.Add(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MostDmgDealt));
+                        result.Add(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange));
+                        result.Add(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MinimizeReachableEnemiesAfterTurn));
+                        result.Add(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MaximiseReachableEnemiesAfterTurn));
+                        result.Add(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MinimisePositionBuffAfterTurn));
+                        result.Add(new HeavyAttack().WithPreferences(ArgsEnemyTargetingPreference.MaximisePositionBuffAfterTurn));
+                        break;
+                    case CommandId.Teleport:
+                        result.Add(new Teleport().WithPreferences(ArgsMovementTargetingPreference.None)); 
+                        result.Add(new Teleport().WithPreferences(ArgsMovementTargetingPreference.GetOutOfReach)); 
+                        result.Add(new Teleport().WithPreferences(ArgsMovementTargetingPreference.GetCloserCarefully)); 
+                        result.Add(new Teleport().WithPreferences(ArgsMovementTargetingPreference.GetCloserAggressively)); 
+                        result.Add(new Teleport().WithPreferences(ArgsMovementTargetingPreference.OptimizeFortifiedPosition)); 
+                        break;
+                    case CommandId.HealAll:
+                        result.Add(new HealAll());
+                        break;
+                    case CommandId.ShieldPosition:
+                        result.Add(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.None));
+                        result.Add(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.OnLeastHpPercentageAlly));
+                        result.Add(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.OnMostHpPercentageAlly));
+                        result.Add(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.NextToClosestEnemy));
+                        result.Add(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.OnAllyWithMostEnemiesInReach));
+                        result.Add(new ShieldPosition().WithPreferences(ArgsPositionTargetingPreference.InBetweenTeams));
+                        break;
+                    case CommandId.LowerEnemyDefense:
+                        result.Add(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.None));
+                        result.Add(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.Closest));
+                        result.Add(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPoints));
+                        result.Add(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.LeastHpPercentage));
+                        result.Add(new LowerEnemyDefense().WithPreferences(ArgsEnemyTargetingPreference.EnemyWithMostAlliesInRange));
+                        break;
+                    case CommandId.None:
+                    case CommandId.HealOne:
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            
+            return result;
         }
     }
 }

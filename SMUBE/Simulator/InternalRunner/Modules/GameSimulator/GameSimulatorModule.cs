@@ -66,8 +66,22 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                     while (simulationsRun++ < simulationsPerThread)
                     {
                         RunSingleSimulation(simulationWrapper, gameConfigurator, useSimpleBehavior, simulationSeries);
+                        /*
+                        try
+                        {
+                            RunSingleSimulation(simulationWrapper, gameConfigurator, useSimpleBehavior, simulationSeries);
+                        }
+                        catch (TimeoutException e)
+                        {
+                            Console.WriteLine($"thread {run}, progress {simulationsRun}/{simulationsPerThread}, simulation group timed out!");
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine($"thread {run}, progress {simulationsRun}/{simulationsPerThread}, simulation group was corrupted!");
+                        }
+                        */
 
-                        if (simulationsRun % 25 == 0)
+                        if (simulationsRun % 1 == 0)
                         {
                             Console.WriteLine($"thread {run} simulation group progress: {simulationsRun}/{simulationsPerThread}");
                         }

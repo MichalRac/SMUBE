@@ -328,7 +328,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             BaseCommand nextCommand = null;
             CommandArgs nextArgs = null;
 
-            if (unit.AiModel is BehaviorTreeAIModel || unit.AiModel is QLearningModel)
+            if (unit.AiModel is BehaviorTreeAIModel || unit.AiModel is CompetentBehaviorTreeAIModel || unit.AiModel is QLearningModel)
             {
                 commandStopwatch.Start();
                 nextCommand = unit.AiModel.ResolveNextCommand(_core.currentStateModel, unit.UnitData.UnitIdentifier);
@@ -407,7 +407,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 _simulatorDebugData.teamTwoActions++;
             }
 
-            if (!(unit.AiModel is BehaviorTreeAIModel || unit.AiModel is QLearningModel))
+            if (!(unit.AiModel is BehaviorTreeAIModel || unit.AiModel is CompetentBehaviorTreeAIModel || unit.AiModel is QLearningModel))
             {
                 _core.currentStateModel.ExecuteCommand(nextCommand, nextArgs);
             }
@@ -425,6 +425,19 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
         public void OnTurnEnded()
         {
+            if (_core.currentStateModel.IsFinished(out var winnerTeamId))
+            {
+                foreach (var unit in _core.currentStateModel.AllUnits)
+                {
+                    if (unit.AiModel is QLearningModel qLearningModel)
+                    {
+                        // only apply to one model
+                        qLearningModel.OnGameEndCondition(_core.currentStateModel, unit, winnerTeamId);
+                    }
+                }
+
+            }
+            
             _simulatorDebugData.turnCount++;
         }
 

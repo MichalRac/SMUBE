@@ -19,7 +19,7 @@ namespace SMUBE.DataStructures.BattleScene
             new SMUBEVector2<int>(5, 11),
         };
         
-        public PathfindingHandler PathfindingHandler { get; } = new PathfindingHandler();
+        public PathfindingHandler PathfindingHandler { get; protected set; } = new PathfindingHandler();
 
     }
 }

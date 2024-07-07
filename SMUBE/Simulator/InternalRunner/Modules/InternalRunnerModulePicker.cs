@@ -22,11 +22,14 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules
             {
                 ("Game Simulator", new GameSimulatorModule()),
                 ("Predefined Game Simulator", new PredefinedGameSimulatorModule()),
-                ("Decision Tree Learning", new DecisionTreeLearningModule()),
+                ("Decision Tree Learning - Win Rate Fitness", new DecisionTreeLearningModule()),
+                ("Decision Tree Learning - Turns Survived Fitness", new DecisionTreeLearningModule(DecisionTreeLearningModule.DTLearningFitnessMode.TurnsSurvived)),
                 ("Q Learning", new QLearningModule(false)),
                 ("Q Learning - Restart Mode", new QLearningModule(true)),
                 ("Pathfinding Simulator", new PathfindingSimulatorModule()),
+                /*
                 ("Test Process", new TestProcessModule()),
+                */
                 ("Process qTable to human-readable", new QTableToReadableModule())
             });
 
@@ -37,7 +40,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules
     internal class QTableToReadableModule : IInternalRunnerModule
     {
         //private static string QTablePath = "E:\\_RepositoryE\\SMUBE\\Output\\JsonConfigs\\QTable\\";
-        private static string QTablePath = "E:\\_RepositoryE\\SMUBE\\Output\\logs\\QLearning\\2024_5_27_20_59-testAll";
+        private static string QTablePath = "F:\\ThesisStuff\\_AllLogs\\_Results";
         public Task Run()
         {
             while(!Directory.Exists(QTablePath))

@@ -23,6 +23,7 @@ namespace SMUBE.DataStructures.Units
             UnitIdentifier = sourceUnitData.UnitIdentifier;
             Name = sourceUnitData.Name;
             UnitStats = new UnitStats(sourceUnitData.UnitStats);
+            BattleScenePosition = sourceUnitData.BattleScenePosition.DeepCopy();
         }
 
         public UnitData DeepCopy()

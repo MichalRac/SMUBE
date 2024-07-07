@@ -112,6 +112,11 @@ namespace SMUBE.Commands.Args.ArgsPicker
             var startBattleScenePosition = BattleStateModel.ActiveUnit.UnitData.BattleScenePosition;
             var targetBattleScenePosition = BattleStateModel.BattleSceneState.Grid[targetPos.x, targetPos.y];
 
+            if (startBattleScenePosition.Coordinates.Equals(targetBattleScenePosition.Coordinates))
+            {
+                return true;
+            }
+
             var surrounding = BattleStateModel.BattleSceneState.PathfindingHandler.GetSurroundingPositions(BattleStateModel, targetBattleScenePosition);
             foreach (var surroundingPos in surrounding)
             {

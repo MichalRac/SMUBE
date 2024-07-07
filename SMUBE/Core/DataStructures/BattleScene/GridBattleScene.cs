@@ -1,6 +1,7 @@
 ﻿using SMUBE.DataStructures.Units;
 using SMUBE.DataStructures.Utils;
 using System.Collections.Generic;
+using SMUBE.Pathfinding;
 
 namespace SMUBE.DataStructures.BattleScene
 {
@@ -57,6 +58,27 @@ namespace SMUBE.DataStructures.BattleScene
             {
                 TryAddUnstable(unstableCellPs);
             }
+        }
+
+        private GridBattleScene(GridBattleScene sourceGridBattleScene)
+        {
+            Width = sourceGridBattleScene.Width;
+            Height = sourceGridBattleScene.Height;
+            _grid = new BattleScenePosition[Width, Height];
+            for (int i = 0; i < Width; i++)
+            {
+                for (int j = 0; j < Height; j++)
+                {
+                    Grid[i, j] = sourceGridBattleScene.Grid[i, j].DeepCopy();
+                }
+            }
+
+            PathfindingHandler = sourceGridBattleScene.PathfindingHandler.DeepCopy();
+        }
+
+        public GridBattleScene DeepCopy()
+        {
+            return new GridBattleScene(this);
         }
 
         public bool TryAddUnit(SMUBEVector2<int> pos, UnitIdentifier unitIdentifier)

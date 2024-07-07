@@ -1,14 +1,10 @@
-﻿using SMUBE.AI.DecisionTree;
-using SMUBE.Commands.SpecificCommands.BaseBlock;
+﻿using SMUBE.Commands.SpecificCommands.BaseBlock;
 using SMUBE.Commands.SpecificCommands.DefendAll;
 using SMUBE.Commands.SpecificCommands.HealAll;
 using SMUBE.Commands.SpecificCommands.HeavyAttack;
 using SMUBE.Units.CharacterTypes;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SMUBE.AI.Common;
 using SMUBE.Commands.SpecificCommands.BaseAttack;
 
 namespace SMUBE.AI.StateMachine
@@ -48,6 +44,28 @@ namespace SMUBE.AI.StateMachine
             blockState.InjectTransitions(new List<StateMachineTransition>() { blockToAttackTransition });
 
             return new StateMachineAIModel(attackState, true);
+        }
+        
+        public static StateMachineAIModel GetCompetentStateMachine()
+        {
+            var farAwayState = new SimpleWeightedSelectionSetState(SimpleWeightedCommandSelectionConfig.OnFarAwayActionSelection());
+            var closeState = new SimpleWeightedSelectionSetState(SimpleWeightedCommandSelectionConfig.OnInCombatActionSelection());
+            var hurtState = new SimpleWeightedSelectionSetState(SimpleWeightedCommandSelectionConfig.OnHurtActionSelection());
+            
+            var toHurtTransition = new StateMachineHealthThresholdTransition(hurtState, 0.25f, false);
+            var outOfHurtTransition = new StateMachineHealthThresholdTransition(hurtState, 0.25f, true);
+            var toCloseTransition = new StateMachineCanPerformTransition<BaseAttack>(closeState);
+            var toFarTransition = new StateMachineCanPerformTransition<BaseAttack>(farAwayState).AsNegated();
+
+            var hurtToCloseTransition = new StateMachineConjunctionTransition(closeState, outOfHurtTransition, toCloseTransition);
+            var hurtToFarTransition = new StateMachineConjunctionTransition(farAwayState, outOfHurtTransition, toFarTransition);
+            
+            
+            farAwayState.InjectTransitions(new List<StateMachineTransition>() { toHurtTransition, toCloseTransition });
+            closeState.InjectTransitions(new List<StateMachineTransition>() { toHurtTransition, toFarTransition });
+            hurtState.InjectTransitions(new List<StateMachineTransition>() { hurtToCloseTransition, hurtToFarTransition });
+
+            return new StateMachineAIModel(farAwayState, true);
         }
 
         public static StateMachineAIModel GetHunterStateMachine()
@@ -100,6 +118,5 @@ namespace SMUBE.AI.StateMachine
 
             return new StateMachineAIModel(attackState, false);
         }
-
     }
 }

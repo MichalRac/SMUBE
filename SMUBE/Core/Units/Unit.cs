@@ -44,7 +44,7 @@ namespace SMUBE.Units
         private Unit(Unit sourceUnit)
         {
             UnitData = sourceUnit.UnitData.DeepCopy();
-            UnitCommandProvider = sourceUnit.UnitCommandProvider;
+            UnitCommandProvider = sourceUnit.UnitCommandProvider.DeepCopy();
             AiModel = sourceUnit.AiModel;
             isDeepCopy = true;
         }

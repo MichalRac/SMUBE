@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator.Configurator;
+using SMUBE_Utils.Simulator.Utils;
 using SMUBE.AI.DecisionTree;
 using SMUBE.Core;
 
@@ -12,12 +14,23 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 {
     internal class DecisionTreeLearningModule : GameSimulatorModule
     {
+        private static string FinalJsonConfigPath = "E:\\_RepositoryE\\SMUBE\\Output\\JsonConfigs\\DT";
+        
+        /*
         private const int GENERATION_SIZE = 18;
         private const int GENERATIONS_TO_RUN = 250;
         private const int SIMULATIONS_PER_FITNESS_TEST = 2500;
         private const int IMMUNITY_RATE = 2;
         private const int ELITISM_RATE = 4;
         private const int RESSURECTION_RATE = 4;
+        */
+        
+        private const int GENERATION_SIZE = 10;
+        private const int GENERATIONS_TO_RUN = 250;
+        private const int SIMULATIONS_PER_FITNESS_TEST = 2500;
+        private const int IMMUNITY_RATE = 1;
+        private const int ELITISM_RATE = 3;
+        private const int RESSURECTION_RATE = 2;
         
         // thread groups per solution simulation set, preferably valid divisor for sims per fitness test
         private const int SUB_THREADING_RATE = 1;
@@ -32,11 +45,29 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
         private const float CHANCE_TO_RANDOMIZE_PARAMETER = 0.5f;
 
         private List<DecisionTreeDataSet> _solutions;
+        private readonly DTLearningFitnessMode _dtLearningFitnessMode;
+        private DecisionTreeDataSet _turnsSurvivedLearningOpponentDataSet;
+
+        public enum DTLearningFitnessMode
+        {
+            WinRate = 0,
+            TurnsSurvived = 1,
+        }
+
+        public DecisionTreeLearningModule(DTLearningFitnessMode dtLearningFitnessMode = DTLearningFitnessMode.WinRate)
+        {
+            _dtLearningFitnessMode = dtLearningFitnessMode;
+        }
         
         public override async Task Run()
         {
             SimulatorDebugData.EnsurePath();
             _solutions = InitializeFirstGeneration();
+
+            if (_dtLearningFitnessMode == DTLearningFitnessMode.TurnsSurvived)
+            {
+                _turnsSurvivedLearningOpponentDataSet = GetJsonDataSet();
+            }
 
             Console.WriteLine("Give an unique id for the run:");
             var learningRunId = Console.ReadLine(); 
@@ -51,7 +82,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
             (DecisionTreeDataSet best_solution, int fitness) bestSolutionTuple = (null, int.MinValue);
             List<string> allGenSummary = new List<string>();
-            allGenSummary.Add($"generation,best-fitness,avg-win-rate");
+            allGenSummary.Add($"generation,best-fitness,avg-fitness");
             
             int simulationsPerThread = SIMULATIONS_PER_FITNESS_TEST / SUB_THREADING_RATE;
 
@@ -69,8 +100,22 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                     var solutionId = solutionIndex;
                     var solution = _solutions[solutionId];
 
-                    var gameConfigurator = new DecisionTreeLearningConfigurator(
-                        () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetComplexDecisionTree(bc, solution)));
+                    DecisionTreeLearningConfigurator gameConfigurator;
+                    switch (_dtLearningFitnessMode)
+                    {
+                        case DTLearningFitnessMode.WinRate:
+                            gameConfigurator = new DecisionTreeLearningConfigurator(
+                                () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetComplexDecisionTree(bc, solution)));
+                            break;
+                        case DTLearningFitnessMode.TurnsSurvived:
+                            gameConfigurator = new DecisionTreeLearningConfigurator(
+                                () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetComplexDecisionTree(bc, solution)),
+                                    () => new DecisionTreeAIModel((bc) => DecisionTreeConfigs.GetComplexDecisionTree(bc, _turnsSurvivedLearningOpponentDataSet)));
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    
 
                     for (int subThreadId = 0; subThreadId < SUB_THREADING_RATE; subThreadId++)
                     {
@@ -151,7 +196,11 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 var selectionList = new List<(DecisionTreeDataSet simulationSolution, int fitness)>();
                 foreach (var solutionDebugResult in solutionDebugResults)
                 {
-                    selectionList.Add((_solutions[solutionDebugResult.Key], GetFitnessByWinRatio(solutionDebugResult.Value)));
+                    var fitness = _dtLearningFitnessMode == DTLearningFitnessMode.WinRate
+                        ? GetFitnessByWinRatio(solutionDebugResult.Value)
+                        : GetFitnessByTurnsSurvived(solutionDebugResult.Value);
+                    
+                    selectionList.Add((_solutions[solutionDebugResult.Key], fitness));
                 }
                 selectionList = selectionList.OrderByDescending(s => s.fitness).ToList();
 
@@ -166,7 +215,7 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
                 }
                 
                 var avgFitness = selectionList.Average(sol => sol.fitness);
-                allGenSummary.Add($"{generation},{genBestSolution.fitness},{avgFitness}");
+                allGenSummary.Add($"{generation},{(float)genBestSolution.fitness / 10_000},{avgFitness / 10_000}");
                 var genSummary = new List<string>(allGenSummary);
                 genSummary.Add("\n");
                 genSummary.Add($"Best Fitness {bestSolutionTuple.fitness} Serialized Config Set:");
@@ -330,6 +379,13 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
             
             return (int)(((float)simulationResult.team1WinCount / simulationResult.totalSimulationCount) * 10000 * turnAmountModifier);
         }
+        
+        private int GetFitnessByTurnsSurvived(SimulatorDebugData simulationResult)
+        {
+            var averageTurnsPerSimulation = (float)(simulationResult.teamOneActions + simulationResult.teamTwoActions) / simulationResult.totalSimulationCount;
+            
+            return (int)((averageTurnsPerSimulation) * 10000);
+        }
 
         private (DecisionTreeDataSet res1, DecisionTreeDataSet res2) SinglePointCrossover(DecisionTreeDataSet sol1, DecisionTreeDataSet sol2)
         {
@@ -387,6 +443,31 @@ namespace SMUBE_Utils.Simulator.InternalRunner.Modules.GameSimulator
 
             return _solutions;
         }
+        
+        private static DecisionTreeDataSet GetJsonDataSet()
+        {
+            while(!Directory.Exists(FinalJsonConfigPath))
+            {
+                Console.Clear();
+                Console.WriteLine("Path to configs not chosen! \n" +
+                                  "Input path where your DecisionTreeConfigs are, or enter \"Q\" to leave");
+                FinalJsonConfigPath = Console.ReadLine();
+            }
+
+            var files = Directory.GetFiles(FinalJsonConfigPath);
+            var choice = new List<(string msg, string path)>();
+            foreach (var file in files)
+            {
+                var filename = Path.GetFileName(file);
+                choice.Add((filename, file));
+            }
+            var result = GenericChoiceUtils.GetListChoice("choose config file to learn against", false, choice);
+
+            var fileContent = File.ReadAllText(result);
+            var config = JsonConvert.DeserializeObject<DecisionTreeDataSet>(fileContent);
+            return config;
+        }
+
 
         private DecisionTreeDataSet GenerateConditionalDecisionTreeDataSet()
         {

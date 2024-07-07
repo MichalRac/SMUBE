@@ -13,10 +13,18 @@ namespace SMUBE.AI.StateMachine
         public StateMachineState initialState;
         public StateMachineState currentState;
 
+        public bool IsCompetent { get; private set; }
+
         public StateMachineAIModel(StateMachineState initialState, bool useSimpleBehavior) : base(useSimpleBehavior)
         {
             this.initialState = initialState;
             currentState = initialState;
+        }
+
+        public StateMachineAIModel AsCompetent()
+        {
+            IsCompetent = true;
+            return this;
         }
 
         public void ResolveTransitions(BattleStateModel battleStateModel)
@@ -42,12 +50,12 @@ namespace SMUBE.AI.StateMachine
         {
             ResolveTransitions(battleStateModel);
 
-            return currentState.Command;
+            return currentState.GetCommand(battleStateModel);
         }
 
         public override CommandArgs GetCommandArgs(BaseCommand command, BattleStateModel battleStateModel, UnitIdentifier activeUnitIdentifier)
         {
-            return CommandArgsHelper.GetDumbCommandArgs(command, battleStateModel, activeUnitIdentifier);
+            return command.GetSuggestedPseudoRandomArgs(battleStateModel);
         }
     }
 }

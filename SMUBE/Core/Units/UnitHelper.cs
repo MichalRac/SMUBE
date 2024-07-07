@@ -41,9 +41,16 @@ namespace SMUBE.Units
 
             teamCounts[teamId] = teamCounts[teamId] + 1;
 
-            if(aiModel is StateMachineAIModel)
+            if(aiModel is StateMachineAIModel fsmAi)
             {
-                aiModel = StateMachineConfig.GetStateMachineForArchetype(newUnitStats.BaseCharacter, useSimpleBehavior);
+                if (fsmAi.IsCompetent)
+                {
+                    aiModel = StateMachineConfig.GetCompetentStateMachine();
+                }
+                else
+                {
+                    aiModel = StateMachineConfig.GetStateMachineForArchetype(newUnitStats.BaseCharacter, useSimpleBehavior);
+                }
             }
 
             return new Unit(newUnitName, newUnitIdentifier, newUnitStats, aiModel, useSimpleBehavior ? null : baseUnit.AvailableCommands);

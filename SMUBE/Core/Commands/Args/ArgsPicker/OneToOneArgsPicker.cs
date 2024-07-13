@@ -94,7 +94,33 @@ namespace SMUBE.Commands.Args.ArgsPicker
         {
             HandlePickerInput(1, 0);
         }
-        
+
+        public override bool IsTargetValid(SMUBEVector2<int> pos)
+        {
+            foreach (var potentialTarget in ValidTargets)
+            {
+                if (potentialTarget.Equals(pos) && ContainsValidTarget(pos))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public override void TargetPosition(SMUBEVector2<int> pos)
+        {
+            for (var index = 0; index < ValidTargets.Count; index++)
+            {
+                var potentialTarget = ValidTargets[index];
+                if (potentialTarget.Equals(pos) && ContainsValidTarget(pos))
+                {
+                    _currentTargetIndex = index;
+                    Submit();
+                    return;
+                }
+            }
+        }
+
         private void HandlePickerInput(int xDelta, int yDelta)
         {
             if (xDelta == 1 || yDelta == 1)

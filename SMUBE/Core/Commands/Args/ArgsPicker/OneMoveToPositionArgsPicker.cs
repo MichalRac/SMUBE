@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using SMUBE.BattleState;
 using SMUBE.BattleState.Heatmap.GeneralHeatmaps;
 using SMUBE.Commands._Common;
-using SMUBE.Commands.Effects;
 using SMUBE.DataStructures.BattleScene;
-using SMUBE.DataStructures.Units;
 using SMUBE.DataStructures.Utils;
 
 namespace SMUBE.Commands.Args.ArgsPicker
@@ -85,6 +82,15 @@ namespace SMUBE.Commands.Args.ArgsPicker
         {
             HandlePickerInput(1, 0);
         }
+        
+        public override void TargetPosition(SMUBEVector2<int> pos)
+        {
+            if (IsTargetValid(pos))
+            {
+                _currentTargetCoordinates = pos;
+                Submit();
+            }
+        }
 
         private void HandlePickerInput(int xDelta, int yDelta)
         {
@@ -95,7 +101,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
         private void TryMoveToOffset(int xDelta, int yDelta)
         {
             var targetPos = new SMUBEVector2<int>(_currentTargetCoordinates.x + xDelta, _currentTargetCoordinates.y + yDelta);
-            if (IsValidTarget(targetPos))
+            if (IsTargetValid(targetPos))
             {
                 _currentTargetCoordinates = targetPos;
             }
@@ -113,7 +119,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
                 : "Pick any empty reachable position";
         }
 
-        private bool IsValidTarget(SMUBEVector2<int> targetPos)
+        public override bool IsTargetValid(SMUBEVector2<int> targetPos)
         {
             if (targetPos.x < 0 || targetPos.x >= BattleStateModel.BattleSceneState.Width)
                 return false;

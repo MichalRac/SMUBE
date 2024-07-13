@@ -1,5 +1,6 @@
 ﻿using System;
 using SMUBE.BattleState;
+using SMUBE.DataStructures.Utils;
 
 namespace SMUBE.Commands.Args.ArgsPicker
 {
@@ -36,6 +37,16 @@ namespace SMUBE.Commands.Args.ArgsPicker
         public abstract void Left();
 
         public abstract void Right();
+
+        public virtual bool IsTargetValid(SMUBEVector2<int> _)
+        {
+            return true;
+        }
+
+        public virtual void TargetPosition(SMUBEVector2<int> _)
+        {
+            Submit();
+        }
 
         public abstract string GetPickerInfo();
 

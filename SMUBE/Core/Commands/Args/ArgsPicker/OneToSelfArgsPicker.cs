@@ -1,4 +1,5 @@
 ﻿using SMUBE.BattleState;
+using SMUBE.DataStructures.Utils;
 
 namespace SMUBE.Commands.Args.ArgsPicker
 {
@@ -51,7 +52,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
         public override void Right()
         {
         }
-
+        
         public override string GetPickerInfo()
         {
             return "Confirm or cancel command on self";

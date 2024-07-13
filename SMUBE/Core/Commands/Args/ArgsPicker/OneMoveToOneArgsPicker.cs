@@ -161,6 +161,69 @@ namespace SMUBE.Commands.Args.ArgsPicker
             HandlePickerInput(1, 0);
         }
 
+        public override bool IsTargetValid(SMUBEVector2<int> pos)
+        {
+            switch (_currentStage)
+            {
+                case Stage.ChooseTargetUnit:
+                    foreach (var coordinates in ValidTargets)
+                    {
+                        if (pos.Equals(coordinates))
+                        {
+                            return true;
+                        }
+                    }
+                    break;
+                case Stage.ChooseMoveSpot:
+                    foreach (var coordinates in ValidMoveTargets)
+                    {
+                        if (pos.Equals(coordinates))
+                        {
+                            return true;
+                        }
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return false;
+        }
+
+        public override void TargetPosition(SMUBEVector2<int> pos)
+        {
+            switch (_currentStage)
+            {
+                case Stage.ChooseTargetUnit:
+                    for (int index = 0; index < ValidTargets.Count; index++)
+                    {
+                        var coordinates = ValidTargets[index];
+                        if (pos.Equals(coordinates))
+                        {
+                            _currentTargetIndex = index;
+                            Submit();
+                            return;
+                        }
+                    }
+                    break;
+                case Stage.ChooseMoveSpot:
+                    for (int index = 0; index < ValidMoveTargets.Count; index++)
+                    {
+                        var coordinates = ValidMoveTargets[index];
+                        if (pos.Equals(coordinates))
+                        {
+                            _currentMoveIndex = index;
+                            Submit();
+                            return;
+                        }
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            ArgsUpdated?.Invoke(GetCommandArgs());
+        }
+
         private void HandlePickerInput(int xDelta, int yDelta)
         {
             switch (_currentStage)

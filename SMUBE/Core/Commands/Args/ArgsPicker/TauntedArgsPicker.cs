@@ -81,7 +81,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
         public override void Right()
         {
         }
-
+        
         public override string GetPickerInfo()
         {
             return "Pick target";

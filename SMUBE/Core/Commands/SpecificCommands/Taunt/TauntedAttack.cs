@@ -8,6 +8,7 @@ using SMUBE.Commands.Args.ArgsValidators;
 using SMUBE.Commands.Effects;
 using SMUBE.Commands.Results;
 using SMUBE.DataStructures.BattleScene;
+using SMUBE.DataStructures.Utils;
 
 namespace SMUBE.Commands.SpecificCommands.Taunt
 {
@@ -17,6 +18,8 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
         public override int ManaCost => SpecificCommandCostConfiguration.Mana_TauntedAttack;
         public override CommandId CommandId => CommandId.TauntedAttack;
         public override BaseCommandArgsValidator CommandArgsValidator => new TauntedAttackArgsValidator();
+
+        private CommandResults _commandResultsCache;
         
         internal override CommandArgs GetSuggestedPseudoRandomArgs(BattleStateModel battleStateModel)
         {
@@ -35,6 +38,8 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
         
         public override bool TryExecute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
+            _commandResultsCache = null;
+            
             if (!base.TryExecute(battleStateModel, commandArgs))
             {
                 return false;
@@ -64,8 +69,24 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
                     {
                         if (pathCost < smallestPathCost)
                         {
+                            var path = new List<SMUBEVector2<int>>();
+                            var activeUnitPaths = battleStateModel.BattleSceneState.PathfindingHandler.GetAllPathCacheSetsForUnit(battleStateModel, activeUnit.UnitData.UnitIdentifier);
+                            var shortestKnownPath = activeUnitPaths.Data[surroundingPosition.Coordinates.x, surroundingPosition.Coordinates.y].ShortestKnownPath;
+                            var activeUnitReachablePaths = battleStateModel.BattleSceneState.PathfindingHandler.GetAllReachablePathCacheSetsForUnit(battleStateModel, activeUnit.UnitData.UnitIdentifier);
+                            foreach (var pos in shortestKnownPath)
+                            {
+                                if (activeUnitReachablePaths.Data[pos.Coordinates.x, pos.Coordinates.y] != null)
+                                {
+                                    path.Add(pos.Coordinates);
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            
                             smallestPathCost = pathCost;
-                            var positionDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, activeUnit.UnitData.BattleScenePosition.Coordinates, lastReachable.Coordinates);
+                            var positionDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, activeUnit.UnitData.BattleScenePosition.Coordinates, lastReachable.Coordinates, path);
                             commandArgs.PositionDelta = positionDelta;
                             anyPathFound = true;
                         }
@@ -80,7 +101,23 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
             }
             else if(optimalMove != null)
             {
-                var positionDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, activeUnit.UnitData.BattleScenePosition.Coordinates, optimalMove.Coordinates);
+                var path = new List<SMUBEVector2<int>>();
+                var activeUnitPaths = battleStateModel.BattleSceneState.PathfindingHandler.GetAllPathCacheSetsForUnit(battleStateModel, activeUnit.UnitData.UnitIdentifier);
+                var shortestKnownPath = activeUnitPaths.Data[optimalMove.Coordinates.x, optimalMove.Coordinates.y].ShortestKnownPath;
+                var activeUnitReachablePaths = battleStateModel.BattleSceneState.PathfindingHandler.GetAllReachablePathCacheSetsForUnit(battleStateModel, activeUnit.UnitData.UnitIdentifier);
+                foreach (var pos in shortestKnownPath)
+                {
+                    if (activeUnitReachablePaths.Data[pos.Coordinates.x, pos.Coordinates.y] != null)
+                    {
+                        path.Add(pos.Coordinates);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                
+                var positionDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, activeUnit.UnitData.BattleScenePosition.Coordinates, optimalMove.Coordinates, path);
                 commandArgs.PositionDelta = positionDelta;
             }
 
@@ -104,6 +141,11 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
 
         public override CommandResults GetCommandResults(CommandArgs commandArgs)
         {
+            if (_commandResultsCache != null)
+            {
+                return _commandResultsCache;
+            }
+            
             var commandResults = new CommandResults();
             
             commandResults.performer = commandArgs.ActiveUnit;
@@ -117,6 +159,8 @@ namespace SMUBE.Commands.SpecificCommands.Taunt
             }
             
             commandResults.PositionDeltas = new List<PositionDelta>() { commandArgs.PositionDelta };
+            _commandResultsCache = commandResults;
+            
             return commandResults;
         }
 

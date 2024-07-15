@@ -97,7 +97,9 @@ namespace SMUBE.DataStructures.BattleScene
         
         public bool IsSpecial()
         {
-            return ContentType == BattleScenePositionContentType.Defensive || ContentType == BattleScenePositionContentType.Unstable;
+            return ContentType == BattleScenePositionContentType.Defensive 
+                   || ContentType == BattleScenePositionContentType.Unstable 
+                   || ContentType == BattleScenePositionContentType.DefensiveTimed;
         }
 
         public void Clear()

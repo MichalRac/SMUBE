@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SMUBE.BattleState;
 using SMUBE.BattleState.Heatmap.GeneralHeatmaps;
@@ -58,8 +59,22 @@ namespace SMUBE.Commands.Args.ArgsPicker
         public override CommandArgs GetCommandArgs()
         {
             var activeUnit = BattleStateModel.ActiveUnit;
+            
+            var target = _currentTargetCoordinates;
+            var path = new List<SMUBEVector2<int>>();
+
+            if (!IsPathless)
+            {
+                var activeUnitPaths = BattleStateModel.BattleSceneState.PathfindingHandler.GetAllReachablePathCacheSetsForUnit(BattleStateModel, activeUnit.UnitData.UnitIdentifier);
+                var shortestKnownPath = activeUnitPaths.Data[target.x, target.y].ShortestKnownPath;
+                foreach (var pos in shortestKnownPath)
+                {
+                    path.Add(pos.Coordinates);
+                }
+            }
+            
             var positionDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, 
-                activeUnit.UnitData.BattleScenePosition.Coordinates, _currentTargetCoordinates, IsPathless);
+                activeUnit.UnitData.BattleScenePosition.Coordinates, _currentTargetCoordinates, path, IsPathless);
             return new CommonArgs(activeUnit.UnitData, null, BattleStateModel, positionDelta);
         }
 
@@ -186,8 +201,19 @@ namespace SMUBE.Commands.Args.ArgsPicker
                 return null;
             
             var target = reachablePositions.GetRandom();
+
+            var path = new List<SMUBEVector2<int>>();
+            if (!IsPathless)
+            {
+                var activeUnitPaths = BattleStateModel.BattleSceneState.PathfindingHandler.GetAllReachablePathCacheSetsForUnit(BattleStateModel, unit.UnitData.UnitIdentifier);
+                var shortestKnownPath = activeUnitPaths.Data[target.TargetPosition.Coordinates.x, target.TargetPosition.Coordinates.y].ShortestKnownPath;
+                foreach (var pos in shortestKnownPath)
+                {
+                    path.Add(pos.Coordinates);
+                }
+            }
             
-            var positionDelta = new PositionDelta(unit.UnitData.UnitIdentifier, unit.UnitData.BattleScenePosition.Coordinates, target.TargetPosition.Coordinates);
+            var positionDelta = new PositionDelta(unit.UnitData.UnitIdentifier, unit.UnitData.BattleScenePosition.Coordinates, target.TargetPosition.Coordinates, path);
             var result = new CommonArgs(unit.UnitData, null, BattleStateModel, positionDelta);
             result.DebugSource = $"{nameof(OneMoveToPositionArgsPicker)}:{nameof(GetAnyStrategy)}";
             return result;
@@ -228,18 +254,28 @@ namespace SMUBE.Commands.Args.ArgsPicker
                     if (potentialRisk >= minRisk) continue;
                     
                     minRisk = potentialRisk;
+                    
+                    var path = new List<SMUBEVector2<int>>();
+                    if (!IsPathless)
+                    {
+                        var shortestKnownPath = validPath.ShortestKnownPath;
+                        foreach (var pos in shortestKnownPath)
+                        {
+                            path.Add(pos.Coordinates);
+                        }
+                    }
 
                     if (turnsRequired == 1)
                     {
                         optimalPositionDelta = new PositionDelta(unit.UnitData.UnitIdentifier, 
-                            unit.UnitData.BattleScenePosition.Coordinates, targetCoordinates);
+                            unit.UnitData.BattleScenePosition.Coordinates, targetCoordinates, path);
                     }
                     else
                     {
                         BattleStateModel.BattleSceneState.PathfindingHandler
                             .GetLastReachableOnPath(BattleStateModel, validPath.TargetPosition, out var lastReachable, out _);
                         optimalPositionDelta = new PositionDelta(unit.UnitData.UnitIdentifier, 
-                            unit.UnitData.BattleScenePosition.Coordinates, lastReachable.Coordinates);
+                            unit.UnitData.BattleScenePosition.Coordinates, lastReachable.Coordinates, path);
                     }
                 }
             }
@@ -293,9 +329,19 @@ namespace SMUBE.Commands.Args.ArgsPicker
 
                 if (distance < minDistance)
                 {
+                    var path = new List<SMUBEVector2<int>>();
+                    if (!IsPathless)
+                    {
+                        var shortestKnownPath = validPath.ShortestKnownPath;
+                        foreach (var pos in shortestKnownPath)
+                        {
+                            path.Add(pos.Coordinates);
+                        }
+                    }
+                    
                     minDistance = distance;
                     optimalPositionDelta = new PositionDelta(unit.UnitData.UnitIdentifier, 
-                        unit.UnitData.BattleScenePosition.Coordinates, targetCoordinates);
+                        unit.UnitData.BattleScenePosition.Coordinates, targetCoordinates, path);
                 }
             }
             
@@ -344,13 +390,33 @@ namespace SMUBE.Commands.Args.ArgsPicker
                     var speed = activeUnit.UnitData.UnitStats.Speed;
                     var stepsRequired = BattleStateModel.BattleSceneState.PathfindingHandler.GetRequiredMovementTurns(closestReachableSurroundingPosition, speed);
 
+                    var path = new List<SMUBEVector2<int>>();
+                    if (!IsPathless)
+                    {
+                        var activeUnitPaths = BattleStateModel.BattleSceneState.PathfindingHandler.GetAllPathCacheSetsForUnit(BattleStateModel, activeUnit.UnitData.UnitIdentifier);
+                        var target = closestReachableSurroundingPosition.TargetPosition.Coordinates;
+                        var shortestKnownPath = activeUnitPaths.Data[target.x, target.y].ShortestKnownPath;
+                        var activeUnitReachablePaths = BattleStateModel.BattleSceneState.PathfindingHandler.GetAllReachablePathCacheSetsForUnit(BattleStateModel, activeUnit.UnitData.UnitIdentifier);
+                        foreach (var pos in shortestKnownPath)
+                        {
+                            if (activeUnitReachablePaths.Data[pos.Coordinates.x, pos.Coordinates.y] != null)
+                            {
+                                path.Add(pos.Coordinates);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    
                     if (stepsRequired > 1)
                     {
                         BattleStateModel.BattleSceneState.PathfindingHandler.GetLastReachableOnPath(BattleStateModel,
                             closestReachableSurroundingPosition.TargetPosition, out var lastReachable, out _);
                         var posDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, 
                             activeUnit.UnitData.BattleScenePosition.Coordinates, 
-                            lastReachable.Coordinates);
+                            lastReachable.Coordinates, path);
                         var args = new CommonArgs(activeUnit.UnitData, null, BattleStateModel, posDelta);
                         minDistanceArgs = args;
                     }
@@ -358,7 +424,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
                     {
                         var posDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, 
                             activeUnit.UnitData.BattleScenePosition.Coordinates, 
-                            closestReachableSurroundingPosition.TargetPosition.Coordinates);
+                            closestReachableSurroundingPosition.TargetPosition.Coordinates, path);
                         var args = new CommonArgs(activeUnit.UnitData, null, BattleStateModel, posDelta);
                         minDistanceArgs = args;
                     }
@@ -461,13 +527,23 @@ namespace SMUBE.Commands.Args.ArgsPicker
             foreach (var potentialTargetPosition in validPaths)
             {
                 var positionScore = GetPositionContentTypeScore(potentialTargetPosition.TargetPosition.ContentType);
+                
+                var path = new List<SMUBEVector2<int>>();
+                if (!IsPathless)
+                {
+                    var shortestKnownPath = potentialTargetPosition.ShortestKnownPath;
+                    foreach (var pos in shortestKnownPath)
+                    {
+                        path.Add(pos.Coordinates);
+                    }
+                }
 
                 if (minimize)
                 {
                     if (positionScore < worstScore)
                     {
                         worstScore = positionScore;
-                        var posDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, activeUnit.UnitData.BattleScenePosition.Coordinates, potentialTargetPosition.TargetPosition.Coordinates);
+                        var posDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, activeUnit.UnitData.BattleScenePosition.Coordinates, potentialTargetPosition.TargetPosition.Coordinates, path);
                         optimalArgs = new CommonArgs(activeUnit.UnitData, null, BattleStateModel, posDelta);
                     }
                 }
@@ -476,7 +552,7 @@ namespace SMUBE.Commands.Args.ArgsPicker
                     if (positionScore > bestScore)
                     {
                         bestScore = positionScore;
-                        var posDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, activeUnit.UnitData.BattleScenePosition.Coordinates, potentialTargetPosition.TargetPosition.Coordinates);
+                        var posDelta = new PositionDelta(activeUnit.UnitData.UnitIdentifier, activeUnit.UnitData.BattleScenePosition.Coordinates, potentialTargetPosition.TargetPosition.Coordinates, path);
                         optimalArgs = new CommonArgs(activeUnit.UnitData, null, BattleStateModel, posDelta);
                     }
                 }

@@ -246,7 +246,17 @@ namespace SMUBE.Commands.Args
 
                         reachableSurrounding.Shuffle();
 
-                        var posDelta = new PositionDelta(activeUnitIdentifier, unit.UnitData.BattleScenePosition.Coordinates, reachableSurrounding.First().Coordinates);
+                        var target = reachableSurrounding.First().Coordinates;
+                        
+                        var path = new List<SMUBEVector2<int>>();
+                        var activeUnitPaths = battleStateModel.BattleSceneState.PathfindingHandler.GetAllReachablePathCacheSetsForUnit(battleStateModel, unit.UnitData.UnitIdentifier);
+                        var shortestKnownPath = activeUnitPaths.Data[target.x, target.y].ShortestKnownPath;
+                        foreach (var pos in shortestKnownPath)
+                        {
+                            path.Add(pos.Coordinates);
+                        }
+
+                        var posDelta = new PositionDelta(activeUnitIdentifier, unit.UnitData.BattleScenePosition.Coordinates, target, path);
                         var args = new CommonArgs(unit.UnitData, new List<UnitData>() { validTarget.UnitData }, battleStateModel, posDelta);
 
                         return args;
@@ -264,8 +274,16 @@ namespace SMUBE.Commands.Args
                     if (reachablePositions.Count == 0)
                         return null;
                     
-                    var target = reachablePositions.GetRandom();
-                    var positionDelta = new PositionDelta(unit.UnitData.UnitIdentifier, unit.UnitData.BattleScenePosition.Coordinates, target.TargetPosition.Coordinates);
+                    var targetPath = reachablePositions.GetRandom();
+                        
+                    var path = new List<SMUBEVector2<int>>();
+                    foreach (var pos in targetPath.ShortestKnownPath)
+                    {
+                        path.Add(pos.Coordinates);
+                    }
+
+                    
+                    var positionDelta = new PositionDelta(unit.UnitData.UnitIdentifier, unit.UnitData.BattleScenePosition.Coordinates, targetPath.TargetPosition.Coordinates, path);
                     return new CommonArgs(unit.UnitData, null, battleStateModel, positionDelta);
                 }
                 return null;

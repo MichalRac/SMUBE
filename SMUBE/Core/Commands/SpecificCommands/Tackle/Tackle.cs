@@ -19,8 +19,12 @@ namespace SMUBE.Commands.SpecificCommands.Tackle
         public override CommandId CommandId => CommandId.Tackle;
         public override BaseCommandArgsValidator CommandArgsValidator => new OneMoveToOneArgsValidator(ArgsConstraint.OtherUnit);
 
+        public CommandResults ResultsCache;
+
         public override bool TryExecute(BattleStateModel battleStateModel, CommandArgs commandArgs)
         {
+            ResultsCache = null;
+            
             if (!base.TryExecute(battleStateModel, commandArgs))
             {
                 return false;
@@ -37,7 +41,7 @@ namespace SMUBE.Commands.SpecificCommands.Tackle
             
             TryUseCommand(commandArgs, activeUnit);
 
-            var commandResults = GetCommandResults(commandArgs);
+            ResultsCache = GetCommandResults(commandArgs);
             
             var startPos = commandArgs.BattleStateModel.BattleSceneState
                 .Grid[activeUnit.UnitData.BattleScenePosition.Coordinates.x, activeUnit.UnitData.BattleScenePosition.Coordinates.y];
@@ -52,23 +56,29 @@ namespace SMUBE.Commands.SpecificCommands.Tackle
                 battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((targetCoords, false));
             }
             
-            if (commandResults.PositionDeltas.Count == 2)
+            if (ResultsCache.PositionDeltas.Count == 2)
             {
                 battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((targetUnit.UnitData.BattleScenePosition.Coordinates, true));
                 targetUnit.UnitData.BattleScenePosition.Clear();
-                var targetMoveCoords = commandResults.PositionDeltas[1].Target;
+                var targetMoveCoords = ResultsCache.PositionDeltas[1].Target;
                 var targetMovePosition = commandArgs.BattleStateModel.BattleSceneState.Grid[targetMoveCoords.x, targetMoveCoords.y];
                 targetUnit.UnitData.BattleScenePosition = targetMovePosition;
                 targetUnit.UnitData.BattleScenePosition.ApplyUnit(targetUnit.UnitData.UnitIdentifier);;
                 battleStateModel.BattleSceneState.PathfindingHandler.AggregatedDirtyPositionCache.Add((targetMoveCoords, false));
             }
-            targetUnit.UnitData.UnitStats.AffectByAbility(GetCommandResults(commandArgs));
+            targetUnit.UnitData.UnitStats.AffectByAbility(ResultsCache);
             
             return true;
         }
 
+        // todo the calculation of target position delta can potentially change it this is called multiple times
         public override CommandResults GetCommandResults(CommandArgs commandArgs)
         {
+            if (ResultsCache != null)
+            {
+                return ResultsCache;
+            }
+            
             var results = new CommandResults { performer = commandArgs.ActiveUnit };
 
             var target = commandArgs.TargetUnits.First();
@@ -89,7 +99,12 @@ namespace SMUBE.Commands.SpecificCommands.Tackle
                 && commandArgs.BattleStateModel.BattleSceneState.IsEmpty(potentialTargetMoveCoordinates);
             if (canMove)
             {
-                positionDeltas.Add(new PositionDelta(target.UnitIdentifier, targetUnitPos, potentialTargetMoveCoordinates));
+                var path = new List<SMUBEVector2<int>>()
+                {
+                    targetUnitPos, potentialTargetMoveCoordinates,
+                };
+                
+                positionDeltas.Add(new PositionDelta(target.UnitIdentifier, targetUnitPos, potentialTargetMoveCoordinates, path));
             }
             
             results.PositionDeltas = positionDeltas;
